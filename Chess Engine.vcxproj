@@ -165,6 +165,18 @@
     <ClCompile Include="Play.cpp" />
     <ClCompile Include="Queen.cpp" />
     <ClCompile Include="Rook.cpp" />
+    <ClCompile Include="src\Bishop.cpp" />
+    <ClCompile Include="src\Bitboard.cpp" />
+    <ClCompile Include="src\ChessBoard.cpp" />
+    <ClCompile Include="src\ChessPiece.cpp" />
+    <ClCompile Include="src\Functions.cpp" />
+    <ClCompile Include="src\King.cpp" />
+    <ClCompile Include="src\Knight.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Pawn.cpp" />
+    <ClCompile Include="src\Play.cpp" />
+    <ClCompile Include="src\Queen.cpp" />
+    <ClCompile Include="src\Rook.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="x64\Debug\Chess Engine.exe.recipe" />
@@ -209,6 +221,17 @@
     <ClInclude Include="Play.h" />
     <ClInclude Include="Queen.h" />
     <ClInclude Include="Rook.h" />
+    <ClInclude Include="src\Bishop.h" />
+    <ClInclude Include="src\Bitboard.h" />
+    <ClInclude Include="src\ChessBoard.h" />
+    <ClInclude Include="src\ChessPiece.h" />
+    <ClInclude Include="src\Functions.h" />
+    <ClInclude Include="src\King.h" />
+    <ClInclude Include="src\Knight.h" />
+    <ClInclude Include="src\Pawn.h" />
+    <ClInclude Include="src\Play.h" />
+    <ClInclude Include="src\Queen.h" />
+    <ClInclude Include="src\Rook.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
