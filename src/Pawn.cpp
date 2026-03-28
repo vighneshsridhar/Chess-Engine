@@ -22,7 +22,7 @@ namespace ChessGame {
 		
 		if (pawn.getColor() == "WHITE") {
 			
-			if (chessBoard[r - 1][c].getPieceType() == "EMPTY_SQUARE") {
+			if (r > 0 && chessBoard[r - 1][c].getPieceType() == "EMPTY_SQUARE") {
 				y = Functions::convertToPosition(r - 1, c);
 				moves.push_back(std::make_pair(position, y));
 
@@ -32,12 +32,12 @@ namespace ChessGame {
 				}
 			}
 
-			if (c - 1 >= 0 && chessBoard[r - 1][c - 1].getColor() == "BLACK") {
+			if (r > 0 && c - 1 >= 0 && chessBoard[r - 1][c - 1].getColor() == "BLACK") {
 				y = Functions::convertToPosition(r - 1, c - 1);
 				moves.push_back(std::make_pair(position, y));
 			}
 
-			if (r - 1 >= 0 && c + 1 < boardSize && chessBoard[r - 1][c + 1].getColor() == "BLACK") {
+			if (r > 0 && c + 1 < boardSize && chessBoard[r - 1][c + 1].getColor() == "BLACK") {
 				y = Functions::convertToPosition(r - 1, c + 1);
 				moves.push_back(std::make_pair(position, y));
 			}
@@ -45,7 +45,7 @@ namespace ChessGame {
 
 		if (pawn.getColor() == "BLACK") {
 
-			if (chessBoard[r + 1][c].getPieceType() == "EMPTY_SQUARE") {
+			if (r < 7 && chessBoard[r + 1][c].getPieceType() == "EMPTY_SQUARE") {
 				y = Functions::convertToPosition(r + 1, c);
 				moves.push_back(std::make_pair(position, y));
 
@@ -55,12 +55,12 @@ namespace ChessGame {
 				}
 			}
 
-			if (c - 1 >= 0 && chessBoard[r + 1][c - 1].getColor() == "WHITE") {
+			if (r < 7 && c - 1 >= 0 && chessBoard[r + 1][c - 1].getColor() == "WHITE") {
 				y = Functions::convertToPosition(r + 1, c - 1);
 				moves.push_back(std::make_pair(position, y));
 			}
 
-			if (c + 1 < boardSize && chessBoard[r + 1][c + 1].getColor() == "WHITE") {
+			if (r < 7 && c + 1 < boardSize && chessBoard[r + 1][c + 1].getColor() == "WHITE") {
 				y = Functions::convertToPosition(r + 1, c + 1);
 				moves.push_back(std::make_pair(position, y));
 			}

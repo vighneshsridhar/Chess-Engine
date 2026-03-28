@@ -5,6 +5,7 @@
 #include "ChessBoard.h"
 #include "ChessPiece.h"
 #include "Functions.h"
+#include "PromotionClicker.h"
 
 namespace ChessGame {
 
@@ -12,7 +13,11 @@ namespace ChessGame {
 	public:
 		Play();
 		void playGame();
+
+	private:
+		int boardSize;
 	};
+
 }
 
 #endif

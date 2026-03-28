@@ -21,6 +21,8 @@ namespace ChessGame {
 		std::vector<std::pair<sf::Vector2f, sf::Vector2f>> getPieceMoves(ChessPiece piece);
 		std::pair<int, int> getKingPosition();
 		void setKingPosition(std::pair<int, int> coordinates);
+		bool isCheckmate(std::vector<std::pair<sf::Vector2f, sf::Vector2f>> legalMoves);
+		bool isStalemate(std::vector<std::pair<sf::Vector2f, sf::Vector2f>> legalMoves);
 
 	private:
 		int boardSize;

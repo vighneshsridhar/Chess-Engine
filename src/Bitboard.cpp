@@ -36,7 +36,8 @@ namespace ChessGame {
 				square1 = r1 * 8 + c1;
 				long long mask = (static_cast<long long>(1) << (numSquares - 1 - square1));
 
-				if (chessBoard[r1][c1].getPieceType() != "PAWN" || (b.getTurn() && chessBoard[r1][c1].getColor() != "WHITE") || (!b.getTurn() && chessBoard[r1][c1].getColor() != "BLACK")) {
+				if (chessBoard[r1][c1].getPieceType() != "PAWN" || (b.getTurn() && chessBoard[r1][c1].getColor() != "WHITE") || 
+					(!b.getTurn() && chessBoard[r1][c1].getColor() != "BLACK") || r1 == 0 || r1 == 7) {
 					continue;
 				}
 

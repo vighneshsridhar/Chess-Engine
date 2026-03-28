@@ -2,6 +2,7 @@
 #include <string>
 #include <utility>
 #include <cstdlib>
+#include <cmath>
 #include <iostream>
 #include <filesystem> // Requires C++17 or later
 #include <windows.h>
@@ -12,23 +13,23 @@
 #include "ChessPiece.h"
 #include "Functions.h"
 #include "Bitboard.h"
+#include "PromotionClicker.h"
 #include <bitset>
 
 
 namespace ChessGame {
 
     Play::Play() {
-
+        boardSize = 8;
     };
 
     void Play::playGame() {
         sf::RenderWindow window(sf::VideoMode({ 800, 800 }), "Chess Board with Pieces!");
         auto windowSize = window.getSize();
         float squareSize = std::min(windowSize.x, windowSize.y) / 8.f;
-        int boardSize = 8;
-        bool lightSquare = true;
 
         bool isDragging = false;
+        bool didPromote = false;
         sf::Vector2f dragOffset;
         sf::Vector2f mousePosition;
         sf::Vector2f a = { 20.f, 20.f };
@@ -85,6 +86,8 @@ namespace ChessGame {
         sf::Sprite transparentSprite(textures["WHITE_PAWN"]);
         transparentSprite.setColor({ 0, 255, 0, 255 });
         std::vector<std::vector<sf::Sprite>> spritesBoard(boardSize, std::vector<sf::Sprite>(boardSize, transparentSprite));
+        std::vector<std::vector<sf::Sprite>> promotionSprites = { { whiteQueenSprite, whiteRookSprite, whiteBishopSprite, whiteKnightSprite },
+            { blackQueenSprite, blackRookSprite, blackBishopSprite, blackKnightSprite } };
 
         for (int c = 0; c < boardSize; c++) {
             spritesBoard[1][c] = blackPawnSprite;
@@ -93,6 +96,8 @@ namespace ChessGame {
         spritesBoard[0] = { blackRookSprite, blackKnightSprite, blackBishopSprite, blackQueenSprite, blackKingSprite, blackBishopSprite, blackKnightSprite, blackRookSprite };
         spritesBoard[7] = { whiteRookSprite, whiteKnightSprite, whiteBishopSprite, whiteQueenSprite, whiteKingSprite, whiteBishopSprite, whiteKnightSprite, whiteRookSprite };
 
+        PromotionClicker p;
+
         int initial_r = 0;
         int initial_c = 0;
         int r;
@@ -100,16 +105,6 @@ namespace ChessGame {
         float x;
         float y;
         std::vector<std::pair<sf::Vector2f, sf::Vector2f>> legalMoves = b.getLegalMoves();
-
-        // Bitboard bb(b);
-        // std::vector<long long> z = bb.getBitboard();
-
-        /* for (int x = 0; x < z.size(); x++) {
-            std::uint64_t u_value = static_cast<std::uint64_t>(z[x]);
-
-            // Create a bitset of 64 bits and print it directly
-            std::cout << "x = " << x << " and Binary representation : " << std::bitset<64>(u_value) << std::endl;
-        } */
 
         while (window.isOpen()) {
 
@@ -127,14 +122,6 @@ namespace ChessGame {
                         initial_c = int(mousePosition.x / squareSize);
                         x = squareSize * initial_c;
                         y = squareSize * initial_r;
-
-                        if (!isDragging) {
-                            ChessGame::ChessPiece piece = chessBoard[initial_r][initial_c];
-
-                            if (piece.getPieceType() == "EMPTY_SQUARE") {
-                                break;
-                            }
-                        }
                         isDragging = true;
                         dragOffset.x = mousePosition.x - spritesBoard[initial_r][initial_c].getPosition().x;
                         dragOffset.y = mousePosition.y - spritesBoard[initial_r][initial_c].getPosition().y;
@@ -145,7 +132,10 @@ namespace ChessGame {
 
                     if (isDragging) {
                         isDragging = false;
-                        sf::Vector2f spritePosition = spritesBoard[initial_r][initial_c].getPosition();
+                        didPromote = false;
+                        sf::Sprite initialSprite = spritesBoard[initial_r][initial_c];
+                        sf::Vector2f spritePosition = initialSprite.getPosition();
+                        ChessPiece initialPiece = chessBoard[initial_r][initial_c];
                         r = std::round(spritePosition.y / squareSize);
                         c = std::round(spritePosition.x / squareSize);
                         square1 = Functions::convertToPosition(initial_r, initial_c);
@@ -153,22 +143,51 @@ namespace ChessGame {
                         std::pair<sf::Vector2f, sf::Vector2f> move = std::make_pair(square1, square2);
 
                         if (std::find(legalMoves.begin(), legalMoves.end(), move) != legalMoves.end()) {
-                            chessBoard[r][c] = chessBoard[initial_r][initial_c];
-                            chessBoard[r][c].setPosition(sf::Vector2f(square2.x, square2.y));
-                            spritesBoard[r][c] = spritesBoard[initial_r][initial_c];
-                            spritesBoard[r][c].setPosition(sf::Vector2f(square2.x, square2.y));
 
-                            if (chessBoard[initial_r][initial_c].getPieceType() == "KING") {
+                            if (initialPiece.getPieceType() == "PAWN" && (r == 0 || r == 7)) {
+                                int j;
+
+                                if (initialPiece.getColor() == "WHITE") {
+                                    j = 0;
+                                }
+
+                                else {
+                                    j = 1;
+                                }
+                                chessBoard[initial_r][initial_c] = empty;
+                                auto [i, didPromote] = p.promotePawn(window, chessBoard, initialPiece, spritesBoard, promotionSprites[j], 
+                                    square2);
+
+                                if (didPromote) {
+                                    spritesBoard[r][c] = promotionSprites[j][i];
+                                    spritesBoard[r][c].setPosition(square2);
+                                }
+
+                                else {
+                                    chessBoard[initial_r][initial_c] = initialPiece;
+                                    chessBoard[initial_r][initial_c].setPosition(square1);
+                                    continue;
+                                }
+                            }
+
+                            else {
+                                chessBoard[r][c] = chessBoard[initial_r][initial_c];
+                                chessBoard[r][c].setPosition(square2);
+                                spritesBoard[r][c] = spritesBoard[initial_r][initial_c];
+                                spritesBoard[r][c].setPosition(square2);
+                            }
+                            
+                            
+                            if (initialPiece.getPieceType() == "KING") {
                                 b.setKingPosition(std::make_pair(r, c));
 
                                 if (c - initial_c == 2) {
-                                    std::cout << "king side castling" << std::endl;
                                     square3 = Functions::convertToPosition(r, 5);
                                     chessBoard[r][5] = chessBoard[r][7];
                                     chessBoard[r][5].setPosition(square3);
                                     chessBoard[r][7] = empty;
                                     spritesBoard[r][5] = spritesBoard[r][7];
-                                    spritesBoard[r][5].setPosition(sf::Vector2f(square3.x, square3.y));
+                                    spritesBoard[r][5].setPosition(square3);
                                     spritesBoard[r][7] = transparentSprite;
                                 }
 
@@ -178,7 +197,7 @@ namespace ChessGame {
                                     chessBoard[r][3].setPosition(square3);
                                     chessBoard[r][0] = empty;
                                     spritesBoard[r][3] = spritesBoard[r][0];
-                                    spritesBoard[r][3].setPosition(sf::Vector2(square3.x, square3.y));
+                                    spritesBoard[r][3].setPosition(square3);
                                     spritesBoard[r][0] = transparentSprite;
                                 }
                             }
@@ -188,11 +207,23 @@ namespace ChessGame {
                             b.changeTurn();
                             b.setChessBoard(chessBoard);
                             legalMoves = b.getLegalMoves();
+
+                            if (legalMoves.size() == 0) {
+                                
+                                if (b.isCheckmate(legalMoves)) {
+                                    std::string statement = b.getTurn() ? "Black wins!" : "White wins!";
+                                    std::cout << "Checkmate! " << statement << std::endl;
+                                }
+
+                                else {
+                                    std::cout << "Stalemate!" << std::endl;
+                                }
+                            }
                         }
 
                         else {
-                            chessBoard[initial_r][initial_c].setPosition(sf::Vector2f(square1.x, square1.y));
-                            spritesBoard[initial_r][initial_c].setPosition(sf::Vector2f(square1.x, square1.y));
+                            chessBoard[initial_r][initial_c].setPosition(square1);
+                            spritesBoard[initial_r][initial_c].setPosition(square1);
                         }
                     }
                 }
@@ -213,16 +244,12 @@ namespace ChessGame {
                         sf::RectangleShape square({ squareSize, squareSize });
                         square.setPosition(sf::Vector2f(squareSize * c, squareSize * r));
 
-                        if (lightSquare) {
+                        if ((r + c) % 2 == 0) {
                             square.setFillColor(sf::Color(153, 204, 255));
                         }
 
                         else {
                             square.setFillColor(sf::Color(0, 0, 255));
-                        }
-
-                        if (c < boardSize - 1) {
-                            lightSquare = !lightSquare;
                         }
                         window.draw(square);
                     }

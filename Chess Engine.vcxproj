@@ -153,18 +153,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Bishop.cpp" />
-    <ClCompile Include="Bitboard.cpp" />
-    <ClCompile Include="ChessBoard.cpp" />
-    <ClCompile Include="ChessPiece.cpp" />
-    <ClCompile Include="Functions.cpp" />
-    <ClCompile Include="King.cpp" />
-    <ClCompile Include="Knight.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Pawn.cpp" />
-    <ClCompile Include="Play.cpp" />
-    <ClCompile Include="Queen.cpp" />
-    <ClCompile Include="Rook.cpp" />
     <ClCompile Include="src\Bishop.cpp" />
     <ClCompile Include="src\Bitboard.cpp" />
     <ClCompile Include="src\ChessBoard.cpp" />
@@ -175,6 +163,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Pawn.cpp" />
     <ClCompile Include="src\Play.cpp" />
+    <ClCompile Include="src\PromotionClicker.cpp" />
     <ClCompile Include="src\Queen.cpp" />
     <ClCompile Include="src\Rook.cpp" />
   </ItemGroup>
@@ -210,17 +199,6 @@
     <Image Include="Sprites\WhitePawn.png" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Bishop.h" />
-    <ClInclude Include="Bitboard.h" />
-    <ClInclude Include="ChessBoard.h" />
-    <ClInclude Include="ChessPiece.h" />
-    <ClInclude Include="Functions.h" />
-    <ClInclude Include="King.h" />
-    <ClInclude Include="Knight.h" />
-    <ClInclude Include="Pawn.h" />
-    <ClInclude Include="Play.h" />
-    <ClInclude Include="Queen.h" />
-    <ClInclude Include="Rook.h" />
     <ClInclude Include="src\Bishop.h" />
     <ClInclude Include="src\Bitboard.h" />
     <ClInclude Include="src\ChessBoard.h" />
@@ -230,6 +208,7 @@
     <ClInclude Include="src\Knight.h" />
     <ClInclude Include="src\Pawn.h" />
     <ClInclude Include="src\Play.h" />
+    <ClInclude Include="src\PromotionClicker.h" />
     <ClInclude Include="src\Queen.h" />
     <ClInclude Include="src\Rook.h" />
   </ItemGroup>

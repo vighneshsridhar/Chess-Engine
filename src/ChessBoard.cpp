@@ -128,7 +128,6 @@ namespace ChessGame {
                 }
             }
         }
-
         return legalMoves;
     }
 
@@ -232,5 +231,39 @@ namespace ChessGame {
         else {
             kingPosition["BLACK_KING"] = coordinates;
         }
+    }
+
+    bool ChessBoard::isCheckmate(std::vector<std::pair<sf::Vector2f, sf::Vector2f>> legalMoves) {
+        if (legalMoves.size() == 0) {
+            Bitboard bb;
+            this->changeTurn();
+            bb.updateBitboard(*this, false);
+            this->changeTurn();
+            auto [l, m] = getKingPosition();
+            std::vector<long long> squaresAttacked = bb.getBitboard();
+            int k = l * 8 + m;
+
+            if (squaresAttacked[k] != 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool ChessBoard::isStalemate(std::vector<std::pair<sf::Vector2f, sf::Vector2f>> legalMoves) {
+        if (legalMoves.size() == 0) {
+            Bitboard bb;
+            this->changeTurn();
+            bb.updateBitboard(*this, false);
+            this->changeTurn();
+            auto [l, m] = getKingPosition();
+            std::vector<long long> squaresAttacked = bb.getBitboard();
+            int k = l * 8 + m;
+
+            if (squaresAttacked[k] == 0) {
+                return true;
+            }
+        }
+        return false;
     }
 }

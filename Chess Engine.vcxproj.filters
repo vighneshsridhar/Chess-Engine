@@ -15,42 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ChessBoard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Pawn.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ChessPiece.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Functions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Knight.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Bishop.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Rook.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Queen.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="King.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Play.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Bitboard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Bishop.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -85,6 +49,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Rook.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PromotionClicker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -146,39 +113,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Pawn.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ChessBoard.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ChessPiece.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Functions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Knight.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Bishop.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Rook.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Queen.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="King.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Play.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Bitboard.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Bishop.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -210,6 +144,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Rook.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PromotionClicker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
