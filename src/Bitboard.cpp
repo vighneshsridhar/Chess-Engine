@@ -36,12 +36,12 @@ namespace ChessGame {
 				square1 = r1 * 8 + c1;
 				long long mask = (static_cast<long long>(1) << (numSquares - 1 - square1));
 
-				if (chessBoard[r1][c1].getPieceType() != "PAWN" || (b.getTurn() && chessBoard[r1][c1].getColor() != "WHITE") || 
-					(!b.getTurn() && chessBoard[r1][c1].getColor() != "BLACK") || r1 == 0 || r1 == 7) {
+				if (chessBoard[r1][c1].getPieceType() != PieceType::PAWN || (b.getTurn() && chessBoard[r1][c1].getColor() != PieceColor::WHITE) || 
+					(!b.getTurn() && chessBoard[r1][c1].getColor() != PieceColor::BLACK) || r1 == 0 || r1 == 7) {
 					continue;
 				}
 
-				if (chessBoard[r1][c1].getColor() == "WHITE") {
+				if (chessBoard[r1][c1].getColor() == PieceColor::WHITE) {
 
 					if (c1 == 0) {
 						square2 = (r1 - 1) * 8 + 1;
@@ -61,7 +61,7 @@ namespace ChessGame {
 					}
 				}
 
-				if (chessBoard[r1][c1].getColor() == "BLACK") {
+				if (chessBoard[r1][c1].getColor() == PieceColor::BLACK) {
 
 					if (c1 == 0) {
 						square2 = (r1 + 1) * 8 + 1;
@@ -112,7 +112,7 @@ namespace ChessGame {
 
 			for (int c = 0; c < boardSize; c++) {
 
-				if (chessBoard[r][c].getPieceType() == "PAWN" || (b.getTurn() && chessBoard[r][c].getColor() != "WHITE") || (!b.getTurn() && chessBoard[r][c].getColor() != "BLACK")) {
+				if (chessBoard[r][c].getPieceType() == PieceType::PAWN || (b.getTurn() && chessBoard[r][c].getColor() != PieceColor::WHITE) || (!b.getTurn() && chessBoard[r][c].getColor() != PieceColor::BLACK)) {
 					continue;
 				}
 				moves = b.getPieceMoves(chessBoard[r][c]);
@@ -123,24 +123,12 @@ namespace ChessGame {
 					auto [r2, c2] = Functions::convertToSquare(position2);
 					square1 = Functions::convertToNumber(position1);
 					square2 = Functions::convertToNumber(position2);
-					// :cout << "r1 = " << r1 << " r2 = " << r2 << " c1 = " << c1 << " c2 = " << c2 << chessBoard[r1][c1].getPieceType() << std::endl;
 					mask = (static_cast<long long>(1) << (numSquares - 1 - square1));
 					squaresAttacked[square2] |= mask;
 				}
 			}
 		}
 		updatePawnAttackSquares(b);
-
-		/*for (int r = 0; r < boardSize; r++) {
-
-			for (int c = 0; c < boardSize; c++) {
-				square1 = r * 8 + c;
-				std::uint64_t u_value = static_cast<std::uint64_t>(squaresAttacked[square1]);
-
-				// Create a bitset of 64 bits and print it directly
-				std::cout << "square1 = " << square1 << " and Binary representation : " << std::bitset<64>(u_value) << std::endl;
-			}
-		} */
 
 		return;
 	}

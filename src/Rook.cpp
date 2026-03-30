@@ -11,7 +11,7 @@
 
 namespace ChessGame {
 
-	Rook::Rook(std::string color) : color(color) {
+	Rook::Rook(PieceColor color) : color(color) {
 	};
 
 	std::vector<std::pair<sf::Vector2f, sf::Vector2f>> Rook::getMoves(std::vector<std::vector<ChessPiece>> chessBoard, ChessPiece rook) {
@@ -28,7 +28,7 @@ namespace ChessGame {
 			y = Functions::convertToPosition(s, t);
 			moves.push_back(std::make_pair(position, y));
 
-			if (chessBoard[s][t].getPieceType() != "EMPTY_SQUARE") {
+			if (chessBoard[s][t].getPieceType() != PieceType::EMPTY) {
 				break;
 			}
 			s++;
@@ -40,7 +40,7 @@ namespace ChessGame {
 			y = Functions::convertToPosition(s, t);
 			moves.push_back(std::make_pair(position, y));
 
-			if (chessBoard[s][t].getPieceType() != "EMPTY_SQUARE") {
+			if (chessBoard[s][t].getPieceType() != PieceType::EMPTY) {
 				break;
 			}
 			s--;
@@ -52,7 +52,7 @@ namespace ChessGame {
 			y = Functions::convertToPosition(s, t);
 			moves.push_back(std::make_pair(position, y));
 
-			if (chessBoard[s][t].getPieceType() != "EMPTY_SQUARE") {
+			if (chessBoard[s][t].getPieceType() != PieceType::EMPTY) {
 				break;
 			}
 			t++;
@@ -64,7 +64,7 @@ namespace ChessGame {
 			y = Functions::convertToPosition(s, t);
 			moves.push_back(std::make_pair(position, y));
 
-			if (chessBoard[s][t].getPieceType() != "EMPTY_SQUARE") {
+			if (chessBoard[s][t].getPieceType() != PieceType::EMPTY) {
 				break;
 			}
 			t--;

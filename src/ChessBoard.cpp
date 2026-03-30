@@ -24,20 +24,20 @@ namespace ChessGame {
         float x = 20.f;
         float y = 20.f;
 
-        ChessGame::ChessPiece empty("EMPTY_SQUARE", "NONE", sf::Vector2f(x, y));
-        ChessGame::ChessPiece whitePawn("PAWN", "WHITE", sf::Vector2f(x, y));
-        ChessGame::ChessPiece whiteKnight("KNIGHT", "WHITE", sf::Vector2f(x, y));
-        ChessGame::ChessPiece whiteBishop("BISHOP", "WHITE", sf::Vector2f(x, y));
-        ChessGame::ChessPiece whiteRook("ROOK", "WHITE", sf::Vector2f(x, y));
-        ChessGame::ChessPiece whiteQueen("QUEEN", "WHITE", sf::Vector2f(x, y));
-        ChessGame::ChessPiece whiteKing("KING", "WHITE", sf::Vector2f(x, y));
+        ChessGame::ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, sf::Vector2f(x, y));
+        ChessGame::ChessPiece whitePawn(PieceType::PAWN, PieceColor::WHITE, sf::Vector2f(x, y));
+        ChessGame::ChessPiece whiteKnight(PieceType::KNIGHT, PieceColor::WHITE, sf::Vector2f(x, y));
+        ChessGame::ChessPiece whiteBishop(PieceType::BISHOP, PieceColor::WHITE, sf::Vector2f(x, y));
+        ChessGame::ChessPiece whiteRook(PieceType::ROOK, PieceColor::WHITE, sf::Vector2f(x, y));
+        ChessGame::ChessPiece whiteQueen(PieceType::QUEEN, PieceColor::WHITE, sf::Vector2f(x, y));
+        ChessGame::ChessPiece whiteKing(PieceType::KING, PieceColor::WHITE, sf::Vector2f(x, y));
 
-        ChessGame::ChessPiece blackPawn("PAWN", "BLACK", sf::Vector2f(x, y));
-        ChessGame::ChessPiece blackKnight("KNIGHT", "BLACK", sf::Vector2f(x, y));
-        ChessGame::ChessPiece blackBishop("BISHOP", "BLACK", sf::Vector2f(x, y));
-        ChessGame::ChessPiece blackRook("ROOK", "BLACK", sf::Vector2f(x, y));
-        ChessGame::ChessPiece blackQueen("QUEEN", "BLACK", sf::Vector2f(x, y));
-        ChessGame::ChessPiece blackKing("KING", "BLACK", sf::Vector2f(x, y));
+        ChessGame::ChessPiece blackPawn(PieceType::PAWN, PieceColor::BLACK, sf::Vector2f(x, y));
+        ChessGame::ChessPiece blackKnight(PieceType::KNIGHT, PieceColor::BLACK, sf::Vector2f(x, y));
+        ChessGame::ChessPiece blackBishop(PieceType::BISHOP, PieceColor::BLACK, sf::Vector2f(x, y));
+        ChessGame::ChessPiece blackRook(PieceType::ROOK, PieceColor::BLACK, sf::Vector2f(x, y));
+        ChessGame::ChessPiece blackQueen(PieceType::QUEEN, PieceColor::BLACK, sf::Vector2f(x, y));
+        ChessGame::ChessPiece blackKing(PieceType::KING, PieceColor::BLACK, sf::Vector2f(x, y));
 
         chessBoard = { {blackRook, blackKnight, blackBishop, blackQueen, blackKing, blackBishop, blackKnight, blackRook},
             {blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn},
@@ -90,7 +90,7 @@ namespace ChessGame {
             for (int c = 0; c < boardSize; c++) {
                 ChessPiece piece = chessBoard[r][c];
 
-                if ((whiteTurn && piece.getColor() != "WHITE") || (!whiteTurn && piece.getColor() != "BLACK")) {
+                if ((whiteTurn && piece.getColor() != PieceColor::WHITE) || (!whiteTurn && piece.getColor() != PieceColor::BLACK)) {
                     continue;
                 }
                 position = Functions::convertToPosition(r, c);
@@ -98,13 +98,13 @@ namespace ChessGame {
 
                 for (const auto& move : moves) {
                     auto [x, y] = Functions::convertToSquare(move.second);
-                    ChessPiece empty("EMPTY_SQUARE", "NONE", position);
+                    ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, position);
                     ChessPiece old = chessBoard[x][y];
                     
                     chessBoard[x][y] = piece;
                     chessBoard[r][c] = empty;
 
-                    if (piece.getPieceType() == "KING") {
+                    if (piece.getPieceType() == PieceType::KING) {
                         setKingPosition(std::make_pair(x, y));
 
                         if (std::abs(y - c) == 2) {
@@ -121,7 +121,7 @@ namespace ChessGame {
                     chessBoard[r][c] = piece;
                     chessBoard[x][y] = old;
 
-                    if (piece.getPieceType() == "KING") {
+                    if (piece.getPieceType() == PieceType::KING) {
                         setKingPosition(std::make_pair(r, c));
                     }
                     castling = false;
@@ -134,80 +134,80 @@ namespace ChessGame {
     std::vector<std::pair<sf::Vector2f, sf::Vector2f>> ChessBoard::getPieceMoves(ChessPiece piece) {
         std::vector<std::pair<sf::Vector2f, sf::Vector2f>> moves;
 
-        if (piece.getPieceType() == "PAWN") {
+        if (piece.getPieceType() == PieceType::PAWN) {
 
-            if (piece.getColor() == "WHITE") {
-                Pawn pawn("WHITE");
+            if (piece.getColor() == PieceColor::WHITE) {
+                Pawn pawn(PieceColor::WHITE);
                 moves = pawn.getMoves(chessBoard, piece);
             }
 
-            if (piece.getColor() == "BLACK") {
-                Pawn pawn("BLACK");
+            if (piece.getColor() == PieceColor::BLACK) {
+                Pawn pawn(PieceColor::BLACK);
                 moves = pawn.getMoves(chessBoard, piece);
             }
         }
 
-        if (piece.getPieceType() == "KNIGHT") {
+        if (piece.getPieceType() == PieceType::KNIGHT) {
 
-            if (piece.getColor() == "WHITE") {
-                Knight knight("WHITE");
+            if (piece.getColor() == PieceColor::WHITE) {
+                Knight knight(PieceColor::WHITE);
                 moves = knight.getMoves(chessBoard, piece);
             }
 
-            if (piece.getColor() == "BLACK") {
-                Knight knight("BLACK");
+            if (piece.getColor() == PieceColor::BLACK) {
+                Knight knight(PieceColor::BLACK);
                 moves = knight.getMoves(chessBoard, piece);
             }
         }
 
-        if (piece.getPieceType() == "BISHOP") {
+        if (piece.getPieceType() == PieceType::BISHOP) {
 
-            if (piece.getColor() == "WHITE") {
-                Bishop bishop("WHITE");
+            if (piece.getColor() == PieceColor::WHITE) {
+                Bishop bishop(PieceColor::WHITE);
                 moves = bishop.getMoves(chessBoard, piece);
             }
 
-            if (piece.getColor() == "BLACK") {
-                Bishop bishop("BLACK");
+            if (piece.getColor() == PieceColor::BLACK) {
+                Bishop bishop(PieceColor::BLACK);
                 moves = bishop.getMoves(chessBoard, piece);
             }
         }
 
-        if (piece.getPieceType() == "ROOK") {
+        if (piece.getPieceType() == PieceType::ROOK) {
 
-            if (piece.getColor() == "WHITE") {
-                Rook rook("WHITE");
+            if (piece.getColor() == PieceColor::WHITE) {
+                Rook rook(PieceColor::WHITE);
                 moves = rook.getMoves(chessBoard, piece);
             }
 
-            if (piece.getColor() == "BLACK") {
-                Rook rook("BLACK");
+            if (piece.getColor() == PieceColor::BLACK) {
+                Rook rook(PieceColor::BLACK);
                 moves = rook.getMoves(chessBoard, piece);
             }
         }
 
-        if (piece.getPieceType() == "QUEEN") {
+        if (piece.getPieceType() == PieceType::QUEEN) {
 
-            if (piece.getColor() == "WHITE") {
-                Queen queen("WHITE");
+            if (piece.getColor() == PieceColor::WHITE) {
+                Queen queen(PieceColor::WHITE);
                 moves = queen.getMoves(chessBoard, piece);
             }
 
-            if (piece.getColor() == "BLACK") {
-                Queen queen("BLACK");
+            if (piece.getColor() == PieceColor::BLACK) {
+                Queen queen(PieceColor::BLACK);
                 moves = queen.getMoves(chessBoard, piece);
             }
         }
 
-        if (piece.getPieceType() == "KING") {
+        if (piece.getPieceType() == PieceType::KING) {
 
-            if (piece.getColor() == "WHITE") {
-                King king("WHITE");
+            if (piece.getColor() == PieceColor::WHITE) {
+                King king(PieceColor::WHITE);
                 moves = king.getMoves(chessBoard, piece);
             }
 
-            if (piece.getColor() == "BLACK") {
-                King king("BLACK");
+            if (piece.getColor() == PieceColor::BLACK) {
+                King king(PieceColor::BLACK);
                 moves = king.getMoves(chessBoard, piece);
             }
         }

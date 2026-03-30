@@ -6,23 +6,40 @@
 #include <string>
 #include <utility>
 
+
 namespace ChessGame {
+
+	enum class PieceType {
+		EMPTY,
+		PAWN,
+		KNIGHT,
+		BISHOP,
+		ROOK,
+		QUEEN,
+		KING
+	};
+
+	enum class PieceColor {
+		WHITE,
+		BLACK,
+		NONE
+	};
 
 	class ChessPiece {
 	public: 
-		ChessPiece(std::string pieceType, std::string color, sf::Vector2f position);
-		std::string getPieceType();
-		void setPieceType(std::string newPieceType);
-		std::string getColor();
+		ChessPiece(PieceType pieceType, PieceColor color, sf::Vector2f position);
+		PieceType getPieceType();
+		void setPieceType(PieceType newPieceType);
+		PieceColor getColor();
 		sf::Texture getTexture();
-		sf::Vector2f getPosition();
+		sf::Vector2f getPosition() const;
 		void setPosition(sf::Vector2f);
 		bool pieceHasMoved();
 		void setPieceHasMoved();
 
 	private:
-		std::string pieceType;
-		std::string color;
+		PieceType pieceType;
+		PieceColor color;
 		sf::Vector2f position;
 		bool hasMoved;
 	};

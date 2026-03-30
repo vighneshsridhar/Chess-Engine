@@ -6,7 +6,6 @@
 #include <utility>
 
 #include "ChessPiece.h"
-// #include "Bitboard.h"
 
 namespace ChessGame {
 

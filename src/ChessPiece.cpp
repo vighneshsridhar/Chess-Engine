@@ -6,22 +6,23 @@
 #include <filesystem> // Requires C++17 or later
 #include <windows.h>
 
+
 namespace ChessGame {
 
-	ChessPiece::ChessPiece(std::string pieceType, std::string color, sf::Vector2f position): pieceType(pieceType), color(color), position(position) {
+	ChessPiece::ChessPiece(PieceType pieceType, PieceColor color, sf::Vector2f position): pieceType(pieceType), color(color), position(position) {
 		hasMoved = false;
 	};
 
-	std::string ChessPiece::getPieceType() {
+	PieceType ChessPiece::getPieceType() {
 		return pieceType;
 	}
 
-	void ChessPiece::setPieceType(std::string newPieceType) {
+	void ChessPiece::setPieceType(PieceType newPieceType) {
 		pieceType = newPieceType;
 		return;
 	}
 
-	std::string ChessPiece::getColor() {
+	PieceColor ChessPiece::getColor() {
 		return color;
 	}
 
@@ -29,72 +30,72 @@ namespace ChessGame {
 		sf::Texture texture;
 		std::string path;
 
-		if (pieceType == "EMPTY_SQUARE") {
+		if (pieceType == PieceType::EMPTY) {
 			path = "Assets/WhitePawn.png";
 		}
 
-		if (pieceType == "PAWN") {
+		if (pieceType == PieceType::PAWN) {
 
-			if (color == "WHITE") {
+			if (color == PieceColor::WHITE) {
 				path = "Assets/WhitePawn.png";
 			}
 
-			if (color == "BLACK") {
+			if (color == PieceColor::BLACK) {
 				path = "Assets/BlackPawn.png";
 			}
 		}
 
-		if (pieceType == "KNIGHT") {
+		if (pieceType == PieceType::KNIGHT) {
 
-			if (color == "WHITE") {
+			if (color == PieceColor::WHITE) {
 				path = "Assets/WhiteKnight.png";
 			}
 
-			if (color == "BLACK") {
+			if (color == PieceColor::BLACK) {
 				path = "Assets/BlackKnight.png";
 			}
 		}
 
-		if (pieceType == "BISHOP") {
+		if (pieceType == PieceType::BISHOP) {
 
-			if (color == "WHITE") {
+			if (color == PieceColor::WHITE) {
 				path = "Assets/WhiteBishop.png";
 			}
 
-			if (color == "BLACK") {
+			if (color == PieceColor::BLACK) {
 				path = "Assets/BlackBishop.png";
 			}
 		}
 
-		if (pieceType == "ROOK") {
+		if (pieceType == PieceType::ROOK) {
 
-			if (color == "WHITE") {
+			if (color == PieceColor::WHITE) {
 				path = "Assets/WhiteRook.png";
 			}
 
-			if (color == "BLACK") {
+			if (color == PieceColor::BLACK) {
 				path = "Assets/BlackRook.png";
 			}
 		}
 
-		if (pieceType == "QUEEN") {
+		if (pieceType == PieceType::QUEEN) {
 
-			if (color == "WHITE") {
+			if (color == PieceColor::WHITE) {
 				path = "Assets/WhiteQueen.png";
 			}
 
-			if (color == "BLACK") {
+			if (color == PieceColor::BLACK) {
 				path = "Assets/BlackQueen.png";
 			}
 		}
 
-		if (pieceType == "KING") {
+		if (pieceType == PieceType::KING) {
 
-			if (color == "WHITE") {
+			if (color == PieceColor::WHITE) {
 				path = "Assets/WhiteKing.png";
 			}
 
-			if (color == "BLACK") {
+			if (color == PieceColor::BLACK) {
 				path = "Assets/BlackKing.png";
 			}
 		}
@@ -106,7 +107,7 @@ namespace ChessGame {
 		return texture;
 	}
 
-	sf::Vector2f ChessPiece::getPosition() {
+	sf::Vector2f ChessPiece::getPosition() const {
 		return position;
 	}
 

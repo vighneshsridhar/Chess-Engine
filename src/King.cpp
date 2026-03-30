@@ -11,7 +11,7 @@
 
 namespace ChessGame {
 
-	King::King(std::string color) : color(color) {
+	King::King(PieceColor color) : color(color) {
 	};
 
 	std::vector<std::pair<sf::Vector2f, sf::Vector2f>> King::getMoves(std::vector<std::vector<ChessPiece>> chessBoard, ChessPiece king) {
@@ -42,27 +42,27 @@ namespace ChessGame {
 
 		if (!king.pieceHasMoved()) {
 
-			if (king.getColor() == "WHITE") {
+			if (king.getColor() == PieceColor::WHITE) {
 
-				if (!chessBoard[7][7].pieceHasMoved() && chessBoard[7][5].getPieceType() == "EMPTY_SQUARE" && chessBoard[7][6].getPieceType() == "EMPTY_SQUARE") {
+				if (!chessBoard[7][7].pieceHasMoved() && chessBoard[7][5].getPieceType() == PieceType::EMPTY && chessBoard[7][6].getPieceType() == PieceType::EMPTY) {
 					y = Functions::convertToPosition(7, 6);
 					moves.push_back(std::make_pair(position, y));
 				}
 
-				if (!chessBoard[7][0].pieceHasMoved() && chessBoard[7][1].getPieceType() == "EMPTY_SQUARE" && chessBoard[7][2].getPieceType() == "EMPTY_SQUARE" && chessBoard[7][3].getPieceType() == "EMPTY_SQUARE"){
+				if (!chessBoard[7][0].pieceHasMoved() && chessBoard[7][1].getPieceType() == PieceType::EMPTY && chessBoard[7][2].getPieceType() == PieceType::EMPTY && chessBoard[7][3].getPieceType() == PieceType::EMPTY){
 					y = Functions::convertToPosition(7, 2);
 					moves.push_back(std::make_pair(position, y));
 				}
 			}
 
-			if (king.getColor() == "BLACK") {
+			if (king.getColor() == PieceColor::BLACK) {
 
-				if (!chessBoard[0][7].pieceHasMoved() && chessBoard[0][5].getPieceType() == "EMPTY_SQUARE" && chessBoard[0][6].getPieceType() == "EMPTY_SQUARE") {
+				if (!chessBoard[0][7].pieceHasMoved() && chessBoard[0][5].getPieceType() == PieceType::EMPTY && chessBoard[0][6].getPieceType() == PieceType::EMPTY) {
 					y = Functions::convertToPosition(0, 6);
 					moves.push_back(std::make_pair(position, y));
 				}
 
-				if (!chessBoard[0][0].pieceHasMoved() && chessBoard[0][1].getPieceType() == "EMPTY_SQUARE" && chessBoard[0][2].getPieceType() == "EMPTY_SQUARE" && chessBoard[0][3].getPieceType() == "EMPTY_SQUARE") {
+				if (!chessBoard[0][0].pieceHasMoved() && chessBoard[0][1].getPieceType() == PieceType::EMPTY && chessBoard[0][2].getPieceType() == PieceType::EMPTY && chessBoard[0][3].getPieceType() == PieceType::EMPTY) {
 					y = Functions::convertToPosition(0, 2);
 					moves.push_back(std::make_pair(position, y));
 				}

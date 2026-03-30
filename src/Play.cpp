@@ -38,20 +38,20 @@ namespace ChessGame {
         sf::Vector2f square3;
         std::unordered_map<std::string, sf::Texture> textures;
 
-        ChessGame::ChessPiece empty("EMPTY_SQUARE", "NONE", a);
-        ChessGame::ChessPiece whitePawn("PAWN", "WHITE", a);
-        ChessGame::ChessPiece whiteKnight("KNIGHT", "WHITE", a);
-        ChessGame::ChessPiece whiteBishop("BISHOP", "WHITE", a);
-        ChessGame::ChessPiece whiteRook("ROOK", "WHITE", a);
-        ChessGame::ChessPiece whiteQueen("QUEEN", "WHITE", a);
-        ChessGame::ChessPiece whiteKing("KING", "WHITE", a);
+        ChessGame::ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, a);
+        ChessGame::ChessPiece whitePawn(PieceType::PAWN, PieceColor::WHITE, a);
+        ChessGame::ChessPiece whiteKnight(PieceType::KNIGHT, PieceColor::WHITE, a);
+        ChessGame::ChessPiece whiteBishop(PieceType::BISHOP, PieceColor::WHITE, a);
+        ChessGame::ChessPiece whiteRook(PieceType::ROOK, PieceColor::WHITE, a);
+        ChessGame::ChessPiece whiteQueen(PieceType::QUEEN, PieceColor::WHITE, a);
+        ChessGame::ChessPiece whiteKing(PieceType::KING, PieceColor::WHITE, a);
 
-        ChessGame::ChessPiece blackPawn("PAWN", "BLACK", a);
-        ChessGame::ChessPiece blackKnight("KNIGHT", "BLACK", a);
-        ChessGame::ChessPiece blackBishop("BISHOP", "BLACK", a);
-        ChessGame::ChessPiece blackRook("ROOK", "BLACK", a);
-        ChessGame::ChessPiece blackQueen("QUEEN", "BLACK", a);
-        ChessGame::ChessPiece blackKing("KING", "BLACK", a);
+        ChessGame::ChessPiece blackPawn(PieceType::PAWN, PieceColor::BLACK, a);
+        ChessGame::ChessPiece blackKnight(PieceType::KNIGHT, PieceColor::BLACK, a);
+        ChessGame::ChessPiece blackBishop(PieceType::BISHOP, PieceColor::BLACK, a);
+        ChessGame::ChessPiece blackRook(PieceType::ROOK, PieceColor::BLACK, a);
+        ChessGame::ChessPiece blackQueen(PieceType::QUEEN, PieceColor::BLACK, a);
+        ChessGame::ChessPiece blackKing(PieceType::KING, PieceColor::BLACK, a);
 
         textures["WHITE_PAWN"] = whitePawn.getTexture();
         textures["WHITE_KNIGHT"] = whiteKnight.getTexture();
@@ -144,10 +144,10 @@ namespace ChessGame {
 
                         if (std::find(legalMoves.begin(), legalMoves.end(), move) != legalMoves.end()) {
 
-                            if (initialPiece.getPieceType() == "PAWN" && (r == 0 || r == 7)) {
+                            if (initialPiece.getPieceType() == PieceType::PAWN && (r == 0 || r == 7)) {
                                 int j;
 
-                                if (initialPiece.getColor() == "WHITE") {
+                                if (initialPiece.getColor() == PieceColor::WHITE) {
                                     j = 0;
                                 }
 
@@ -178,7 +178,7 @@ namespace ChessGame {
                             }
                             
                             
-                            if (initialPiece.getPieceType() == "KING") {
+                            if (initialPiece.getPieceType() == PieceType::KING) {
                                 b.setKingPosition(std::make_pair(r, c));
 
                                 if (c - initial_c == 2) {
@@ -207,6 +207,7 @@ namespace ChessGame {
                             b.changeTurn();
                             b.setChessBoard(chessBoard);
                             legalMoves = b.getLegalMoves();
+                            // std::cout << "legal moves size = " << legalMoves.size() << std::endl;
 
                             if (legalMoves.size() == 0) {
                                 
@@ -259,7 +260,7 @@ namespace ChessGame {
 
                     for (int c = 0; c < boardSize; c++) {
 
-                        if (chessBoard[r][c].getPieceType() != "EMPTY_SQUARE") {
+                        if (chessBoard[r][c].getPieceType() != PieceType::EMPTY) {
                             sf::FloatRect bounds = spritesBoard[r][c].getLocalBounds();
                             spritesBoard[r][c].setScale(sf::Vector2f(squareSize / bounds.size.x, squareSize / bounds.size.y));
                             spritesBoard[r][c].setPosition(chessBoard[r][c].getPosition());

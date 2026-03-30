@@ -8,7 +8,7 @@
 
 namespace ChessGame {
 
-	Knight::Knight(std::string color) : color(color) {
+	Knight::Knight(PieceColor color) : color(color) {
 	};
 
 	std::vector<std::pair<sf::Vector2f, sf::Vector2f>> Knight::getMoves(std::vector<std::vector<ChessPiece>> chessBoard, ChessPiece knight) {

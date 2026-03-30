@@ -32,15 +32,15 @@ namespace ChessGame {
         chessBoard[r][c] = pawn;
         chessBoard[r][c].setPosition(promotionPosition);
 
-        ChessPiece promotionPiece("QUEEN", pawn.getColor(), promotionPosition);
+        ChessPiece promotionPiece(PieceType::QUEEN, pawn.getColor(), promotionPosition);
 
-        std::string color = pawn.getColor();
+        PieceColor color = pawn.getColor();
         sf::FloatRect bounds;
 
         int i;
         int increment;
 
-        if (pawn.getColor() == "WHITE") {
+        if (pawn.getColor() == PieceColor::WHITE) {
             i = 0;
             increment = 1;
         }
@@ -82,15 +82,15 @@ namespace ChessGame {
                     if (y == c && std::abs(r - x) <= 3) {
 
                         if (std::abs(r - x) == 1) {
-                            promotionPiece.setPieceType("ROOK");
+                            promotionPiece.setPieceType(PieceType::ROOK);
                         }
 
                         if (std::abs(r - x) == 2) {
-                            promotionPiece.setPieceType("BISHOP");
+                            promotionPiece.setPieceType(PieceType::BISHOP);
                         }
 
                         if (std::abs(r - x) == 3) {
-                            promotionPiece.setPieceType("KNIGHT");
+                            promotionPiece.setPieceType(PieceType::KNIGHT);
                         }
                         chessBoard[r][c] = promotionPiece;
                         chessBoard[r][c].setPosition(promotionPosition);
@@ -126,7 +126,7 @@ namespace ChessGame {
 
                     for (int c = 0; c < boardSize; c++) {
 
-                        if (chessBoard[r][c].getPieceType() != "EMPTY_SQUARE") {
+                        if (chessBoard[r][c].getPieceType() != PieceType::EMPTY) {
                             bounds = spritesBoard[r][c].getLocalBounds();
                             spritesBoard[r][c].setScale(sf::Vector2f(squareSize / bounds.size.x, squareSize / bounds.size.y));
                             spritesBoard[r][c].setPosition(chessBoard[r][c].getPosition());

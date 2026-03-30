@@ -9,7 +9,7 @@
 
 namespace ChessGame {
 
-	Pawn::Pawn(std::string color): color(color) {
+	Pawn::Pawn(PieceColor color): color(color) {
 	};
 
 	std::vector<std::pair<sf::Vector2f, sf::Vector2f>> Pawn::getMoves(std::vector<std::vector<ChessGame::ChessPiece>> chessBoard, ChessPiece pawn) {
@@ -20,47 +20,47 @@ namespace ChessGame {
 		float squareSize = 100.f;
 		auto [r, c] = Functions::convertToSquare(position);
 		
-		if (pawn.getColor() == "WHITE") {
+		if (pawn.getColor() == PieceColor::WHITE) {
 			
-			if (r > 0 && chessBoard[r - 1][c].getPieceType() == "EMPTY_SQUARE") {
+			if (r > 0 && chessBoard[r - 1][c].getPieceType() == PieceType::EMPTY) {
 				y = Functions::convertToPosition(r - 1, c);
 				moves.push_back(std::make_pair(position, y));
 
-				if (r == 6 && chessBoard[r - 2][c].getPieceType() == "EMPTY_SQUARE") {
+				if (r == 6 && chessBoard[r - 2][c].getPieceType() == PieceType::EMPTY) {
 					y = Functions::convertToPosition(r - 2, c);
 					moves.push_back(std::make_pair(position, y));
 				}
 			}
 
-			if (r > 0 && c - 1 >= 0 && chessBoard[r - 1][c - 1].getColor() == "BLACK") {
+			if (r > 0 && c - 1 >= 0 && chessBoard[r - 1][c - 1].getColor() == PieceColor::BLACK) {
 				y = Functions::convertToPosition(r - 1, c - 1);
 				moves.push_back(std::make_pair(position, y));
 			}
 
-			if (r > 0 && c + 1 < boardSize && chessBoard[r - 1][c + 1].getColor() == "BLACK") {
+			if (r > 0 && c + 1 < boardSize && chessBoard[r - 1][c + 1].getColor() == PieceColor::BLACK) {
 				y = Functions::convertToPosition(r - 1, c + 1);
 				moves.push_back(std::make_pair(position, y));
 			}
 		}
 
-		if (pawn.getColor() == "BLACK") {
+		if (pawn.getColor() == PieceColor::BLACK) {
 
-			if (r < 7 && chessBoard[r + 1][c].getPieceType() == "EMPTY_SQUARE") {
+			if (r < 7 && chessBoard[r + 1][c].getPieceType() == PieceType::EMPTY) {
 				y = Functions::convertToPosition(r + 1, c);
 				moves.push_back(std::make_pair(position, y));
 
-				if (r == 1 && chessBoard[r + 2][c].getPieceType() == "EMPTY_SQUARE") {
+				if (r == 1 && chessBoard[r + 2][c].getPieceType() == PieceType::EMPTY) {
 					y = Functions::convertToPosition(r + 2, c);
 					moves.push_back(std::make_pair(position, y));
 				}
 			}
 
-			if (r < 7 && c - 1 >= 0 && chessBoard[r + 1][c - 1].getColor() == "WHITE") {
+			if (r < 7 && c - 1 >= 0 && chessBoard[r + 1][c - 1].getColor() == PieceColor::WHITE) {
 				y = Functions::convertToPosition(r + 1, c - 1);
 				moves.push_back(std::make_pair(position, y));
 			}
 
-			if (r < 7 && c + 1 < boardSize && chessBoard[r + 1][c + 1].getColor() == "WHITE") {
+			if (r < 7 && c + 1 < boardSize && chessBoard[r + 1][c + 1].getColor() == PieceColor::WHITE) {
 				y = Functions::convertToPosition(r + 1, c + 1);
 				moves.push_back(std::make_pair(position, y));
 			}

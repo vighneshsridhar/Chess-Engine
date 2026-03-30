@@ -12,11 +12,11 @@ namespace ChessGame {
 
 	class King {
 	public:
-		King(std::string color);
+		King(PieceColor color);
 		std::vector<std::pair<sf::Vector2f, sf::Vector2f>> getMoves(std::vector<std::vector<ChessPiece>> chessBoard, ChessPiece king);
 
 	private:
-		std::string color;
+		PieceColor color;
 	};
 
 }
