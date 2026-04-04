@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "Knight.h"
+#include "Move.h"
 #include "ChessPiece.h"
 #include "Functions.h"
 
@@ -11,9 +12,9 @@ namespace ChessGame {
 	Knight::Knight(PieceColor color) : color(color) {
 	};
 
-	std::vector<std::pair<sf::Vector2f, sf::Vector2f>> Knight::getMoves(std::vector<std::vector<ChessPiece>> chessBoard, ChessPiece knight) {
+	std::vector<Move> Knight::getMoves(std::vector<std::vector<ChessPiece>> chessBoard, ChessPiece knight) {
 		sf::Vector2f position = knight.getPosition();
-		std::vector<std::pair<sf::Vector2f, sf::Vector2f>> moves;
+		std::vector<Move> moves;
 		sf::Vector2f y;
 		int boardSize = 8;
 		float squareSize = 100.f;
@@ -28,7 +29,8 @@ namespace ChessGame {
 
 			if (s >= 0 && s < boardSize && t >= 0 && t < boardSize && chessBoard[s][t].getColor() != chessBoard[r][c].getColor()) {
 				y = Functions::convertToPosition(s, t);
-				moves.push_back(std::make_pair(position, y));
+				Move move = { position, y, -1, knight, chessBoard[s][t] };
+				moves.push_back(move);
 			}
 		}
 

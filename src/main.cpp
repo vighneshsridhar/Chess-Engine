@@ -2,8 +2,6 @@
 #include <string>
 #include <utility>
 #include <iostream>
-#include <filesystem> // Requires C++17 or later
-#include <windows.h>
 #include <vector>
 
 

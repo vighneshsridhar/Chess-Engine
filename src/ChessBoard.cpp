@@ -3,11 +3,13 @@
 #include <utility>
 #include <cstdlib>
 #include <iostream>
+#include <bitset>
 #include <filesystem> // Requires C++17 or later
 #include <windows.h>
 
 #include "ChessBoard.h"
 #include "ChessPiece.h"
+#include "Move.h"
 #include "Pawn.h"
 #include "Knight.h"
 #include "Bishop.h"
@@ -17,9 +19,11 @@
 #include "Bitboard.h"
 
 namespace ChessGame {
+
     ChessBoard::ChessBoard() {
         boardSize = 8;
         whiteTurn = true;
+        enPassantFile = -1;
         float squareSize = 100.f;
         float x = 20.f;
         float y = 20.f;
@@ -60,7 +64,7 @@ namespace ChessGame {
         }
     };
 
-    bool ChessBoard::getTurn() {
+    bool ChessBoard::getTurn() const {
         return whiteTurn;
     }
 
@@ -77,9 +81,9 @@ namespace ChessGame {
         chessBoard = newChessBoard;
     }
 
-    std::vector<std::pair<sf::Vector2f, sf::Vector2f>> ChessBoard::getLegalMoves() {
-        std::vector<std::pair<sf::Vector2f, sf::Vector2f>> legalMoves;
-        std::vector<std::pair<sf::Vector2f, sf::Vector2f>> moves;
+    std::vector<Move> ChessBoard::getLegalMoves() {
+        std::vector<Move> legalMoves;
+        std::vector<Move> moves;
         Bitboard bb;
         std::vector<long long> x;
         sf::Vector2f position;
@@ -97,7 +101,7 @@ namespace ChessGame {
                 moves = getPieceMoves(piece);
 
                 for (const auto& move : moves) {
-                    auto [x, y] = Functions::convertToSquare(move.second);
+                    auto [x, y] = Functions::convertToSquare(move.getEndSquare());
                     ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, position);
                     ChessPiece old = chessBoard[x][y];
                     
@@ -131,19 +135,19 @@ namespace ChessGame {
         return legalMoves;
     }
 
-    std::vector<std::pair<sf::Vector2f, sf::Vector2f>> ChessBoard::getPieceMoves(ChessPiece piece) {
-        std::vector<std::pair<sf::Vector2f, sf::Vector2f>> moves;
+    std::vector<Move> ChessBoard::getPieceMoves(ChessPiece piece) {
+        std::vector<Move> moves;
 
         if (piece.getPieceType() == PieceType::PAWN) {
 
             if (piece.getColor() == PieceColor::WHITE) {
                 Pawn pawn(PieceColor::WHITE);
-                moves = pawn.getMoves(chessBoard, piece);
+                moves = pawn.getMoves(*this, piece);
             }
 
             if (piece.getColor() == PieceColor::BLACK) {
                 Pawn pawn(PieceColor::BLACK);
-                moves = pawn.getMoves(chessBoard, piece);
+                moves = pawn.getMoves(*this, piece);
             }
         }
 
@@ -233,36 +237,26 @@ namespace ChessGame {
         }
     }
 
-    bool ChessBoard::isCheckmate(std::vector<std::pair<sf::Vector2f, sf::Vector2f>> legalMoves) {
-        if (legalMoves.size() == 0) {
-            Bitboard bb;
-            this->changeTurn();
-            bb.updateBitboard(*this, false);
-            this->changeTurn();
-            auto [l, m] = getKingPosition();
-            std::vector<long long> squaresAttacked = bb.getBitboard();
-            int k = l * 8 + m;
-
-            if (squaresAttacked[k] != 0) {
-                return true;
-            }
-        }
-        return false;
+    int ChessBoard::getEnPassantFile() {
+        return enPassantFile;
     }
 
-    bool ChessBoard::isStalemate(std::vector<std::pair<sf::Vector2f, sf::Vector2f>> legalMoves) {
-        if (legalMoves.size() == 0) {
-            Bitboard bb;
-            this->changeTurn();
-            bb.updateBitboard(*this, false);
-            this->changeTurn();
-            auto [l, m] = getKingPosition();
-            std::vector<long long> squaresAttacked = bb.getBitboard();
-            int k = l * 8 + m;
+    void ChessBoard::setEnPassantFile(int file) {
+        enPassantFile = file;
+        return;
+    }
 
-            if (squaresAttacked[k] == 0) {
-                return true;
-            }
+    bool ChessBoard::isCheckOrCheckmate() {
+        Bitboard bb;
+        this->changeTurn();
+        bb.updateBitboard(*this, false);
+        this->changeTurn();
+        auto [l, m] = getKingPosition();
+        std::vector<long long> squaresAttacked = bb.getBitboard();
+        int k = l * 8 + m;
+
+        if (squaresAttacked[k] != 0) {
+            return true;
         }
         return false;
     }

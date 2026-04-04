@@ -5,6 +5,7 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <utility>
+
 #include "ChessBoard.h"
 #include "Functions.h"
 
@@ -13,7 +14,7 @@ namespace ChessGame {
 	class Pawn{
 	public:
 		Pawn(PieceColor color);
-		std::vector<std::pair<sf::Vector2f, sf::Vector2f>> getMoves(std::vector<std::vector<ChessPiece>> chessBoard, ChessPiece pawn);
+		std::vector<Move> getMoves(ChessBoard b, ChessPiece pawn);
 
 	private:
 		PieceColor color;

@@ -54,6 +54,15 @@
     <ClCompile Include="src\PromotionClicker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\PGN.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextureManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Move.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="x64\Debug\Chess Engine.exe.recipe" />
@@ -147,6 +156,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\PromotionClicker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PGN.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TextureManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Move.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

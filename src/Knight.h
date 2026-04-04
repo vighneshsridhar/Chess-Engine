@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "ChessPiece.h"
+#include "Move.h"
 #include "Functions.h"
 
 namespace ChessGame {
@@ -13,7 +14,7 @@ namespace ChessGame {
 	class Knight {
 	public:
 		Knight(PieceColor color);
-		std::vector<std::pair<sf::Vector2f, sf::Vector2f>> getMoves(std::vector<std::vector<ChessPiece>> chessBoard, ChessPiece knight);
+		std::vector<Move> getMoves(std::vector<std::vector<ChessPiece>> chessBoard, ChessPiece knight);
 
 	private:
 		PieceColor color;

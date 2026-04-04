@@ -13,7 +13,7 @@ namespace ChessGame {
 		hasMoved = false;
 	};
 
-	PieceType ChessPiece::getPieceType() {
+	PieceType ChessPiece::getPieceType() const {
 		return pieceType;
 	}
 
@@ -26,7 +26,11 @@ namespace ChessGame {
 		return color;
 	}
 
-	sf::Texture ChessPiece::getTexture() {
+	void ChessPiece::setColor(PieceColor newColor) {
+		color = newColor;
+	}
+
+	sf::Texture ChessPiece::getTexture() const {
 		sf::Texture texture;
 		std::string path;
 
@@ -116,11 +120,15 @@ namespace ChessGame {
 		return;
 	}
 	
-	bool ChessPiece::pieceHasMoved() {
+	bool ChessPiece::pieceHasMoved() const {
 		return hasMoved;
 	}
 
 	void ChessPiece::setPieceHasMoved() {
 		hasMoved = true;
+	}
+
+	bool ChessPiece::operator == (ChessPiece& piece) const {
+		return pieceType == piece.getPieceType() && color == piece.getColor();
 	}
 }

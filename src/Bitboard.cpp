@@ -1,15 +1,15 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <vector>
-#include <filesystem> // Requires C++17 or later
-#include <windows.h>
+#include <iostream>
+#include <bitset>
 
 #include "Bitboard.h"
+#include "Move.h"
 #include "ChessBoard.h"
 #include "ChessPiece.h"
 #include "Functions.h"
-#include <iostream>
-#include <bitset>
+
 
 namespace ChessGame {
 	Bitboard::Bitboard() {
@@ -102,7 +102,7 @@ namespace ChessGame {
 	void Bitboard::updateBitboard(ChessBoard b, bool castling) {
 		std::vector<std::vector<ChessPiece>> chessBoard = b.getChessBoard();
 		resetBitboard();
-		std::vector<std::pair<sf::Vector2f, sf::Vector2f>> moves;
+		std::vector<Move> moves;
 
 		long long mask;
 		int square1;
@@ -118,7 +118,8 @@ namespace ChessGame {
 				moves = b.getPieceMoves(chessBoard[r][c]);
 
 				for (const auto& move : moves) {
-					auto& [position1, position2] = move;
+					auto position1 = move.getInitialSquare();
+					auto position2 = move.getEndSquare();
 					auto [r1, c1] = Functions::convertToSquare(position1);
 					auto [r2, c2] = Functions::convertToSquare(position2);
 					square1 = Functions::convertToNumber(position1);

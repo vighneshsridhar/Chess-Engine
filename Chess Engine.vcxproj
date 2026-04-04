@@ -161,11 +161,14 @@
     <ClCompile Include="src\King.cpp" />
     <ClCompile Include="src\Knight.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Move.cpp" />
     <ClCompile Include="src\Pawn.cpp" />
+    <ClCompile Include="src\PGN.cpp" />
     <ClCompile Include="src\Play.cpp" />
     <ClCompile Include="src\PromotionClicker.cpp" />
     <ClCompile Include="src\Queen.cpp" />
     <ClCompile Include="src\Rook.cpp" />
+    <ClCompile Include="src\TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="x64\Debug\Chess Engine.exe.recipe" />
@@ -206,11 +209,14 @@
     <ClInclude Include="src\Functions.h" />
     <ClInclude Include="src\King.h" />
     <ClInclude Include="src\Knight.h" />
+    <ClInclude Include="src\Move.h" />
     <ClInclude Include="src\Pawn.h" />
+    <ClInclude Include="src\PGN.h" />
     <ClInclude Include="src\Play.h" />
     <ClInclude Include="src\PromotionClicker.h" />
     <ClInclude Include="src\Queen.h" />
     <ClInclude Include="src\Rook.h" />
+    <ClInclude Include="src\TextureManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

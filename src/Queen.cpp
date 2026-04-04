@@ -5,6 +5,7 @@
 #include <windows.h>
 
 #include "Queen.h"
+#include "Move.h"
 #include "ChessPiece.h"
 #include "Functions.h"
 
@@ -14,9 +15,9 @@ namespace ChessGame {
 	Queen::Queen(PieceColor color) : color(color) {
 	};
 
-	std::vector<std::pair<sf::Vector2f, sf::Vector2f>> Queen::getMoves(std::vector<std::vector<ChessPiece>> chessBoard, ChessPiece queen) {
+	std::vector<Move> Queen::getMoves(std::vector<std::vector<ChessPiece>> chessBoard, ChessPiece queen) {
 		sf::Vector2f position = queen.getPosition();
-		std::vector<std::pair<sf::Vector2f, sf::Vector2f>> moves;
+		std::vector<Move> moves;
 		sf::Vector2f y;
 		int boardSize = 8;
 		float squareSize = 100.f;
@@ -26,7 +27,8 @@ namespace ChessGame {
 
 		while (s < boardSize && chessBoard[s][t].getColor() != chessBoard[r][c].getColor()) {
 			y = Functions::convertToPosition(s, t);
-			moves.push_back(std::make_pair(position, y));
+			Move move = { position, y, -1, queen, chessBoard[s][t] };
+			moves.push_back(move);
 
 			if (chessBoard[s][t].getPieceType() != PieceType::EMPTY) {
 				break;
@@ -38,7 +40,8 @@ namespace ChessGame {
 
 		while (s >= 0 && chessBoard[s][t].getColor() != chessBoard[r][c].getColor()) {
 			y = Functions::convertToPosition(s, t);
-			moves.push_back(std::make_pair(position, y));
+			Move move = { position, y, -1, queen, chessBoard[s][t] };
+			moves.push_back(move);
 
 			if (chessBoard[s][t].getPieceType() != PieceType::EMPTY) {
 				break;
@@ -50,7 +53,8 @@ namespace ChessGame {
 
 		while (t < boardSize && chessBoard[s][t].getColor() != chessBoard[r][c].getColor()) {
 			y = Functions::convertToPosition(s, t);
-			moves.push_back(std::make_pair(position, y));
+			Move move = { position, y, -1, queen, chessBoard[s][t] };
+			moves.push_back(move);
 
 			if (chessBoard[s][t].getPieceType() != PieceType::EMPTY) {
 				break;
@@ -62,7 +66,8 @@ namespace ChessGame {
 
 		while (t >= 0 && chessBoard[s][t].getColor() != chessBoard[r][c].getColor()) {
 			y = Functions::convertToPosition(s, t);
-			moves.push_back(std::make_pair(position, y));
+			Move move = { position, y, -1, queen, chessBoard[s][t] };
+			moves.push_back(move);
 
 			if (chessBoard[s][t].getPieceType() != PieceType::EMPTY) {
 				break;
@@ -74,7 +79,8 @@ namespace ChessGame {
 
 		while (s < boardSize && t < boardSize && chessBoard[s][t].getColor() != chessBoard[r][c].getColor()) {
 			y = Functions::convertToPosition(s, t);
-			moves.push_back(std::make_pair(position, y));
+			Move move = { position, y, -1, queen, chessBoard[s][t] };
+			moves.push_back(move);
 
 			if (chessBoard[s][t].getPieceType() != PieceType::EMPTY) {
 				break;
@@ -87,7 +93,8 @@ namespace ChessGame {
 
 		while (s < boardSize && t >= 0 && chessBoard[s][t].getColor() != chessBoard[r][c].getColor()) {
 			y = Functions::convertToPosition(s, t);
-			moves.push_back(std::make_pair(position, y));
+			Move move = { position, y, -1, queen, chessBoard[s][t] };
+			moves.push_back(move);
 
 			if (chessBoard[s][t].getPieceType() != PieceType::EMPTY) {
 				break;
@@ -100,7 +107,8 @@ namespace ChessGame {
 
 		while (s >= 0 && t < boardSize && chessBoard[s][t].getColor() != chessBoard[r][c].getColor()) {
 			y = Functions::convertToPosition(s, t);
-			moves.push_back(std::make_pair(position, y));
+			Move move = { position, y, -1, queen, chessBoard[s][t] };
+			moves.push_back(move);
 
 			if (chessBoard[s][t].getPieceType() != PieceType::EMPTY) {
 				break;
@@ -113,7 +121,8 @@ namespace ChessGame {
 
 		while (s >= 0 && t >= 0 && chessBoard[s][t].getColor() != chessBoard[r][c].getColor()) {
 			y = Functions::convertToPosition(s, t);
-			moves.push_back(std::make_pair(position, y));
+			Move move = { position, y, -1, queen, chessBoard[s][t] };
+			moves.push_back(move);
 			
 			if (chessBoard[s][t].getPieceType() != PieceType::EMPTY) {
 				break;

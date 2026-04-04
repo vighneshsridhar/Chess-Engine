@@ -24,6 +24,7 @@ namespace ChessGame {
 		int numSquares;
 		int boardSize;
 		std::vector<long long> squaresAttacked;
+		std::vector<long long> squaresAttackedInverse;
 	};
 
 }

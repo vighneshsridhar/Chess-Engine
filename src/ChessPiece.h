@@ -28,14 +28,16 @@ namespace ChessGame {
 	class ChessPiece {
 	public: 
 		ChessPiece(PieceType pieceType, PieceColor color, sf::Vector2f position);
-		PieceType getPieceType();
+		PieceType getPieceType() const;
 		void setPieceType(PieceType newPieceType);
 		PieceColor getColor();
-		sf::Texture getTexture();
+		void setColor(PieceColor color);
+		sf::Texture getTexture() const;
 		sf::Vector2f getPosition() const;
-		void setPosition(sf::Vector2f);
-		bool pieceHasMoved();
+		void setPosition(sf::Vector2f newPosition);
+		bool pieceHasMoved() const;
 		void setPieceHasMoved();
+		bool operator == (ChessPiece& piece) const;
 
 	private:
 		PieceType pieceType;
