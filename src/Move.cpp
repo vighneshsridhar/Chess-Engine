@@ -2,8 +2,10 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <cmath>
 
 #include "Move.h"
+#include "Functions.h"
 
 namespace ChessGame {
 
@@ -23,7 +25,14 @@ namespace ChessGame {
 		return capturedPiece;
 	}
 
-	bool Move::operator == (const Move & m) const {
+	bool Move::isEnPassant() const {
+		if (capturedPiece.getPieceType() == PieceType::EMPTY && piece.getPieceType() == PieceType::PAWN && std::abs(endSquare.x - initialSquare.x) > 0) {
+			return true;
+		}
+		return false;
+	}
+
+	bool Move::operator == (const Move m) const {
 		return initialSquare == m.getInitialSquare() && endSquare == m.getEndSquare();
 	}
 }

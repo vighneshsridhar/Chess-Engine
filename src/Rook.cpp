@@ -15,9 +15,10 @@ namespace ChessGame {
 	Rook::Rook(PieceColor color) : color(color) {
 	};
 
-	std::vector<Move> Rook::getMoves(std::vector<std::vector<ChessPiece>> chessBoard, ChessPiece rook) {
+	std::vector<Move*> Rook::getMoves(ChessBoard chessBoard, ChessPiece rook) {
 		sf::Vector2f position = rook.getPosition();
-		std::vector<Move> moves;
+		std::vector<std::vector<ChessPiece>> b = chessBoard.getChessBoard();
+		std::vector<Move*> moves;
 		sf::Vector2f y;
 		int boardSize = 8;
 		float squareSize = 100.f;
@@ -25,12 +26,12 @@ namespace ChessGame {
 		int s = r + 1;
 		int t = c;
 
-		while (s < boardSize && chessBoard[s][t].getColor() != chessBoard[r][c].getColor()) {
+		while (s < boardSize && b[s][t].getColor() != b[r][c].getColor()) {
 			y = Functions::convertToPosition(s, t);
-			Move move = { position, y, -1, rook, chessBoard[s][t] };
+			Move* move = new Move{ position, y, -1, rook, b[s][t] };
 			moves.push_back(move);
 
-			if (chessBoard[s][t].getPieceType() != PieceType::EMPTY) {
+			if (b[s][t].getPieceType() != PieceType::EMPTY) {
 				break;
 			}
 			s++;
@@ -38,12 +39,12 @@ namespace ChessGame {
 		s = r - 1;
 		t = c;
 
-		while (s >= 0 && chessBoard[s][t].getColor() != chessBoard[r][c].getColor()) {
+		while (s >= 0 && b[s][t].getColor() != b[r][c].getColor()) {
 			y = Functions::convertToPosition(s, t);
-			Move move = { position, y, -1, rook, chessBoard[s][t] };
+			Move* move = new Move{ position, y, -1, rook, b[s][t] };
 			moves.push_back(move);
 
-			if (chessBoard[s][t].getPieceType() != PieceType::EMPTY) {
+			if (b[s][t].getPieceType() != PieceType::EMPTY) {
 				break;
 			}
 			s--;
@@ -51,12 +52,12 @@ namespace ChessGame {
 		s = r;
 		t = c + 1;
 
-		while (t < boardSize && chessBoard[s][t].getColor() != chessBoard[r][c].getColor()) {
+		while (t < boardSize && b[s][t].getColor() != b[r][c].getColor()) {
 			y = Functions::convertToPosition(s, t);
-			Move move = { position, y, -1, rook, chessBoard[s][t] };
+			Move* move = new Move{ position, y, -1, rook, b[s][t] };
 			moves.push_back(move);
 
-			if (chessBoard[s][t].getPieceType() != PieceType::EMPTY) {
+			if (b[s][t].getPieceType() != PieceType::EMPTY) {
 				break;
 			}
 			t++;
@@ -64,12 +65,12 @@ namespace ChessGame {
 		s = r;
 		t = c - 1;
 
-		while (t >= 0 && chessBoard[s][t].getColor() != chessBoard[r][c].getColor()) {
+		while (t >= 0 && b[s][t].getColor() != b[r][c].getColor()) {
 			y = Functions::convertToPosition(s, t);
-			Move move = { position, y, -1, rook, chessBoard[s][t] };
+			Move* move = new Move{ position, y, -1, rook, b[s][t] };
 			moves.push_back(move);
 
-			if (chessBoard[s][t].getPieceType() != PieceType::EMPTY) {
+			if (b[s][t].getPieceType() != PieceType::EMPTY) {
 				break;
 			}
 			t--;

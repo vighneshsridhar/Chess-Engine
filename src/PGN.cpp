@@ -16,11 +16,12 @@
 namespace ChessGame {
 
 	PGN::PGN() {
-		moveNumber = 1;
+		pgn = "";
+		moveNumber = 0;
 	};
 
 	std::string PGN::convertSquareToPGN(int r, int c) const {
-		std::vector<char> files = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
+		std::vector<char> files = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
 		std::vector<char> ranks = { '8', '7', '6', '5', '4', '3', '2', '1' };
 		char file = files[c];
 		char rank = ranks[r];
@@ -31,27 +32,27 @@ namespace ChessGame {
 		return square;
 	}
 
-	std::string PGN::convertMoveToPGN(Move move, bool isCapture, ChessBoard b) const {
-		std::vector<std::vector<ChessPiece>> chessBoard = b.getChessBoard();
-		auto [r1, c1] = Functions::convertToSquare(move.getInitialSquare());
-		auto [r2, c2] = Functions::convertToSquare(move.getEndSquare());
+	std::string PGN::convertMoveToPGN(Move* move, int moveNumber, ChessBoard chessBoard) const {
+		std::vector<std::vector<ChessPiece>> b = chessBoard.getChessBoard();
+		auto [r1, c1] = Functions::convertToSquare(move->getInitialSquare());
+		auto [r2, c2] = Functions::convertToSquare(move->getEndSquare());
 
-		ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, move.getInitialSquare());
-		ChessPiece piece = chessBoard[r1][c1];
+		ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, move->getInitialSquare());
+		ChessPiece piece = b[r1][c1];
 		PieceType type = piece.getPieceType();
 		PieceColor color = piece.getColor();
+		bool moveRecorded = false;
+		std::string s;
 		std::string ans;
 
 		if (type == PieceType::KING && c2 - c1 == 2) {
-			ans = "O-O";
-
-			return ans;
+			s = "O-O";
+			moveRecorded = true;
 		}
 
 		if (type == PieceType::KING && c2 - c1 == -2) {
-			ans = "O-O-O";
-
-			return ans;
+			s = "O-O-O";
+			moveRecorded = true;
 		}
 
 		std::string square1 = convertSquareToPGN(r1, c1);
@@ -68,41 +69,44 @@ namespace ChessGame {
 		std::string disambiguateRank = "";
 		std::string capture = "";
 
-		if (isCapture) {
+		if (move->getCapturedPiece().getPieceType() != PieceType::EMPTY || move->isEnPassant()) {
 			capture = "x";
 		}
 
 		if (type == PieceType::PAWN) {
 
 			if (capture.length() > 0) {
-				ans = pieceToLetter[type] + capture + square2;
+				s = pieceToLetter[type] + capture + square2;
 			}
 
 			else {
-				ans = pieceToLetter[type] + square2[1];
+				s = pieceToLetter[type] + square2[1];
 			}
 
+			if (chessBoard.getTurn()) {
+				ans += std::to_string(moveNumber) + ".";
+			}
+			ans += s;
 			return ans;
 		}
-		std::vector<Move> moves = b.getPieceMoves(chessBoard[r1][c1]);
+		std::vector<Move*> moves = chessBoard.getPieceMoves(b[r1][c1]);
 		int boardSize = 8;
-		std::vector<ChessPiece> samePieces;
 
 		for (int r3 = 0; r3 < boardSize; r3++) {
 
 			for (int c3 = 0; c3 < boardSize; c3++) {
-				
+
 				if (r1 == r3 && c1 == c3) {
 					continue;
 				}
-				ChessPiece piece2 = chessBoard[r3][c3];
+				ChessPiece piece2 = b[r3][c3];
 
 				if (piece2 == piece) {
-					std::vector<Move> moves2 = b.getPieceMoves(piece2);
+					std::vector<Move*> moves2 = chessBoard.getPieceMoves(piece2);
 
 					for (const auto& move2 : moves2) {
-						
-						if (move2.getEndSquare() == move.getEndSquare() && c1 == c3) {
+
+						if (move2->getEndSquare() == move->getEndSquare() && c1 == c3) {
 							disambiguateRank = convertSquareToPGN(r1, c1)[1];
 						}
 					}
@@ -117,67 +121,87 @@ namespace ChessGame {
 				if (r1 == r3 && c1 == c3) {
 					continue;
 				}
-				ChessPiece piece2 = chessBoard[r3][c3];
+				ChessPiece piece2 = b[r3][c3];
 
 				if (piece2 == piece) {
-					std::vector<Move> moves2 = b.getPieceMoves(piece2);
+					std::vector<Move*> moves2 = chessBoard.getPieceMoves(piece2);
 
 					for (const auto& move2 : moves2) {
 
-						if (move2.getEndSquare() == move.getEndSquare() && (r1 == r3 || disambiguateRank.length() == 0)) {
+						if (move2->getEndSquare() == move->getEndSquare() && (r1 == r3 || disambiguateRank.length() == 0)) {
 							disambiguateFile = convertSquareToPGN(r1, c1)[0];
 						}
 					}
 				}
 			}
 		}
-		ans = pieceToLetter[type] + disambiguateFile + disambiguateRank + capture + square2;
 
+		if (!moveRecorded) {
+			s = pieceToLetter[type] + disambiguateFile + disambiguateRank + capture + square2;
+		}
+
+		if (chessBoard.getTurn()) {
+			ans = std::to_string(moveNumber) + ".";
+		}
+		ans += s;
 		return ans;
 	}
 
-	void PGN::printMove(std::string ans, ChessBoard b, size_t numLegalMoves) const {
-		if (!b.getTurn()) {
-			ans = std::to_string(moveNumber) + ". " + ans;
+	std::string PGN::generatePGN(Move::MoveNode* root, ChessBoard chessBoard, int index) {
+		std::string pgn_ans = "";
+		std::string move_pgn;
+		int moveNumber = root->moveNumber;
+
+		if (root->move) {
+			move_pgn = convertMoveToPGN(root->move, moveNumber, chessBoard) + root->check;
+			pgn_ans = move_pgn + " ";
+		}
+		std::vector<Move::MoveNode*> siblings;
+
+		if (root->parent) {
+			siblings = root->parent->children;
 		}
 
-		else {
-			ans = " " + ans;
+		if (index + 1 < siblings.size()) {
+			move_pgn = generatePGN(siblings[index + 1], chessBoard, index + 1);
+			pgn_ans += "\n";
+
+			if (!chessBoard.getTurn()) {
+				pgn_ans += "..." + std::to_string(moveNumber) + ".";
+			}
+			pgn_ans += move_pgn;
 		}
-		std::string statement;
-		bool w = b.isCheckOrCheckmate();
+
+		if (index == 0 && siblings.size() > 1) {
+			pgn_ans += "\n";
+		}
+
+		if (root->children.size() > 0) {
+			Move::MoveNode* n = root->children[0];
+			chessBoard.setChessBoard(n->b);
+			chessBoard.changeTurn();
+			pgn_ans += generatePGN(n, chessBoard, 0);
+		}
+
+		return pgn_ans;
+	}
+
+	std::string PGN::checkOrCheckmate(ChessBoard chessBoard, size_t numLegalMoves) {
+		bool w = chessBoard.isCheckOrCheckmate();
+		std::string c;
 
 		if (w && numLegalMoves == 0) {
-			ans += "#";
-			statement = b.getTurn() ? "\n \nCheckmate! Black wins!" : "\n \nCheckmate! White wins!";
-			std::cout << ans << statement << std::endl;
-			return;
+			c = "#";
 		}
 
 		else if (w) {
-			ans += "+";
+			c = "+";
 		}
-		
+
 		else if (numLegalMoves == 0) {
-			statement = "\n \nStalemate!";
-			std::cout << ans << statement << std::endl;
-			return;
+			return "";
 		}
 
-		if (b.getTurn()) {
-			ans += "\n";
-		}
-		std::cout << ans;
-		return;
-	}
-
-	void PGN::incrementMove() {
-		moveNumber++;
-	}
-
-	void PGN::decrementMove() {
-		if (moveNumber > 1) {
-			moveNumber--;
-		}
+		return c;
 	}
 }

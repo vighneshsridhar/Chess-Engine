@@ -25,8 +25,8 @@ namespace ChessGame {
 							0, 0, 0, 0, 0, 0, 0, 0 };
 	};
 
-	void Bitboard::updatePawnAttackSquares(ChessBoard b) {
-		std::vector<std::vector<ChessPiece>> chessBoard = b.getChessBoard();
+	void Bitboard::updatePawnAttackSquares(ChessBoard chessBoard) {
+		std::vector<std::vector<ChessPiece>> b = chessBoard.getChessBoard();
 		int square1;
 		int square2;
 
@@ -36,12 +36,12 @@ namespace ChessGame {
 				square1 = r1 * 8 + c1;
 				long long mask = (static_cast<long long>(1) << (numSquares - 1 - square1));
 
-				if (chessBoard[r1][c1].getPieceType() != PieceType::PAWN || (b.getTurn() && chessBoard[r1][c1].getColor() != PieceColor::WHITE) || 
-					(!b.getTurn() && chessBoard[r1][c1].getColor() != PieceColor::BLACK) || r1 == 0 || r1 == 7) {
+				if (b[r1][c1].getPieceType() != PieceType::PAWN || (chessBoard.getTurn() && b[r1][c1].getColor() != PieceColor::WHITE) || 
+					(!chessBoard.getTurn() && b[r1][c1].getColor() != PieceColor::BLACK) || r1 == 0 || r1 == 7) {
 					continue;
 				}
 
-				if (chessBoard[r1][c1].getColor() == PieceColor::WHITE) {
+				if (b[r1][c1].getColor() == PieceColor::WHITE) {
 
 					if (c1 == 0) {
 						square2 = (r1 - 1) * 8 + 1;
@@ -61,7 +61,7 @@ namespace ChessGame {
 					}
 				}
 
-				if (chessBoard[r1][c1].getColor() == PieceColor::BLACK) {
+				if (b[r1][c1].getColor() == PieceColor::BLACK) {
 
 					if (c1 == 0) {
 						square2 = (r1 + 1) * 8 + 1;
@@ -99,10 +99,10 @@ namespace ChessGame {
 							0, 0, 0, 0, 0, 0, 0, 0 };
 	}
 
-	void Bitboard::updateBitboard(ChessBoard b, bool castling) {
-		std::vector<std::vector<ChessPiece>> chessBoard = b.getChessBoard();
+	void Bitboard::updateBitboard(ChessBoard chessBoard, bool castling) {
+		std::vector<std::vector<ChessPiece>> b = chessBoard.getChessBoard();
 		resetBitboard();
-		std::vector<Move> moves;
+		std::vector<Move*> moves;
 
 		long long mask;
 		int square1;
@@ -112,14 +112,14 @@ namespace ChessGame {
 
 			for (int c = 0; c < boardSize; c++) {
 
-				if (chessBoard[r][c].getPieceType() == PieceType::PAWN || (b.getTurn() && chessBoard[r][c].getColor() != PieceColor::WHITE) || (!b.getTurn() && chessBoard[r][c].getColor() != PieceColor::BLACK)) {
+				if (b[r][c].getPieceType() == PieceType::PAWN || (chessBoard.getTurn() && b[r][c].getColor() != PieceColor::WHITE) || (!chessBoard.getTurn() && b[r][c].getColor() != PieceColor::BLACK)) {
 					continue;
 				}
-				moves = b.getPieceMoves(chessBoard[r][c]);
+				moves = chessBoard.getPieceMoves(b[r][c]);
 
 				for (const auto& move : moves) {
-					auto position1 = move.getInitialSquare();
-					auto position2 = move.getEndSquare();
+					auto position1 = move->getInitialSquare();
+					auto position2 = move->getEndSquare();
 					auto [r1, c1] = Functions::convertToSquare(position1);
 					auto [r2, c2] = Functions::convertToSquare(position2);
 					square1 = Functions::convertToNumber(position1);
@@ -129,19 +129,19 @@ namespace ChessGame {
 				}
 			}
 		}
-		updatePawnAttackSquares(b);
+		updatePawnAttackSquares(chessBoard);
 
 		return;
 	}
 
-	bool Bitboard::isValidBoard(ChessBoard b, bool castling) {
-		std::pair<int, int> kingPosition = b.getKingPosition();
+	bool Bitboard::isValidBoard(ChessBoard chessBoard, bool castling) {
+		std::pair<int, int> kingPosition = chessBoard.getKingPosition();
 		int num = kingPosition.first * 8 + kingPosition.second;
 		int castlingSquare;
 
 		if (castling) {
 
-			if (b.getTurn()) {
+			if (chessBoard.getTurn()) {
 				
 				if (num == 62) {
 					castlingSquare = 61;

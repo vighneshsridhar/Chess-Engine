@@ -14,11 +14,11 @@ namespace ChessGame {
 	class Bitboard {
 	public:
 		Bitboard();
-		void updatePawnAttackSquares(ChessBoard b);
+		void updatePawnAttackSquares(ChessBoard chessBoard);
 		std::vector<long long> getBitboard();
 		void resetBitboard();
-		void updateBitboard(ChessBoard b, bool castling);
-		bool isValidBoard(ChessBoard b, bool castling);
+		void updateBitboard(ChessBoard chessBoard, bool castling);
+		bool isValidBoard(ChessBoard chessBoard, bool castling);
 
 	private:
 		int numSquares;

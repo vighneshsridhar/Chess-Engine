@@ -6,8 +6,8 @@
 #include <utility>
 #include <vector>
 
-#include "Move.h"
 #include "ChessPiece.h"
+#include "Move.h"
 
 namespace ChessGame {
 
@@ -17,9 +17,9 @@ namespace ChessGame {
 		bool getTurn() const;
 		void changeTurn();
 		std::vector<std::vector<ChessPiece>> getChessBoard();
-		void setChessBoard(std::vector<std::vector<ChessPiece>>);
-		std::vector<Move> getLegalMoves();
-		std::vector<Move> getPieceMoves(ChessPiece piece);
+		void setChessBoard(std::vector<std::vector<ChessPiece>> newChessBoard);
+		std::vector<Move*> getLegalMoves();
+		std::vector<Move*> getPieceMoves(ChessPiece piece);
 		std::pair<int, int> getKingPosition();
 		void setKingPosition(std::pair<int, int> coordinates);
 		int getEnPassantFile();
@@ -30,7 +30,7 @@ namespace ChessGame {
 		int boardSize;
 		bool whiteTurn;
 		int enPassantFile;
-		std::vector<std::vector<ChessPiece>> chessBoard;
+		std::vector<std::vector<ChessPiece>> b;
 		std::unordered_map<std::string, std::pair<int, int>> kingPosition;
 	};
 

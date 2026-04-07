@@ -17,12 +17,12 @@ namespace ChessGame {
 	public:
 		PGN();
 		std::string convertSquareToPGN(int r, int c) const;
-		std::string convertMoveToPGN(Move move, bool isCapture, ChessBoard b) const;
-		void printMove(std::string ans, ChessBoard b, size_t numLegalMoves) const;
-		void incrementMove();
-		void decrementMove();
+		std::string convertMoveToPGN(Move* move, int moveNumber, ChessBoard chessBoard) const;
+		std::string generatePGN(Move::MoveNode* root, ChessBoard chessBoard, int index);
+		std::string checkOrCheckmate(ChessBoard chessBoard, size_t numLegalMoves);
 
 	private:
+		std::string pgn;
 		int moveNumber;
 	};
 }
