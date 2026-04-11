@@ -10,6 +10,7 @@
 #include "ChessPiece.h"
 #include "ChessBoard.h"
 #include "Functions.h"
+#include "Move.h"
 
 
 

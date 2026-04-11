@@ -20,6 +20,7 @@ namespace ChessGame {
 		void setChessBoard(std::vector<std::vector<ChessPiece>> newChessBoard);
 		std::vector<Move*> getLegalMoves();
 		std::vector<Move*> getPieceMoves(ChessPiece piece);
+		void push(Move::MoveNode* n);
 		std::pair<int, int> getKingPosition();
 		void setKingPosition(std::pair<int, int> coordinates);
 		int getEnPassantFile();

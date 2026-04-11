@@ -42,7 +42,7 @@
     <ClCompile Include="src\Pawn.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Play.cpp">
+    <ClCompile Include="src\PlayChess.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Queen.cpp">
@@ -146,7 +146,7 @@
     <ClInclude Include="src\Pawn.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Play.h">
+    <ClInclude Include="src\PlayChess.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Queen.h">

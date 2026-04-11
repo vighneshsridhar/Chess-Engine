@@ -164,7 +164,7 @@
     <ClCompile Include="src\Move.cpp" />
     <ClCompile Include="src\Pawn.cpp" />
     <ClCompile Include="src\PGN.cpp" />
-    <ClCompile Include="src\Play.cpp" />
+    <ClCompile Include="src\PlayChess.cpp" />
     <ClCompile Include="src\PromotionClicker.cpp" />
     <ClCompile Include="src\Queen.cpp" />
     <ClCompile Include="src\Rook.cpp" />
@@ -212,7 +212,7 @@
     <ClInclude Include="src\Move.h" />
     <ClInclude Include="src\Pawn.h" />
     <ClInclude Include="src\PGN.h" />
-    <ClInclude Include="src\Play.h" />
+    <ClInclude Include="src\PlayChess.h" />
     <ClInclude Include="src\PromotionClicker.h" />
     <ClInclude Include="src\Queen.h" />
     <ClInclude Include="src\Rook.h" />

@@ -5,12 +5,12 @@
 #include <vector>
 
 
-#include "Play.h"
+#include "PlayChess.h"
 
 
 
 int main() {
-    ChessGame::Play play;
+    ChessGame::PlayChess play;
     play.playGame();
     return 0;
 }

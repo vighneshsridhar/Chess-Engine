@@ -5,7 +5,8 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 
-#include "Play.h"
+#include "Move.h"
+#include "ChessBoard.h"
 #include "ChessPiece.h"
 #include "Functions.h"
 

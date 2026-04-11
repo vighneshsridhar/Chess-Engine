@@ -32,7 +32,8 @@ namespace ChessGame {
 		return square;
 	}
 
-	std::string PGN::convertMoveToPGN(Move* move, int moveNumber, ChessBoard chessBoard) const {
+	std::string PGN::convertMoveToPGN(Move::MoveNode* n, int moveNumber, ChessBoard chessBoard) const {
+		Move* move = n->move;
 		std::vector<std::vector<ChessPiece>> b = chessBoard.getChessBoard();
 		auto [r1, c1] = Functions::convertToSquare(move->getInitialSquare());
 		auto [r2, c2] = Functions::convertToSquare(move->getEndSquare());
@@ -81,6 +82,11 @@ namespace ChessGame {
 
 			else {
 				s = pieceToLetter[type] + square2[1];
+			}
+
+			if (r2 == 0 || r2 == 7) {
+				ChessPiece p = n->promotionPiece;
+				s += "=" + pieceToLetter[p.getPieceType()];
 			}
 
 			if (chessBoard.getTurn()) {
@@ -151,9 +157,10 @@ namespace ChessGame {
 		std::string pgn_ans = "";
 		std::string move_pgn;
 		int moveNumber = root->moveNumber;
+		bool priorityLine = false;
 
 		if (root->move) {
-			move_pgn = convertMoveToPGN(root->move, moveNumber, chessBoard) + root->check;
+			move_pgn = convertMoveToPGN(root, moveNumber, chessBoard) + root->check;
 			pgn_ans = move_pgn + " ";
 		}
 		std::vector<Move::MoveNode*> siblings;
@@ -174,12 +181,17 @@ namespace ChessGame {
 
 		if (index == 0 && siblings.size() > 1) {
 			pgn_ans += "\n";
+			priorityLine = true;
 		}
 
 		if (root->children.size() > 0) {
 			Move::MoveNode* n = root->children[0];
 			chessBoard.setChessBoard(n->b);
 			chessBoard.changeTurn();
+
+			if (priorityLine && !chessBoard.getTurn()) {
+				pgn_ans += "..." + std::to_string(moveNumber) + ".";
+			}
 			pgn_ans += generatePGN(n, chessBoard, 0);
 		}
 

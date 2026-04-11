@@ -7,7 +7,7 @@
 #include <vector>
 #include <stack>
 
-#include "Play.h"
+#include "PlayChess.h"
 #include "Move.h"
 #include "ChessBoard.h"
 #include "ChessPiece.h"
@@ -20,12 +20,12 @@
 
 namespace ChessGame {
 
-    Play::Play() {
+    PlayChess::PlayChess() {
         boardSize = 8;
         textures = t.getTextures();
     };
 
-    void Play::draw(sf::RenderWindow& window, float squareSize, std::vector<std::vector<ChessPiece>> b, std::vector<std::vector<sf::Sprite>>& spritesBoard) const {
+    void PlayChess::draw(sf::RenderWindow& window, float squareSize, std::vector<std::vector<ChessPiece>> b, std::vector<std::vector<sf::Sprite>>& spritesBoard) const {
         for (int r = 0; r < boardSize; r++) {
 
             for (int c = 0; c < boardSize; c++) {
@@ -57,8 +57,8 @@ namespace ChessGame {
         }
     }
 
-    bool Play::makeMove(sf::RenderWindow& window, ChessBoard& chessBoard, std::vector<std::vector<sf::Sprite>>& spritesBoard, Move::MoveNode* n,
-        std::vector<std::vector<sf::Sprite>>& promotionSprites, std::vector<Move*>& legalMoves, PGN& m) const {
+    bool PlayChess::makeMove(sf::RenderWindow& window, ChessBoard& chessBoard, std::vector<std::vector<sf::Sprite>>& spritesBoard, Move::MoveNode* n,
+    std::vector<std::vector<sf::Sprite>>& promotionSprites, std::vector<Move*>& legalMoves, PGN& m) const {
         Move* move = n->move;
         std::vector<std::vector<ChessPiece>> b = n->b;
 
@@ -69,7 +69,6 @@ namespace ChessGame {
 
         ChessPiece initialPiece = b[initial_r][initial_c];
         ChessPiece capturedPiece = move->getCapturedPiece();
-        ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, sf::Vector2f(20.f, 20.f));
 
         PromotionClicker p;
 
@@ -83,61 +82,34 @@ namespace ChessGame {
             else {
                 j = 1;
             }
-            b[initial_r][initial_c] = empty;
             auto [i, didPromote] = p.promotePawn(window, b, initialPiece, spritesBoard, promotionSprites[j], square2);
 
             if (didPromote) {
                 spritesBoard[r][c] = promotionSprites[j][i];
+                n->promotionPiece = b[r][c];
             }
 
             else {
-                b[initial_r][initial_c] = initialPiece;
-                b[initial_r][initial_c].setPosition(square1);
                 return false;
             }
         }
 
         else {
-            b[r][c] = b[initial_r][initial_c];
-            b[r][c].setPosition(square2);
             spritesBoard[r][c] = spritesBoard[initial_r][initial_c];
-        }
-
-        if (initialPiece.getPieceType() == PieceType::PAWN) {
-
-            if (std::abs(r - initial_r) == 2) {
-                chessBoard.setEnPassantFile(c);
-            }
-
-            if (move->isEnPassant()) {
-                int file = initialPiece.getColor() == PieceColor::WHITE ? r + 1 : r - 1;
-                b[file][c] = empty;
-            }
         }
 
         if (initialPiece.getPieceType() == PieceType::KING) {
             chessBoard.setKingPosition(std::make_pair(r, c));
 
             if (c - initial_c == 2) {
-                auto square3 = Functions::convertToPosition(r, 5);
-                b[r][5] = b[r][7];
-                b[r][5].setPosition(square3);
-                b[r][7] = empty;
                 spritesBoard[r][5] = spritesBoard[r][7];
             }
 
             if (c - initial_c == -2) {
-                auto square3 = Functions::convertToPosition(r, 3);
-                b[r][3] = b[r][0];
-                b[r][3].setPosition(square3);
-                b[r][0] = empty;
                 spritesBoard[r][3] = spritesBoard[r][0];
             }
         }
-        b[initial_r][initial_c] = empty;
-        b[initial_r][initial_c].setPosition(square1);
-        chessBoard.changeTurn();
-        chessBoard.setChessBoard(b);
+        chessBoard.push(n);
         legalMoves = chessBoard.getLegalMoves();
         n->check = m.checkOrCheckmate(chessBoard, legalMoves.size());
         chessBoard.setEnPassantFile(-1);
@@ -145,7 +117,7 @@ namespace ChessGame {
         return true;
     }
 
-    void Play::undoMove(ChessBoard& chessBoard, std::vector<std::vector<sf::Sprite>>& spritesBoard, Move::MoveNode* n, std::vector<std::vector<sf::Sprite>> sprites) const {
+    void PlayChess::undoMove(ChessBoard& chessBoard, std::vector<std::vector<sf::Sprite>>& spritesBoard, Move::MoveNode* n, std::vector<std::vector<sf::Sprite>> sprites) const {
         std::vector<std::vector<ChessPiece>> b = chessBoard.getChessBoard();
         Move* move = n->move;
         auto [r1, c1] = Functions::convertToSquare(move->getInitialSquare());
@@ -162,7 +134,14 @@ namespace ChessGame {
             }
         }
         ChessPiece capturedPiece = move->getCapturedPiece();
-        spritesBoard[r1][c1] = spritesBoard[r2][c2];
+
+        if (n->promotionPiece.getPieceType() == PieceType::EMPTY) {
+            spritesBoard[r1][c1] = spritesBoard[r2][c2];
+        }
+        
+        else {
+            spritesBoard[r1][c1] = b[r2][c2].getColor() == PieceColor::WHITE ? sprites[0][0] : sprites[1][0];
+        }
 
         if (move->isEnPassant()) {
 
@@ -184,7 +163,7 @@ namespace ChessGame {
         chessBoard.setChessBoard(n->b);
     }
 
-    void Play::playGame() {
+    void PlayChess::playGame() {
         sf::RenderWindow window(sf::VideoMode({ 800, 800 }), "Chess Board with Pieces!");
         auto windowSize = window.getSize();
         float squareSize = std::min(windowSize.x, windowSize.y) / 8.f;
@@ -234,6 +213,7 @@ namespace ChessGame {
 
         PromotionClicker p;
         PGN m;
+        std::string pgn;
 
         int initial_r = 0;
         int initial_c = 0;
@@ -243,10 +223,9 @@ namespace ChessGame {
         float y;
 
         std::vector<Move*> legalMoves = chessBoard.getLegalMoves();
-        std::string pgnMove;
         std::vector<Move::MoveNode*> children = {};
         size_t moveNumber = 0;
-        Move::MoveNode* root = new Move::MoveNode{ nullptr, children, nullptr, moveNumber, b, "" };
+        Move::MoveNode* root = new Move::MoveNode{ nullptr, children, nullptr, moveNumber, b, "", empty };
         Move::MoveNode* orig_root = root;
 
         while (window.isOpen()) {
@@ -281,6 +260,9 @@ namespace ChessGame {
                         r = std::round(spritePosition.y / squareSize);
                         c = std::round(spritePosition.x / squareSize);
 
+                        if (r < 0 || r >= boardSize || c < 0 || c >= boardSize) {
+                            continue;
+                        }
                         ChessPiece capturedPiece = b[r][c];
                         square1 = Functions::convertToPosition(initial_r, initial_c);
                         square2 = Functions::convertToPosition(r, c);
@@ -293,7 +275,7 @@ namespace ChessGame {
                         if (it != legalMoves.end()) {
                             std::vector<Move::MoveNode*> children;
                             moveNumber = chessBoard.getTurn() ? root->moveNumber + 1 : root->moveNumber;
-                            Move::MoveNode* n = new Move::MoveNode{ move, children, root, moveNumber, b, "" };
+                            Move::MoveNode* n = new Move::MoveNode{ move, children, root, moveNumber, b, "", empty };
                             bool newMove = true;
 
                             for (const auto node : root->children) {
@@ -310,7 +292,9 @@ namespace ChessGame {
                                     root->children.push_back(n);
                                 }
                                 root = n;
-                                std::cout << m.generatePGN(orig_root, startingPosition, 0) << std::endl;
+                                pgn = m.generatePGN(orig_root, startingPosition, 0);
+                                // std::cout << "\033[2J\033[H";
+                                std::cout << pgn + "\n" << std::endl;
                             }
                         } 
 

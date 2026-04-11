@@ -219,6 +219,66 @@ namespace ChessGame {
         return moves;
     }
 
+    void ChessBoard::push(Move::MoveNode* n) {
+        Move* move = n->move;
+
+        sf::Vector2f square1 = move->getInitialSquare();
+        sf::Vector2f square2 = move->getEndSquare();
+        auto [initial_r, initial_c] = Functions::convertToSquare(square1);
+        auto [r, c] = Functions::convertToSquare(square2);
+
+        ChessPiece initialPiece = b[initial_r][initial_c];
+        ChessPiece capturedPiece = move->getCapturedPiece();
+        ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, sf::Vector2f(20.f, 20.f));
+
+        if (initialPiece.getPieceType() == PieceType::PAWN && (r == 0 || r == 7)) {
+            b[r][c] = n->promotionPiece;
+            b[r][c].setPosition(square2);
+        }
+
+        else {
+            b[r][c] = b[initial_r][initial_c];
+            b[r][c].setPosition(square2);
+        }
+
+        if (initialPiece.getPieceType() == PieceType::PAWN) {
+
+            if (std::abs(r - initial_r) == 2) {
+                this->setEnPassantFile(c);
+            }
+
+            if (move->isEnPassant()) {
+                int rank = initialPiece.getColor() == PieceColor::WHITE ? r + 1 : r - 1;
+                b[rank][c] = empty;
+            }
+        }
+
+        if (initialPiece.getPieceType() == PieceType::KING) {
+            this->setKingPosition(std::make_pair(r, c));
+
+            if (c - initial_c == 2) {
+                auto square3 = Functions::convertToPosition(r, 5);
+                b[r][5] = b[r][7];
+                b[r][5].setPosition(square3);
+                b[r][7] = empty;
+            }
+
+            if (c - initial_c == -2) {
+                auto square3 = Functions::convertToPosition(r, 3);
+                b[r][3] = b[r][0];
+                b[r][3].setPosition(square3);
+                b[r][0] = empty;
+            }
+        }
+        b[r][c].setPieceHasMoved();
+        b[initial_r][initial_c] = empty;
+        b[initial_r][initial_c].setPosition(square1);
+        this->changeTurn();
+        this->setChessBoard(b);
+
+        return;
+    }
+
     std::pair<int, int> ChessBoard::getKingPosition() {
         if (whiteTurn) {
             return kingPosition["WHITE_KING"];

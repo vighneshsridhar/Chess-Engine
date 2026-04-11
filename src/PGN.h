@@ -17,7 +17,7 @@ namespace ChessGame {
 	public:
 		PGN();
 		std::string convertSquareToPGN(int r, int c) const;
-		std::string convertMoveToPGN(Move* move, int moveNumber, ChessBoard chessBoard) const;
+		std::string convertMoveToPGN(Move::MoveNode* n, int moveNumber, ChessBoard chessBoard) const;
 		std::string generatePGN(Move::MoveNode* root, ChessBoard chessBoard, int index);
 		std::string checkOrCheckmate(ChessBoard chessBoard, size_t numLegalMoves);
 

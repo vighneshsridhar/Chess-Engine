@@ -20,6 +20,7 @@ namespace ChessGame {
 			size_t moveNumber;
 			std::vector<std::vector<ChessPiece>> b;
 			std::string check;
+			ChessPiece promotionPiece;
 		};
 		sf::Vector2f getInitialSquare() const;
 		sf::Vector2f getEndSquare() const;
