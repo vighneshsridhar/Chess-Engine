@@ -157,6 +157,8 @@
     <ClCompile Include="src\Bitboard.cpp" />
     <ClCompile Include="src\ChessBoard.cpp" />
     <ClCompile Include="src\ChessPiece.cpp" />
+    <ClCompile Include="src\Engine.cpp" />
+    <ClCompile Include="src\Evaluate.cpp" />
     <ClCompile Include="src\Functions.cpp" />
     <ClCompile Include="src\King.cpp" />
     <ClCompile Include="src\Knight.cpp" />
@@ -169,6 +171,7 @@
     <ClCompile Include="src\Queen.cpp" />
     <ClCompile Include="src\Rook.cpp" />
     <ClCompile Include="src\TextureManager.cpp" />
+    <ClCompile Include="src\TranspositionTable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="x64\Debug\Chess Engine.exe.recipe" />
@@ -206,6 +209,8 @@
     <ClInclude Include="src\Bitboard.h" />
     <ClInclude Include="src\ChessBoard.h" />
     <ClInclude Include="src\ChessPiece.h" />
+    <ClInclude Include="src\Engine.h" />
+    <ClInclude Include="src\Evaluate.h" />
     <ClInclude Include="src\Functions.h" />
     <ClInclude Include="src\King.h" />
     <ClInclude Include="src\Knight.h" />
@@ -217,6 +222,7 @@
     <ClInclude Include="src\Queen.h" />
     <ClInclude Include="src\Rook.h" />
     <ClInclude Include="src\TextureManager.h" />
+    <ClInclude Include="src\TranspositionTable.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

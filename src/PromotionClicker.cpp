@@ -17,13 +17,13 @@
 namespace ChessGame {
 
     PromotionClicker::PromotionClicker() {
-        boardSize = 8;
     };
 
     std::pair<int, bool> PromotionClicker::promotePawn(sf::RenderWindow& window, std::vector<std::vector<ChessPiece>>& b,
-        ChessPiece pawn, std::vector<std::vector<sf::Sprite>>& spritesBoard, std::vector<sf::Sprite>& sprites, sf::Vector2f promotionPosition) const {
+    ChessPiece pawn, std::vector<std::vector<sf::Sprite>>& spritesBoard, std::vector<sf::Sprite>& sprites, sf::Vector2f promotionPosition) {
 
         sf::Vector2f mousePosition;
+        int boardSize = 8;
         auto windowSize = window.getSize();
         float squareSize = std::min(windowSize.x, windowSize.y) / 8.f;
         auto [r, c] = Functions::convertToSquare(promotionPosition);
@@ -39,7 +39,7 @@ namespace ChessGame {
         int i;
         int increment;
 
-        if (pawn.getColor() == PieceColor::WHITE) {
+        if (color == PieceColor::WHITE) {
             i = 0;
             increment = 1;
         }

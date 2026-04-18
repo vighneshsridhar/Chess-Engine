@@ -8,6 +8,11 @@
 
 
 namespace ChessGame {
+	ChessPiece::ChessPiece() {
+		hasMoved = false;
+		pieceType = PieceType::EMPTY;
+		color = PieceColor::NONE;
+	};
 
 	ChessPiece::ChessPiece(PieceType pieceType, PieceColor color, sf::Vector2f position): pieceType(pieceType), color(color), position(position) {
 		hasMoved = false;

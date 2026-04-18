@@ -15,7 +15,7 @@ namespace ChessGame {
 	class King {
 	public:
 		King(PieceColor color);
-		std::vector<Move*> getMoves(ChessBoard chessBoard, ChessPiece king);
+		std::vector<Move> getMoves(ChessBoard chessBoard, ChessPiece king);
 
 	private:
 		PieceColor color;

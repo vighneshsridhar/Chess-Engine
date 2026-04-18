@@ -12,10 +12,7 @@ namespace ChessGame {
 	class TextureManager {
 	public:
 		TextureManager();
-		std::unordered_map<std::string, sf::Texture> getTextures();
-
-	private:
-		std::unordered_map<std::string, sf::Texture> textures;
+		static std::unordered_map<std::string, sf::Texture> getTextures();
 	};
 
 }

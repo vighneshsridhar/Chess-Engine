@@ -36,8 +36,8 @@ namespace ChessGame {
 				square1 = r1 * 8 + c1;
 				long long mask = (static_cast<long long>(1) << (numSquares - 1 - square1));
 
-				if (b[r1][c1].getPieceType() != PieceType::PAWN || (chessBoard.getTurn() && b[r1][c1].getColor() != PieceColor::WHITE) || 
-					(!chessBoard.getTurn() && b[r1][c1].getColor() != PieceColor::BLACK) || r1 == 0 || r1 == 7) {
+				if (b[r1][c1].getPieceType() != PieceType::PAWN || (chessBoard.whiteTurn() && b[r1][c1].getColor() != PieceColor::WHITE) || 
+					(!chessBoard.whiteTurn() && b[r1][c1].getColor() != PieceColor::BLACK) || r1 == 0 || r1 == 7) {
 					continue;
 				}
 
@@ -102,7 +102,7 @@ namespace ChessGame {
 	void Bitboard::updateBitboard(ChessBoard chessBoard, bool castling) {
 		std::vector<std::vector<ChessPiece>> b = chessBoard.getChessBoard();
 		resetBitboard();
-		std::vector<Move*> moves;
+		std::vector<Move> moves;
 
 		long long mask;
 		int square1;
@@ -112,14 +112,14 @@ namespace ChessGame {
 
 			for (int c = 0; c < boardSize; c++) {
 
-				if (b[r][c].getPieceType() == PieceType::PAWN || (chessBoard.getTurn() && b[r][c].getColor() != PieceColor::WHITE) || (!chessBoard.getTurn() && b[r][c].getColor() != PieceColor::BLACK)) {
+				if (b[r][c].getPieceType() == PieceType::PAWN || (chessBoard.whiteTurn() && b[r][c].getColor() != PieceColor::WHITE) || (!chessBoard.whiteTurn() && b[r][c].getColor() != PieceColor::BLACK)) {
 					continue;
 				}
 				moves = chessBoard.getPieceMoves(b[r][c]);
 
 				for (const auto& move : moves) {
-					auto position1 = move->getInitialSquare();
-					auto position2 = move->getEndSquare();
+					auto position1 = move.getInitialSquare();
+					auto position2 = move.getEndSquare();
 					auto [r1, c1] = Functions::convertToSquare(position1);
 					auto [r2, c2] = Functions::convertToSquare(position2);
 					square1 = Functions::convertToNumber(position1);
@@ -141,7 +141,7 @@ namespace ChessGame {
 
 		if (castling) {
 
-			if (chessBoard.getTurn()) {
+			if (chessBoard.whiteTurn()) {
 				
 				if (num == 62) {
 					castlingSquare = 61;

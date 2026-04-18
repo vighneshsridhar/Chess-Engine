@@ -4,8 +4,13 @@
 namespace ChessGame {
 
 	TextureManager::TextureManager() {
+	}
+
+    std::unordered_map<std::string, sf::Texture> TextureManager::getTextures() {
+        std::unordered_map<std::string, sf::Texture> textures;
         float x = 20.f;
         float y = 20.f;
+
         ChessGame::ChessPiece whitePawn(PieceType::PAWN, PieceColor::WHITE, sf::Vector2f(x, y));
         ChessGame::ChessPiece whiteKnight(PieceType::KNIGHT, PieceColor::WHITE, sf::Vector2f(x, y));
         ChessGame::ChessPiece whiteBishop(PieceType::BISHOP, PieceColor::WHITE, sf::Vector2f(x, y));
@@ -33,9 +38,7 @@ namespace ChessGame {
         textures["BLACK_ROOK"] = blackRook.getTexture();
         textures["BLACK_QUEEN"] = blackQueen.getTexture();
         textures["BLACK_KING"] = blackKing.getTexture();
-	}
 
-    std::unordered_map<std::string, sf::Texture> TextureManager::getTextures() {
         return textures;
     }
 }

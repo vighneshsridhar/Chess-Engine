@@ -27,6 +27,7 @@ namespace ChessGame {
 
 	class ChessPiece {
 	public: 
+		ChessPiece();
 		ChessPiece(PieceType pieceType, PieceColor color, sf::Vector2f position);
 		PieceType getPieceType() const;
 		void setPieceType(PieceType newPieceType);

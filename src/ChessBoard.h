@@ -14,13 +14,14 @@ namespace ChessGame {
 	class ChessBoard {
 	public:
 		ChessBoard();
-		bool getTurn() const;
+		bool whiteTurn() const;
 		void changeTurn();
 		std::vector<std::vector<ChessPiece>> getChessBoard();
 		void setChessBoard(std::vector<std::vector<ChessPiece>> newChessBoard);
-		std::vector<Move*> getLegalMoves();
-		std::vector<Move*> getPieceMoves(ChessPiece piece);
-		void push(Move::MoveNode* n);
+		std::vector<Move> getLegalMoves();
+		std::vector<Move> getPieceMoves(ChessPiece piece);
+		void push(Move move);
+		void unmakeMove(Move move);
 		std::pair<int, int> getKingPosition();
 		void setKingPosition(std::pair<int, int> coordinates);
 		int getEnPassantFile();
@@ -29,7 +30,7 @@ namespace ChessGame {
 
 	private:
 		int boardSize;
-		bool whiteTurn;
+		bool wTurn;
 		int enPassantFile;
 		std::vector<std::vector<ChessPiece>> b;
 		std::unordered_map<std::string, std::pair<int, int>> kingPosition;

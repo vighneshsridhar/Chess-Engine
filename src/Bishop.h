@@ -15,7 +15,7 @@ namespace ChessGame {
 	class Bishop {
 	public:
 		Bishop(PieceColor color);
-		std::vector<Move*> getMoves(ChessBoard chessBoard, ChessPiece bishop);
+		std::vector<Move> getMoves(ChessBoard chessBoard, ChessPiece bishop);
 
 	private:
 		PieceColor color;

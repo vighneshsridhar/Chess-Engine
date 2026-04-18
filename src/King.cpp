@@ -13,10 +13,10 @@ namespace ChessGame {
 	King::King(PieceColor color) : color(color) {
 	};
 
-	std::vector<Move*> King::getMoves(ChessBoard chessBoard, ChessPiece king) {
+	std::vector<Move> King::getMoves(ChessBoard chessBoard, ChessPiece king) {
 		sf::Vector2f position = king.getPosition();
 		std::vector<std::vector<ChessPiece>> b = chessBoard.getChessBoard();
-		std::vector<Move*> moves;
+		std::vector<Move> moves;
 		sf::Vector2f y;
 		int boardSize = 8;
 		float squareSize = 100.f;
@@ -35,7 +35,7 @@ namespace ChessGame {
 
 				if (b[s][t].getColor() != b[r][c].getColor()) {
 					y = Functions::convertToPosition(s, t);
-					Move* move = new Move(position, y, -1, king, b[s][t]);
+					Move move(position, y, -1, king, b[s][t]);
 					moves.push_back(move);
 				}
 			}
@@ -47,13 +47,13 @@ namespace ChessGame {
 
 				if (!b[7][7].pieceHasMoved() && b[7][5].getPieceType() == PieceType::EMPTY && b[7][6].getPieceType() == PieceType::EMPTY) {
 					y = Functions::convertToPosition(7, 6);
-					Move* move = new Move(position, y, -1, king, b[7][6]);
+					Move move(position, y, -1, king, b[7][6]);
 					moves.push_back(move);
 				}
 
 				if (!b[7][0].pieceHasMoved() && b[7][1].getPieceType() == PieceType::EMPTY && b[7][2].getPieceType() == PieceType::EMPTY && b[7][3].getPieceType() == PieceType::EMPTY){
 					y = Functions::convertToPosition(7, 2);
-					Move* move = new Move(position, y, -1, king, b[7][2]);
+					Move move(position, y, -1, king, b[7][2]);
 					moves.push_back(move);
 				}
 			}
@@ -62,13 +62,13 @@ namespace ChessGame {
 
 				if (!b[0][7].pieceHasMoved() && b[0][5].getPieceType() == PieceType::EMPTY && b[0][6].getPieceType() == PieceType::EMPTY) {
 					y = Functions::convertToPosition(0, 6);
-					Move* move = new Move(position, y, -1, king, b[0][6]);
+					Move move(position, y, -1, king, b[0][6]);
 					moves.push_back(move);
 				}
 
 				if (!b[0][0].pieceHasMoved() && b[0][1].getPieceType() == PieceType::EMPTY && b[0][2].getPieceType() == PieceType::EMPTY && b[0][3].getPieceType() == PieceType::EMPTY) {
 					y = Functions::convertToPosition(0, 2);
-					Move* move = new Move(position, y, -1, king, b[0][2]);
+					Move move(position, y, -1, king, b[0][2]);
 					moves.push_back(move);
 				}
 			}
