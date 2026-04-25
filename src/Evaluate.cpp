@@ -3,6 +3,7 @@
 #include "Evaluate.h"
 #include "ChessBoard.h"
 #include "ChessPiece.h"
+#include <iostream>
 
 
 
@@ -23,7 +24,7 @@ namespace ChessGame {
             {50, 50, 50, 50, 50, 50, 50, 50},
             {10, 10, 20, 30, 30, 20, 10, 10},
             {5, 5, 10, 25, 25, 10, 5, 5},
-            {0, 0, 0, 20, 20, 0, 0, 0},
+            {0, 0, 0, 30, 30, 0, 0, 0},
             {5, -5, 10, 0, 0, 10, -5, 5},
             {5, 10, 10, -35, -35, 10, 10, 5},
             {0, 0, 0, 0, 0, 0, 0, 0} };
@@ -87,30 +88,6 @@ namespace ChessGame {
         std::reverse(queenActivityScoreBlack.begin(), queenActivityScoreBlack.end());
         std::reverse(kingActivityScoreBlack.begin(), kingActivityScoreBlack.end());
 
-        for (auto& row : pawnActivityScoreBlack) {
-            std::reverse(row.begin(), row.end());
-        }
-
-        for (auto& row : knightActivityScoreBlack) {
-            std::reverse(row.begin(), row.end());
-        }
-
-        for (auto& row : bishopActivityScoreBlack) {
-            std::reverse(row.begin(), row.end());
-        }
-
-        for (auto& row : rookActivityScoreBlack) {
-            std::reverse(row.begin(), row.end());
-        }
-
-        for (auto& row : queenActivityScoreBlack) {
-            std::reverse(row.begin(), row.end());
-        }
-
-        for (auto& row : kingActivityScoreBlack) {
-            std::reverse(row.begin(), row.end());
-        }
-
         pieceTables = {
             {PieceType::PAWN, std::make_pair(pawnActivityScoreWhite, pawnActivityScoreBlack)},
             {PieceType::KNIGHT, std::make_pair(knightActivityScoreWhite, knightActivityScoreBlack)},
@@ -123,47 +100,67 @@ namespace ChessGame {
     int Evaluate::evaluatePosition(ChessBoard& chessBoard) {
         int score = 0;
         int boardSize = 8;
-        std::vector<std::vector<ChessPiece>> b = chessBoard.getChessBoard();
+        bool d5 = false;
+
+        if (chessBoard.pieceAt(3, 3).getPieceType() == PieceType::PAWN && chessBoard.pieceAt(3, 3).getColor() == PieceColor::BLACK) {
+            d5 = true;
+        }
 
         for (int r = 0; r < boardSize; r++) {
 
             for (int c = 0; c < boardSize; c++) {
+                ChessPiece piece = chessBoard.pieceAt(r, c);
 
-                if (b[r][c].getColor() == PieceColor::WHITE) {
-                    score += pieceValues[b[r][c].getPieceType()] + pieceTables[b[r][c].getPieceType()].first[r][c];
+                if (piece.getColor() == PieceColor::WHITE) {
+                    score += pieceValues[piece.getPieceType()] + pieceTables[piece.getPieceType()].first[r][c];
                 }
 
-                else if (b[r][c].getColor() == PieceColor::BLACK) {
-                    score -= pieceValues[b[r][c].getPieceType()] + pieceTables[b[r][c].getPieceType()].second[r][c];
+                else if (piece.getColor() == PieceColor::BLACK) {
+                    score -= pieceValues[piece.getPieceType()] + pieceTables[piece.getPieceType()].second[r][c];
                 }
+                
             }
         }
-
+        
+        //if (d5) {
+            //std::cout << "score = " << score << std::endl;
+        //}
+        
         return score;
     }
 
-    int Evaluate::quiescenceMax(ChessBoard& chessBoard, int alpha, int beta) {
-        int stand_pat = evaluatePosition(chessBoard);
+    int Evaluate::quiescenceMax(ChessBoard& chessBoard, int alpha, int beta, std::unordered_map<unsigned long long, int>& tt, unsigned long long h) {
+        if (tt.find(h) != tt.end()) {
+            return tt[h];
+        }
+        int bestValue = evaluatePosition(chessBoard);
         int score;
+        unsigned long long newH;
 
-        if (stand_pat >= beta) {
-            return stand_pat;
+        if (bestValue >= beta) {
+            return bestValue;
         }
 
-        if (alpha < stand_pat) {
-            alpha = stand_pat;
+        if (alpha < bestValue) {
+            alpha = bestValue;
         }
         std::vector<Move> legalMoves = chessBoard.getLegalMoves();
 
-        for (auto move : legalMoves) {
+        for (auto& move : legalMoves) {
 
             if (move.isCapture()) {
                 chessBoard.push(move);
-                score = quiescenceMin(chessBoard, alpha, beta);
+                newH = tt_zobrist.updateHash(move, h);
+                score = quiescenceMin(chessBoard, alpha, beta, tt, newH);
                 chessBoard.unmakeMove(move);
 
                 if (score >= beta) {
-                    return beta;
+                    tt[h] = score;
+                    return score;
+                }
+
+                if (score > bestValue) {
+                    bestValue = score;
                 }
 
                 if (score > alpha) {
@@ -171,32 +168,43 @@ namespace ChessGame {
                 }
             }
         }
+        tt[h] = bestValue;
 
-        return alpha;
+        return bestValue;
     }
 
-    int Evaluate::quiescenceMin(ChessBoard& chessBoard, int alpha, int beta) {
-        int stand_pat = evaluatePosition(chessBoard);
+    int Evaluate::quiescenceMin(ChessBoard& chessBoard, int alpha, int beta, std::unordered_map<unsigned long long, int>& tt, unsigned long long h) {
+        if (tt.find(h) != tt.end()) {
+            return tt[h];
+        }
+        int bestValue = evaluatePosition(chessBoard);
         int score;
+        unsigned long long newH;
 
-        if (stand_pat <= alpha) {
-            return stand_pat;
+        if (bestValue <= alpha) {
+            return bestValue;
         }
 
-        if (beta > stand_pat) {
-            beta = stand_pat;
+        if (beta > bestValue) {
+            beta = bestValue;
         }
         std::vector<Move> legalMoves = chessBoard.getLegalMoves();
 
-        for (auto move : legalMoves) {
+        for (auto& move : legalMoves) {
 
             if (move.isCapture()) {
                 chessBoard.push(move);
-                score = quiescenceMax(chessBoard, alpha, beta);
+                newH = tt_zobrist.updateHash(move, h);
+                score = quiescenceMax(chessBoard, alpha, beta, tt, newH);
                 chessBoard.unmakeMove(move);
 
                 if (score <= alpha) {
-                    return alpha;
+                    tt[h] = score;
+                    return score;
+                }
+
+                if (score < bestValue) {
+                    bestValue = score;
                 }
 
                 if (score < beta) {
@@ -204,7 +212,8 @@ namespace ChessGame {
                 }
             }
         }
+        tt[h] = bestValue;
 
-        return beta;
+        return bestValue;
     }
 }

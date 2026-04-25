@@ -8,6 +8,7 @@
 #include "Move.h"
 #include "ChessPiece.h"
 #include "ChessBoard.h"
+#include "Bitboard.h"
 #include "Functions.h"
 
 namespace ChessGame {
@@ -15,7 +16,7 @@ namespace ChessGame {
 	class King {
 	public:
 		King(PieceColor color);
-		std::vector<Move> getMoves(ChessBoard chessBoard, ChessPiece king);
+		static std::vector<Move> getMoves(ChessBoard& chessBoard, ChessPiece& king);
 
 	private:
 		PieceColor color;

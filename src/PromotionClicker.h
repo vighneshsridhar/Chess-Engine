@@ -17,7 +17,7 @@ namespace ChessGame {
 	public:
 		PromotionClicker();
 		static std::pair<int, bool> promotePawn(sf::RenderWindow& window, std::vector<std::vector<ChessPiece>>& b,
-			ChessPiece pawn, std::vector<std::vector<sf::Sprite>>& spritesBoard, std::vector<sf::Sprite>& sprites, sf::Vector2f promotionPosition);
+			ChessPiece pawn, std::vector<std::vector<sf::Sprite>>& spritesBoard, std::vector<sf::Sprite>& sprites, int r, int c);
 	};
 }
 

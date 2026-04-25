@@ -13,7 +13,7 @@ namespace ChessGame {
 	class Move {
 	public:
 		Move();
-		Move(sf::Vector2f initialSquare, sf::Vector2f endSquare, int moveNumber, ChessPiece piece, ChessPiece capturedPiece);
+		Move(int r1, int c1, int r2, int c2, ChessPiece piece, ChessPiece capturedPiece);
 		struct MoveNode {
 			Move* move;
 			std::vector<MoveNode*> children;
@@ -22,8 +22,8 @@ namespace ChessGame {
 			std::vector<std::vector<ChessPiece>> b;
 			std::string checkSymbol;
 		};
-		sf::Vector2f getInitialSquare() const;
-		sf::Vector2f getEndSquare() const;
+		std::pair<int, int> getInitialSquare() const;
+		std::pair<int, int> getEndSquare() const;
 		ChessPiece getAttacker() const;
 		ChessPiece getCapturedPiece() const;
 		bool isCheck() const;
@@ -31,15 +31,16 @@ namespace ChessGame {
 		bool isCapture();
 		std::pair<bool, bool> isCastling() const;
 		bool isEnPassant() const;
-		ChessPiece getPromotionPiece();
+		ChessPiece getPromotionPiece() const;
 		void setPromotionPiece(ChessPiece p);
 		int getOrderingScore(std::vector<std::vector<Move>> killerMoves, int depth);
 		bool operator == (const Move m) const;
 
 	private:
-		sf::Vector2f initialSquare;
-		sf::Vector2f endSquare;
-		int moveNumber;
+		int r1;
+		int c1;
+		int r2;
+		int c2;
 		ChessPiece piece;
 		ChessPiece capturedPiece;
 		ChessPiece promotionPiece;

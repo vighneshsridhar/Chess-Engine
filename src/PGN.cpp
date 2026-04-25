@@ -33,10 +33,10 @@ namespace ChessGame {
 
 	std::string PGN::convertMoveToPGN(Move* move, int moveNumber, ChessBoard chessBoard) {
 		std::vector<std::vector<ChessPiece>> b = chessBoard.getChessBoard();
-		auto [r1, c1] = Functions::convertToSquare(move->getInitialSquare());
-		auto [r2, c2] = Functions::convertToSquare(move->getEndSquare());
+		auto [r1, c1] = move->getInitialSquare();
+		auto [r2, c2] = move->getEndSquare();
 
-		ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, move->getInitialSquare());
+		ChessPiece empty;
 		ChessPiece piece = b[r1][c1];
 		PieceType type = piece.getPieceType();
 		PieceColor color = piece.getColor();

@@ -25,29 +25,11 @@ namespace ChessGame {
 	private:
 		int boardSize;
 		int maxDepth;
-		std::unordered_map<PieceType, int> pieceValues;
-
-		std::vector<std::vector<int>> pawnActivityScoreWhite;
-		std::vector<std::vector<int>> knightActivityScoreWhite;
-		std::vector<std::vector<int>> bishopActivityScoreWhite;
-		std::vector<std::vector<int>> rookActivityScoreWhite;
-		std::vector<std::vector<int>> queenActivityScoreWhite;
-		std::vector<std::vector<int>> kingActivityScoreWhite;
-
-		std::vector<std::vector<int>> pawnActivityScoreBlack;
-		std::vector<std::vector<int>> knightActivityScoreBlack;
-		std::vector<std::vector<int>> bishopActivityScoreBlack;
-		std::vector<std::vector<int>> rookActivityScoreBlack;
-		std::vector<std::vector<int>> queenActivityScoreBlack;
-		std::vector<std::vector<int>> kingActivityScoreBlack;
-
-		std::unordered_map<PieceType, std::pair<std::vector<std::vector<int>>, std::vector<std::vector<int>>>> pieceTables;
 		std::unordered_map<unsigned long long, int> tt;
 		std::unordered_map<unsigned long long, int> tt_depth;
 		TranspositionTable tt_zobrist;
 		unsigned long long h;
 		std::vector<std::vector<Move>> killerMoves;
-
 		Evaluate e;
 	};
 

@@ -8,6 +8,7 @@
 
 #include "ChessBoard.h"
 #include "ChessPiece.h"
+#include "TranspositionTable.h"
 
 
 namespace ChessGame {
@@ -16,8 +17,8 @@ namespace ChessGame {
 	public:
 		Evaluate();
 		int evaluatePosition(ChessBoard& chessBoard);
-		int quiescenceMax(ChessBoard& chessBoard, int alpha, int beta);
-		int quiescenceMin(ChessBoard& chessBoard, int alpha, int beta);
+		int quiescenceMax(ChessBoard& chessBoard, int alpha, int beta, std::unordered_map<unsigned long long, int>& tt, unsigned long long h);
+		int quiescenceMin(ChessBoard& chessBoard, int alpha, int beta, std::unordered_map<unsigned long long, int>& tt, unsigned long long h);
 
 	private:
 		int boardSize;
@@ -38,6 +39,7 @@ namespace ChessGame {
 		std::vector<std::vector<int>> kingActivityScoreBlack;
 
 		std::unordered_map<PieceType, std::pair<std::vector<std::vector<int>>, std::vector<std::vector<int>>>> pieceTables;
+		TranspositionTable tt_zobrist;
 	};
 
 }

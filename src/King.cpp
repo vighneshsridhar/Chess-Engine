@@ -13,14 +13,13 @@ namespace ChessGame {
 	King::King(PieceColor color) : color(color) {
 	};
 
-	std::vector<Move> King::getMoves(ChessBoard chessBoard, ChessPiece king) {
-		sf::Vector2f position = king.getPosition();
-		std::vector<std::vector<ChessPiece>> b = chessBoard.getChessBoard();
+	std::vector<Move> King::getMoves(ChessBoard& chessBoard, ChessPiece& king) {
 		std::vector<Move> moves;
-		sf::Vector2f y;
 		int boardSize = 8;
 		float squareSize = 100.f;
-		auto [r, c] = Functions::convertToSquare(position);
+		auto [r, c] = king.getCoordinates();
+
+		PieceColor color = king.getColor();
 
 		for (int s = r - 1; s <= r + 1; s++) {
 
@@ -32,10 +31,10 @@ namespace ChessGame {
 				if (t < 0 || t >= boardSize) {
 					continue;
 				}
+				auto piece = chessBoard.pieceAt(s, t);
 
-				if (b[s][t].getColor() != b[r][c].getColor()) {
-					y = Functions::convertToPosition(s, t);
-					Move move(position, y, -1, king, b[s][t]);
+				if (piece.getColor() != color) {
+					Move move(r, c, s, t, king, piece);
 					moves.push_back(move);
 				}
 			}
@@ -43,32 +42,46 @@ namespace ChessGame {
 
 		if (!king.pieceHasMoved()) {
 
-			if (king.getColor() == PieceColor::WHITE) {
+			if (color == PieceColor::WHITE) {
+				auto rook = chessBoard.pieceAt(7, 7);
+				auto square1 = chessBoard.pieceAt(7, 5);
+				auto square2 = chessBoard.pieceAt(7, 6);
 
-				if (!b[7][7].pieceHasMoved() && b[7][5].getPieceType() == PieceType::EMPTY && b[7][6].getPieceType() == PieceType::EMPTY) {
-					y = Functions::convertToPosition(7, 6);
-					Move move(position, y, -1, king, b[7][6]);
+				if (!rook.pieceHasMoved() && square1.getPieceType() == PieceType::EMPTY && square2.getPieceType() == PieceType::EMPTY && !Bitboard::kingAttacked(chessBoard, 7, 4, color) &&
+					!Bitboard::kingAttacked(chessBoard, 7, 5, color) && !Bitboard::kingAttacked(chessBoard, 7, 6, color)) {
+					Move move(r, c, 7, 6, king, square2);
 					moves.push_back(move);
 				}
+				rook = chessBoard.pieceAt(7, 0);
+				square1 = chessBoard.pieceAt(7, 1);
+				square2 = chessBoard.pieceAt(7, 2);
+				auto square3 = chessBoard.pieceAt(7, 3);
 
-				if (!b[7][0].pieceHasMoved() && b[7][1].getPieceType() == PieceType::EMPTY && b[7][2].getPieceType() == PieceType::EMPTY && b[7][3].getPieceType() == PieceType::EMPTY){
-					y = Functions::convertToPosition(7, 2);
-					Move move(position, y, -1, king, b[7][2]);
+				if (!rook.pieceHasMoved() && square1.getPieceType() == PieceType::EMPTY && square2.getPieceType() == PieceType::EMPTY && square3.getPieceType() == PieceType::EMPTY && 
+					!Bitboard::kingAttacked(chessBoard, 7, 4, color) && !Bitboard::kingAttacked(chessBoard, 7, 3, color) && !Bitboard::kingAttacked(chessBoard, 7, 2, color)) {
+					Move move(r, c, 7, 2, king, square2);
 					moves.push_back(move);
 				}
 			}
 
-			if (king.getColor() == PieceColor::BLACK) {
+			if (color == PieceColor::BLACK) {
+				auto rook = chessBoard.pieceAt(0, 7);
+				auto square1 = chessBoard.pieceAt(0, 5);
+				auto square2 = chessBoard.pieceAt(0, 6);
 
-				if (!b[0][7].pieceHasMoved() && b[0][5].getPieceType() == PieceType::EMPTY && b[0][6].getPieceType() == PieceType::EMPTY) {
-					y = Functions::convertToPosition(0, 6);
-					Move move(position, y, -1, king, b[0][6]);
+				if (!rook.pieceHasMoved() && square1.getPieceType() == PieceType::EMPTY && square2.getPieceType() == PieceType::EMPTY && !Bitboard::kingAttacked(chessBoard, 0, 4, color) &&
+					!Bitboard::kingAttacked(chessBoard, 0, 5, color) && !Bitboard::kingAttacked(chessBoard, 0, 6, color)) {
+					Move move(r, c, 0, 6, king, square2);
 					moves.push_back(move);
 				}
+				rook = chessBoard.pieceAt(0, 0);
+				square1 = chessBoard.pieceAt(0, 1);
+				square2 = chessBoard.pieceAt(0, 2);
+				auto square3 = chessBoard.pieceAt(0, 3);
 
-				if (!b[0][0].pieceHasMoved() && b[0][1].getPieceType() == PieceType::EMPTY && b[0][2].getPieceType() == PieceType::EMPTY && b[0][3].getPieceType() == PieceType::EMPTY) {
-					y = Functions::convertToPosition(0, 2);
-					Move move(position, y, -1, king, b[0][2]);
+				if (!rook.pieceHasMoved() && square1.getPieceType() == PieceType::EMPTY && square2.getPieceType() == PieceType::EMPTY && square3.getPieceType() == PieceType::EMPTY &&
+					!Bitboard::kingAttacked(chessBoard, 0, 4, color) && !Bitboard::kingAttacked(chessBoard, 0, 3, color) && !Bitboard::kingAttacked(chessBoard, 0, 2, color)) {
+					Move move(r, c, 0, 2, king, square2);
 					moves.push_back(move);
 				}
 			}

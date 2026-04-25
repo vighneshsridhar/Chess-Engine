@@ -15,157 +15,113 @@ namespace ChessGame {
 	Bitboard::Bitboard() {
 		numSquares = 64;
 		boardSize = 8;
-		squaresAttacked = { 0, 0, 0, 0, 0, 0, 0, 0,
-							0, 0, 0, 0, 0, 0, 0, 0,
-							0, 0, 0, 0, 0, 0, 0, 0,
-							0, 0, 0, 0, 0, 0, 0, 0,
-							0, 0, 0, 0, 0, 0, 0, 0,
-							0, 0, 0, 0, 0, 0, 0, 0,
-							0, 0, 0, 0, 0, 0, 0, 0,
-							0, 0, 0, 0, 0, 0, 0, 0 };
 	};
 
-	void Bitboard::updatePawnAttackSquares(ChessBoard chessBoard) {
-		std::vector<std::vector<ChessPiece>> b = chessBoard.getChessBoard();
-		int square1;
-		int square2;
+	bool Bitboard::isValidBoard(ChessBoard& chessBoard) {
+		auto [r, c] = chessBoard.getKingPosition();
+		ChessPiece kg = chessBoard.pieceAt(r, c);
+		PieceColor color = kg.getColor();
+		sf::Vector2f kingPosition = Functions::convertToPosition(r, c);
+		ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, r, c);
 
-		for (int r1 = 0; r1 < boardSize; r1++) {
+		if (kingAttacked(chessBoard, r, c, color)) {
+			chessBoard.setPieceAt(kg, r, c);
+			return false;
+		}
 
-			for (int c1 = 0; c1 < boardSize; c1++) {
-				square1 = r1 * 8 + c1;
-				long long mask = (static_cast<long long>(1) << (numSquares - 1 - square1));
+		return true;
+	}
 
-				if (b[r1][c1].getPieceType() != PieceType::PAWN || (chessBoard.whiteTurn() && b[r1][c1].getColor() != PieceColor::WHITE) || 
-					(!chessBoard.whiteTurn() && b[r1][c1].getColor() != PieceColor::BLACK) || r1 == 0 || r1 == 7) {
-					continue;
-				}
+	bool Bitboard::kingAttacked(ChessBoard& chessBoard, int r, int c, PieceColor color) {
+		PieceColor enemy = color == PieceColor::WHITE ? PieceColor::BLACK : PieceColor::WHITE;
+		std::vector<std::vector<int>> pawnDirs;
+		int boardSize = 8;
 
-				if (b[r1][c1].getColor() == PieceColor::WHITE) {
+		if (color == PieceColor::WHITE) {
+			pawnDirs = { { 1, -1 }, { 1, 1 } };
+		}
 
-					if (c1 == 0) {
-						square2 = (r1 - 1) * 8 + 1;
-						squaresAttacked[square2] |= mask;
-					}
+		else {
+			pawnDirs = { { -1, -1 }, {-1, 1} };
+		}
+		int s = r;
+		int t = c;
 
-					else if (c1 == 7) {
-						square2 = (r1 - 1) * 8 + 6;
-						squaresAttacked[square2] |= mask;
-					}
+		for (auto& d : pawnDirs) {
+			s = r + d[0];
+			t = c + d[1];
 
-					else {
-						square2 = (r1 - 1) * 8 + c1 + 1;
-						squaresAttacked[square2] |= mask;
-						square2 = (r1 - 1) * 8 + c1 - 1;
-						squaresAttacked[square2] |= mask;
-					}
-				}
+			if (s >= 0 && s < boardSize && t >= 0 && t < boardSize) {
+				auto p = chessBoard.pieceAt(s, t);
 
-				if (b[r1][c1].getColor() == PieceColor::BLACK) {
-
-					if (c1 == 0) {
-						square2 = (r1 + 1) * 8 + 1;
-						squaresAttacked[square2] |= mask;
-					}
-
-					else if (c1 == 7) {
-						square2 = (r1 + 1) * 8 + 6;
-						squaresAttacked[square2] |= mask;
-					}
-
-					else {
-						square2 = (r1 + 1) * 8 + c1 + 1;
-						squaresAttacked[square2] |= mask;
-						square2 = (r1 + 1) * 8 + c1 - 1;
-						squaresAttacked[square2] |= mask;
-					}
+				if (p.getColor() == enemy && p.getPieceType() == PieceType::PAWN){
+					return true;
 				}
 			}
 		}
-	}
+		std::vector<std::vector<int>> knightDirs = { {-1, 2}, {1, 2}, {1, 2}, {1, 2}, {2, 1}, {2, 1}, {2, 1}, {2, 1} };
 
-	std::vector<long long> Bitboard::getBitboard() {
-		return squaresAttacked;
-	}
+		for (const auto& d: knightDirs) {
+			s = r + d[0];
+			t = c + d[1];
+			
+			if (s >= 0 && s < boardSize && t >= 0 && t < boardSize) {
+				auto p = chessBoard.pieceAt(s, t);
 
-	void Bitboard::resetBitboard() {
-		squaresAttacked = { 0, 0, 0, 0, 0, 0, 0, 0,
-							0, 0, 0, 0, 0, 0, 0, 0,
-							0, 0, 0, 0, 0, 0, 0, 0,
-							0, 0, 0, 0, 0, 0, 0, 0,
-							0, 0, 0, 0, 0, 0, 0, 0,
-							0, 0, 0, 0, 0, 0, 0, 0,
-							0, 0, 0, 0, 0, 0, 0, 0,
-							0, 0, 0, 0, 0, 0, 0, 0 };
-	}
-
-	void Bitboard::updateBitboard(ChessBoard chessBoard, bool castling) {
-		std::vector<std::vector<ChessPiece>> b = chessBoard.getChessBoard();
-		resetBitboard();
-		std::vector<Move> moves;
-
-		long long mask;
-		int square1;
-		int square2;
-
-		for (int r = 0; r < boardSize; r++) {
-
-			for (int c = 0; c < boardSize; c++) {
-
-				if (b[r][c].getPieceType() == PieceType::PAWN || (chessBoard.whiteTurn() && b[r][c].getColor() != PieceColor::WHITE) || (!chessBoard.whiteTurn() && b[r][c].getColor() != PieceColor::BLACK)) {
-					continue;
-				}
-				moves = chessBoard.getPieceMoves(b[r][c]);
-
-				for (const auto& move : moves) {
-					auto position1 = move.getInitialSquare();
-					auto position2 = move.getEndSquare();
-					auto [r1, c1] = Functions::convertToSquare(position1);
-					auto [r2, c2] = Functions::convertToSquare(position2);
-					square1 = Functions::convertToNumber(position1);
-					square2 = Functions::convertToNumber(position2);
-					mask = (static_cast<long long>(1) << (numSquares - 1 - square1));
-					squaresAttacked[square2] |= mask;
+				if (p.getColor() == enemy && p.getPieceType() == PieceType::KNIGHT) {
+					return true;
 				}
 			}
 		}
-		updatePawnAttackSquares(chessBoard);
+		static int bishopDirs[4][2] = { {-1, -1}, {-1, 1}, {1, -1}, {1, 1} };
 
-		return;
-	}
+		for (auto& d : bishopDirs) {
+			s = r + d[0];
+			t = c + d[1];
+			
+			while (s >= 0 && s < boardSize && t >= 0 && t < boardSize) {
+				auto p = chessBoard.pieceAt(s, t);
 
-	bool Bitboard::isValidBoard(ChessBoard chessBoard, bool castling) {
-		std::pair<int, int> kingPosition = chessBoard.getKingPosition();
-		int num = kingPosition.first * 8 + kingPosition.second;
-		int castlingSquare;
-
-		if (castling) {
-
-			if (chessBoard.whiteTurn()) {
-				
-				if (num == 62) {
-					castlingSquare = 61;
+				if (p.getColor() == color) {
+					break;
 				}
 
-				else {
-					castlingSquare = 59;
+				if (p.getColor() == enemy) {
+
+					if (p.getPieceType() == PieceType::BISHOP || p.getPieceType() == PieceType::QUEEN) {
+						return true;
+					}
+					break;
 				}
+				s += d[0];
+				t += d[1];
 			}
-
-			else {
-
-				if (num == 6) {
-					castlingSquare = 5;
-				}
-
-				else {
-					castlingSquare = 3;
-				}
-			}
-
-			return squaresAttacked[num] == 0 && squaresAttacked[castlingSquare] == 0;
 		}
-		
-		return squaresAttacked[num] == 0;
+		static int rookDirs[4][2] = { {-1, 0}, {1,0}, {0, -1}, {0, 1} };
+
+		for (auto& d : rookDirs) {
+			s = r + d[0];
+			t = c + d[1];
+
+			while (s >= 0 && s < boardSize && t >= 0 && t < boardSize) {
+				auto p = chessBoard.pieceAt(s, t);
+
+				if (p.getColor() == color) {
+					break;
+				}
+
+				if (p.getColor() == enemy) {
+
+					if (p.getPieceType() == PieceType::ROOK || p.getPieceType() == PieceType::QUEEN) {
+						return true;
+					}
+					break;
+				}
+				s += d[0];
+				t += d[1];
+			}
+		}
+
+		return false;
 	}
 }

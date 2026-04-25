@@ -8,14 +8,16 @@
 
 
 namespace ChessGame {
+
 	ChessPiece::ChessPiece() {
 		hasMoved = false;
 		pieceType = PieceType::EMPTY;
 		color = PieceColor::NONE;
 	};
 
-	ChessPiece::ChessPiece(PieceType pieceType, PieceColor color, sf::Vector2f position): pieceType(pieceType), color(color), position(position) {
+	ChessPiece::ChessPiece(PieceType pieceType, PieceColor color, int r, int c): pieceType(pieceType), color(color) {
 		hasMoved = false;
+		coordinates = std::make_pair(r, c);
 	};
 
 	PieceType ChessPiece::getPieceType() const {
@@ -123,6 +125,14 @@ namespace ChessGame {
 	void ChessPiece::setPosition(sf::Vector2f p) {
 		position = p;
 		return;
+	}
+
+	std::pair<int, int> ChessPiece::getCoordinates() const {
+		return coordinates;
+	}
+
+	void ChessPiece::setCoordinates(int r, int c) {
+		coordinates = std::make_pair(r, c);
 	}
 	
 	bool ChessPiece::pieceHasMoved() const {

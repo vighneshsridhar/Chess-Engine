@@ -25,23 +25,23 @@ namespace ChessGame {
         wTurn = true;
         enPassantFile = -1;
         float squareSize = 100.f;
-        float x = 20.f;
-        float y = 20.f;
+        int x = -1;
+        int y = -1;
 
-        ChessGame::ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, sf::Vector2f(x, y));
-        ChessGame::ChessPiece whitePawn(PieceType::PAWN, PieceColor::WHITE, sf::Vector2f(x, y));
-        ChessGame::ChessPiece whiteKnight(PieceType::KNIGHT, PieceColor::WHITE, sf::Vector2f(x, y));
-        ChessGame::ChessPiece whiteBishop(PieceType::BISHOP, PieceColor::WHITE, sf::Vector2f(x, y));
-        ChessGame::ChessPiece whiteRook(PieceType::ROOK, PieceColor::WHITE, sf::Vector2f(x, y));
-        ChessGame::ChessPiece whiteQueen(PieceType::QUEEN, PieceColor::WHITE, sf::Vector2f(x, y));
-        ChessGame::ChessPiece whiteKing(PieceType::KING, PieceColor::WHITE, sf::Vector2f(x, y));
+        ChessGame::ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, x, y);
+        ChessGame::ChessPiece whitePawn(PieceType::PAWN, PieceColor::WHITE, x, y);
+        ChessGame::ChessPiece whiteKnight(PieceType::KNIGHT, PieceColor::WHITE, x, y);
+        ChessGame::ChessPiece whiteBishop(PieceType::BISHOP, PieceColor::WHITE, x, y);
+        ChessGame::ChessPiece whiteRook(PieceType::ROOK, PieceColor::WHITE, x, y);
+        ChessGame::ChessPiece whiteQueen(PieceType::QUEEN, PieceColor::WHITE, x, y);
+        ChessGame::ChessPiece whiteKing(PieceType::KING, PieceColor::WHITE, x, y);
 
-        ChessGame::ChessPiece blackPawn(PieceType::PAWN, PieceColor::BLACK, sf::Vector2f(x, y));
-        ChessGame::ChessPiece blackKnight(PieceType::KNIGHT, PieceColor::BLACK, sf::Vector2f(x, y));
-        ChessGame::ChessPiece blackBishop(PieceType::BISHOP, PieceColor::BLACK, sf::Vector2f(x, y));
-        ChessGame::ChessPiece blackRook(PieceType::ROOK, PieceColor::BLACK, sf::Vector2f(x, y));
-        ChessGame::ChessPiece blackQueen(PieceType::QUEEN, PieceColor::BLACK, sf::Vector2f(x, y));
-        ChessGame::ChessPiece blackKing(PieceType::KING, PieceColor::BLACK, sf::Vector2f(x, y));
+        ChessGame::ChessPiece blackPawn(PieceType::PAWN, PieceColor::BLACK, x, y);
+        ChessGame::ChessPiece blackKnight(PieceType::KNIGHT, PieceColor::BLACK, x, y);
+        ChessGame::ChessPiece blackBishop(PieceType::BISHOP, PieceColor::BLACK, x, y);
+        ChessGame::ChessPiece blackRook(PieceType::ROOK, PieceColor::BLACK, x, y);
+        ChessGame::ChessPiece blackQueen(PieceType::QUEEN, PieceColor::BLACK, x, y);
+        ChessGame::ChessPiece blackKing(PieceType::KING, PieceColor::BLACK, x, y);
 
         b = { {blackRook, blackKnight, blackBishop, blackQueen, blackKing, blackBishop, blackKnight, blackRook},
             {blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn},
@@ -55,11 +55,10 @@ namespace ChessGame {
         kingPosition["BLACK_KING"] = std::make_pair(0, 4);
 
         for (int r = 0; r < boardSize; r++) {
-            y = squareSize * r;
 
             for (int c = 0; c < boardSize; c++) {
-                x = squareSize * c;
-                b[r][c].setPosition(sf::Vector2f(x, y));
+                b[r][c].setCoordinates(r, c);
+                b[r][c].setPosition(Functions::convertToPosition(r, c));
             }
         }
     };
@@ -81,14 +80,17 @@ namespace ChessGame {
         b = newChessBoard;
     }
 
+    ChessPiece ChessBoard::pieceAt(int r, int c) {
+        return b[r][c];
+    }
+
+    void ChessBoard::setPieceAt(ChessPiece piece, int r, int c) {
+        b[r][c] = piece;
+    }
+
     std::vector<Move> ChessBoard::getLegalMoves() {
         std::vector<Move> legalMoves;
         std::vector<Move> moves;
-        Bitboard bb;
-        std::vector<long long> x;
-        sf::Vector2f position;
-        bool castling = false;
-        bool check;
 
         for (int r = 0; r < boardSize; r++) {
 
@@ -98,12 +100,11 @@ namespace ChessGame {
                 if ((wTurn && piece.getColor() != PieceColor::WHITE) || (!wTurn && piece.getColor() != PieceColor::BLACK)) {
                     continue;
                 }
-                position = Functions::convertToPosition(r, c);
                 moves = getPieceMoves(piece);
 
                 for (auto& move : moves) {
-                    auto [x, y] = Functions::convertToSquare(move.getEndSquare());
-                    ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, position);
+                    auto [x, y] = move.getEndSquare();
+                    ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, x, y);
                     ChessPiece old = b[x][y];
                     
                     b[x][y] = piece;
@@ -111,18 +112,11 @@ namespace ChessGame {
 
                     if (piece.getPieceType() == PieceType::KING) {
                         setKingPosition(std::make_pair(x, y));
-
-                        if (std::abs(y - c) == 2) {
-                            castling = true;
-                        }
                     }
-                    this->changeTurn();
-                    bb.updateBitboard(*this, castling);
-                    check = isCheckOrCheckmate();
-                    move.setCheck(check);
-                    this->changeTurn();
+                    // check = isCheckOrCheckmate();
+                    // move.setCheck(check);
 
-                    if (bb.isValidBoard(*this, castling)) {
+                    if (Bitboard::isValidBoard(*this)) {
                         legalMoves.push_back(move);
                     }
                     b[r][c] = piece;
@@ -131,115 +125,58 @@ namespace ChessGame {
                     if (piece.getPieceType() == PieceType::KING) {
                         setKingPosition(std::make_pair(r, c));
                     }
-                    castling = false;
                 }
             }
         }
         return legalMoves;
     }
 
-    std::vector<Move> ChessBoard::getPieceMoves(ChessPiece piece) {
+    std::vector<Move> ChessBoard::getPieceMoves(ChessPiece& piece) {
         std::vector<Move> moves;
 
         if (piece.getPieceType() == PieceType::PAWN) {
-
-            if (piece.getColor() == PieceColor::WHITE) {
-                Pawn pawn(PieceColor::WHITE);
-                moves = pawn.getMoves(*this, piece);
-            }
-
-            if (piece.getColor() == PieceColor::BLACK) {
-                Pawn pawn(PieceColor::BLACK);
-                moves = pawn.getMoves(*this, piece);
-            }
+            moves = Pawn::getMoves(*this, piece);
         }
 
         if (piece.getPieceType() == PieceType::KNIGHT) {
-
-            if (piece.getColor() == PieceColor::WHITE) {
-                Knight knight(PieceColor::WHITE);
-                moves = knight.getMoves(*this, piece);
-            }
-
-            if (piece.getColor() == PieceColor::BLACK) {
-                Knight knight(PieceColor::BLACK);
-                moves = knight.getMoves(*this, piece);
-            }
+            moves = Knight::getMoves(*this, piece);
         }
 
         if (piece.getPieceType() == PieceType::BISHOP) {
-
-            if (piece.getColor() == PieceColor::WHITE) {
-                Bishop bishop(PieceColor::WHITE);
-                moves = bishop.getMoves(*this, piece);
-            }
-
-            if (piece.getColor() == PieceColor::BLACK) {
-                Bishop bishop(PieceColor::BLACK);
-                moves = bishop.getMoves(*this, piece);
-            }
+            moves = Bishop::getMoves(*this, piece);
         }
 
         if (piece.getPieceType() == PieceType::ROOK) {
-
-            if (piece.getColor() == PieceColor::WHITE) {
-                Rook rook(PieceColor::WHITE);
-                moves = rook.getMoves(*this, piece);
-            }
-
-            if (piece.getColor() == PieceColor::BLACK) {
-                Rook rook(PieceColor::BLACK);
-                moves = rook.getMoves(*this, piece);
-            }
+            moves = Rook::getMoves(*this, piece);
         }
 
         if (piece.getPieceType() == PieceType::QUEEN) {
-
-            if (piece.getColor() == PieceColor::WHITE) {
-                Queen queen(PieceColor::WHITE);
-                moves = queen.getMoves(*this, piece);
-            }
-
-            if (piece.getColor() == PieceColor::BLACK) {
-                Queen queen(PieceColor::BLACK);
-                moves = queen.getMoves(*this, piece);
-            }
+            moves = Queen::getMoves(*this, piece);
         }
 
         if (piece.getPieceType() == PieceType::KING) {
-
-            if (piece.getColor() == PieceColor::WHITE) {
-                King king(PieceColor::WHITE);
-                moves = king.getMoves(*this, piece);
-            }
-
-            if (piece.getColor() == PieceColor::BLACK) {
-                King king(PieceColor::BLACK);
-                moves = king.getMoves(*this, piece);
-            }
+            moves = King::getMoves(*this, piece);
         }
 
         return moves;
     }
 
     void ChessBoard::push(Move move) {
-        sf::Vector2f square1 = move.getInitialSquare();
-        sf::Vector2f square2 = move.getEndSquare();
-        auto [initial_r, initial_c] = Functions::convertToSquare(square1);
-        auto [r, c] = Functions::convertToSquare(square2);
+        auto [initial_r, initial_c] = move.getInitialSquare();
+        auto [r, c] = move.getEndSquare();
 
         ChessPiece initialPiece = b[initial_r][initial_c];
         ChessPiece capturedPiece = move.getCapturedPiece();
-        ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, sf::Vector2f(20.f, 20.f));
+        ChessPiece empty;
 
         if (initialPiece.getPieceType() == PieceType::PAWN && (r == 0 || r == 7)) {
             b[r][c] = move.getPromotionPiece();
-            b[r][c].setPosition(square2);
+            b[r][c].setCoordinates(r, c);
         }
 
         else {
             b[r][c] = b[initial_r][initial_c];
-            b[r][c].setPosition(square2);
+            b[r][c].setCoordinates(r, c);
         }
 
         if (initialPiece.getPieceType() == PieceType::PAWN) {
@@ -263,31 +200,30 @@ namespace ChessGame {
                 rookC = 7;
                 delta = -2;
             }
+
             if (c - initial_c == -2) {
                 rookC = 0;
                 delta = 3;
             }
 
             if (rookC != -1) {
-                auto square3 = Functions::convertToPosition(r, rookC + delta);
                 b[r][rookC + delta] = b[r][rookC];
-                b[r][rookC + delta].setPosition(square3);
+                b[r][rookC + delta].setCoordinates(r, rookC + delta);
                 b[r][rookC] = empty;
             }
         }
         b[r][c].setPieceHasMoved();
         b[initial_r][initial_c] = empty;
-        b[initial_r][initial_c].setPosition(square1);
+        b[initial_r][initial_c].setCoordinates(initial_r, initial_c);
         this->changeTurn();
 
         return;
     }
 
     void ChessBoard::unmakeMove(Move move) {
-        sf::Vector2f square1 = move.getInitialSquare();
-        sf::Vector2f square2 = move.getEndSquare();
-        auto [initial_r, initial_c] = Functions::convertToSquare(square1);
-        auto [r, c] = Functions::convertToSquare(square2);
+        this->changeTurn();
+        auto [initial_r, initial_c] = move.getInitialSquare();
+        auto [r, c] = move.getEndSquare();
 
         ChessPiece initialPiece = move.getAttacker();
         ChessPiece capturedPiece = move.getCapturedPiece();
@@ -305,30 +241,24 @@ namespace ChessGame {
                 int rank = initialPiece.getColor() == PieceColor::WHITE ? r + 1 : r - 1;
                 b[rank][c] = empty;
             }
-
-            //if (r == 0 || r == 7) {
-
-            // }
         }
 
         if (initialPiece.getPieceType() == PieceType::KING) {
             this->setKingPosition(std::make_pair(initial_r, initial_c));
 
             if (c - initial_c == 2) {
-                auto square3 = Functions::convertToPosition(r, 7);
                 b[r][7] = b[r][5];
-                b[r][7].setPosition(square3);
+                b[r][7].setCoordinates(r, 7);
                 b[r][5] = empty;
             }
 
             if (c - initial_c == -2) {
                 auto square3 = Functions::convertToPosition(r, 0);
                 b[r][0] = b[r][3];
-                b[r][0].setPosition(square3);
+                b[r][0].setCoordinates(r, 7);
                 b[r][3] = empty;
             }
         }
-        this->changeTurn();
 
         return;
     }
@@ -362,16 +292,8 @@ namespace ChessGame {
 
     bool ChessBoard::isCheckOrCheckmate() {
         Bitboard bb;
-        this->changeTurn();
-        bb.updateBitboard(*this, false);
-        this->changeTurn();
-        auto [l, m] = getKingPosition();
-        std::vector<long long> squaresAttacked = bb.getBitboard();
-        int k = l * 8 + m;
-
-        if (squaresAttacked[k] != 0) {
-            return true;
-        }
-        return false;
+        bool k = bb.isValidBoard(*this);
+        
+        return k;
     }
 }

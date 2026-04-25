@@ -8,22 +8,22 @@ namespace ChessGame {
 
     std::unordered_map<std::string, sf::Texture> TextureManager::getTextures() {
         std::unordered_map<std::string, sf::Texture> textures;
-        float x = 20.f;
-        float y = 20.f;
+        int x = -1;
+        int y = -1;
 
-        ChessGame::ChessPiece whitePawn(PieceType::PAWN, PieceColor::WHITE, sf::Vector2f(x, y));
-        ChessGame::ChessPiece whiteKnight(PieceType::KNIGHT, PieceColor::WHITE, sf::Vector2f(x, y));
-        ChessGame::ChessPiece whiteBishop(PieceType::BISHOP, PieceColor::WHITE, sf::Vector2f(x, y));
-        ChessGame::ChessPiece whiteRook(PieceType::ROOK, PieceColor::WHITE, sf::Vector2f(x, y));
-        ChessGame::ChessPiece whiteQueen(PieceType::QUEEN, PieceColor::WHITE, sf::Vector2f(x, y));
-        ChessGame::ChessPiece whiteKing(PieceType::KING, PieceColor::WHITE, sf::Vector2f(x, y));
+        ChessGame::ChessPiece whitePawn(PieceType::PAWN, PieceColor::WHITE, x, y);
+        ChessGame::ChessPiece whiteKnight(PieceType::KNIGHT, PieceColor::WHITE, x, y);
+        ChessGame::ChessPiece whiteBishop(PieceType::BISHOP, PieceColor::WHITE, x, y);
+        ChessGame::ChessPiece whiteRook(PieceType::ROOK, PieceColor::WHITE, x, y);
+        ChessGame::ChessPiece whiteQueen(PieceType::QUEEN, PieceColor::WHITE, x, y);
+        ChessGame::ChessPiece whiteKing(PieceType::KING, PieceColor::WHITE, x, y);
 
-        ChessGame::ChessPiece blackPawn(PieceType::PAWN, PieceColor::BLACK, sf::Vector2f(x, y));
-        ChessGame::ChessPiece blackKnight(PieceType::KNIGHT, PieceColor::BLACK, sf::Vector2f(x, y));
-        ChessGame::ChessPiece blackBishop(PieceType::BISHOP, PieceColor::BLACK, sf::Vector2f(x, y));
-        ChessGame::ChessPiece blackRook(PieceType::ROOK, PieceColor::BLACK, sf::Vector2f(x, y));
-        ChessGame::ChessPiece blackQueen(PieceType::QUEEN, PieceColor::BLACK, sf::Vector2f(x, y));
-        ChessGame::ChessPiece blackKing(PieceType::KING, PieceColor::BLACK, sf::Vector2f(x, y));
+        ChessGame::ChessPiece blackPawn(PieceType::PAWN, PieceColor::BLACK, x, y);
+        ChessGame::ChessPiece blackKnight(PieceType::KNIGHT, PieceColor::BLACK, x, y);
+        ChessGame::ChessPiece blackBishop(PieceType::BISHOP, PieceColor::BLACK, x, y);
+        ChessGame::ChessPiece blackRook(PieceType::ROOK, PieceColor::BLACK, x, y);
+        ChessGame::ChessPiece blackQueen(PieceType::QUEEN, PieceColor::BLACK, x, y);
+        ChessGame::ChessPiece blackKing(PieceType::KING, PieceColor::BLACK, x, y);
 
         textures["WHITE_PAWN"] = whitePawn.getTexture();
         textures["WHITE_KNIGHT"] = whiteKnight.getTexture();

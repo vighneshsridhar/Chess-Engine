@@ -56,10 +56,12 @@ namespace ChessGame {
 
         for (int d = 1; d < maxDepth + 1; d++) {
             int bestScore = wTurn ? std::numeric_limits<int>::min() : std::numeric_limits<int>::max();
-            constexpr int alpha = std::numeric_limits<int>::min();
-            constexpr int beta = std::numeric_limits<int>::max();
-
-            auto comp = [&, d](Move& a, Move& b) { return a.getOrderingScore(killerMoves, d) > b.getOrderingScore(killerMoves, d); };
+            int alpha = std::numeric_limits<int>::min();
+            int beta = std::numeric_limits<int>::max();
+            auto comp = [&, d](Move& a, Move& b) {
+                return a.getOrderingScore(killerMoves, d - 1) >
+                    b.getOrderingScore(killerMoves, d - 1);
+                };
             std::sort(legalMoves.begin(), legalMoves.end(), comp);
 
             for (auto& move : legalMoves) {
@@ -73,6 +75,10 @@ namespace ChessGame {
                         bestMove = move;
                         bestScore = score;
                         h = newH;
+
+                        if (score > alpha) {
+                            alpha = score;
+                        }
                     }
                 }
 
@@ -83,6 +89,10 @@ namespace ChessGame {
                         bestMove = move;
                         bestScore = score;
                         h = newH;
+
+                        if (score < beta) {
+                            beta = score;
+                        }
                     }
                 }
                 chessBoard.unmakeMove(move);
@@ -94,7 +104,7 @@ namespace ChessGame {
 
     int Engine::alphaBetaMax(ChessBoard& chessBoard, int alpha, int beta, int depthLeft, unsigned long long h) {
         if (depthLeft == 0) {
-            return e.quiescenceMax(chessBoard, alpha, beta);
+            return e.quiescenceMax(chessBoard, alpha, beta, tt, h);
         }
 
         if (tt.find(h) != tt.end() && tt_depth[h] >= depthLeft) {
@@ -104,11 +114,13 @@ namespace ChessGame {
         std::vector<Move> legalMoves = chessBoard.getLegalMoves();
 
         if (legalMoves.size() == 0) {
-            return e.evaluatePosition(chessBoard);
+            return e.quiescenceMax(chessBoard, alpha, beta, tt, h);
         }
-        auto comp = [&, depthLeft](Move& a, Move& b) { return a.getOrderingScore(killerMoves, depthLeft) > b.getOrderingScore(killerMoves, depthLeft); };
+        auto comp = [&, depthLeft](Move& a, Move& b) {
+            return a.getOrderingScore(killerMoves, depthLeft) >
+                b.getOrderingScore(killerMoves, depthLeft);
+            };
         std::sort(legalMoves.begin(), legalMoves.end(), comp);
-
         Move bestMove;
         unsigned long long newH;
 
@@ -116,6 +128,7 @@ namespace ChessGame {
             newH = tt_zobrist.updateHash(move, h);
             chessBoard.push(move);
             auto score = alphaBetaMin(chessBoard, alpha, beta, depthLeft - 1, newH);
+            chessBoard.unmakeMove(move);
 
             if (score > bestValue) {
                 bestValue = score;
@@ -129,15 +142,14 @@ namespace ChessGame {
             if (score >= beta) {
                 
                 if (!move.isCapture()) {
-                    killerMoves[depthLeft - 1][1] = killerMoves[depthLeft - 1][0];
-                    killerMoves[depthLeft - 1][0] = move;
+                    killerMoves[depthLeft][1] = killerMoves[depthLeft][0];
+                    killerMoves[depthLeft][0] = move;
                 }
                 tt[h] = score;
                 tt_depth[h] = depthLeft;
 
                 return score;
             }
-            chessBoard.unmakeMove(move);
         }
         tt[h] = bestValue;
         tt_depth[h] = depthLeft;
@@ -147,7 +159,7 @@ namespace ChessGame {
 
     int Engine::alphaBetaMin(ChessBoard& chessBoard, int alpha, int beta, int depthLeft, unsigned long long h) {
         if (depthLeft == 0) {
-            return e.quiescenceMin(chessBoard, alpha, beta);
+            return e.quiescenceMin(chessBoard, alpha, beta, tt, h);
         }
 
         if (tt.find(h) != tt.end() && tt_depth[h] >= depthLeft) {
@@ -157,9 +169,12 @@ namespace ChessGame {
         std::vector<Move> legalMoves = chessBoard.getLegalMoves();
 
         if (legalMoves.size() == 0) {
-            return e.evaluatePosition(chessBoard);
+            return e.quiescenceMin(chessBoard, alpha, beta, tt, h);
         }
-        auto comp = [&, depthLeft](Move& a, Move& b) { return a.getOrderingScore(killerMoves, depthLeft) < b.getOrderingScore(killerMoves, depthLeft); };
+        auto comp = [&, depthLeft](Move& a, Move& b) {
+            return a.getOrderingScore(killerMoves, depthLeft) >
+                b.getOrderingScore(killerMoves, depthLeft);
+            };
         std::sort(legalMoves.begin(), legalMoves.end(), comp);
 
         Move bestMove;
@@ -169,6 +184,7 @@ namespace ChessGame {
             newH = tt_zobrist.updateHash(move, h);
             chessBoard.push(move);
             auto score = alphaBetaMax(chessBoard, alpha, beta, depthLeft - 1, newH);
+            chessBoard.unmakeMove(move);
 
             if (score < bestValue) {
                 bestValue = score;
@@ -182,15 +198,14 @@ namespace ChessGame {
             if (score <= alpha) {
 
                 if (!move.isCapture()) {
-                    killerMoves[depthLeft - 1][1] = killerMoves[depthLeft - 1][0];
-                    killerMoves[depthLeft - 1][0] = move;
+                    killerMoves[depthLeft][1] = killerMoves[depthLeft][0];
+                    killerMoves[depthLeft][0] = move;
                 }
                 tt[h] = score;
                 tt_depth[h] = depthLeft;
 
                 return score;
             }
-            chessBoard.unmakeMove(move);
         }
         tt[h] = bestValue;
         tt_depth[h] = depthLeft;

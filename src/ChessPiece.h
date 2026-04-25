@@ -28,14 +28,16 @@ namespace ChessGame {
 	class ChessPiece {
 	public: 
 		ChessPiece();
-		ChessPiece(PieceType pieceType, PieceColor color, sf::Vector2f position);
+		ChessPiece(PieceType pieceType, PieceColor color, int r, int c);
 		PieceType getPieceType() const;
 		void setPieceType(PieceType newPieceType);
 		PieceColor getColor();
 		void setColor(PieceColor color);
 		sf::Texture getTexture() const;
 		sf::Vector2f getPosition() const;
-		void setPosition(sf::Vector2f newPosition);
+		void setPosition(sf::Vector2f p);
+		std::pair<int, int> getCoordinates() const;
+		void setCoordinates(int r, int c);
 		bool pieceHasMoved() const;
 		void setPieceHasMoved();
 		bool operator == (ChessPiece& piece) const;
@@ -43,6 +45,7 @@ namespace ChessGame {
 	private:
 		PieceType pieceType;
 		PieceColor color;
+		std::pair<int, int> coordinates;
 		sf::Vector2f position;
 		bool hasMoved;
 	};

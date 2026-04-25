@@ -20,18 +20,18 @@ namespace ChessGame {
     };
 
     std::pair<int, bool> PromotionClicker::promotePawn(sf::RenderWindow& window, std::vector<std::vector<ChessPiece>>& b,
-    ChessPiece pawn, std::vector<std::vector<sf::Sprite>>& spritesBoard, std::vector<sf::Sprite>& sprites, sf::Vector2f promotionPosition) {
+    ChessPiece pawn, std::vector<std::vector<sf::Sprite>>& spritesBoard, std::vector<sf::Sprite>& sprites, int r, int c) {
 
         sf::Vector2f mousePosition;
         int boardSize = 8;
         auto windowSize = window.getSize();
         float squareSize = std::min(windowSize.x, windowSize.y) / 8.f;
-        auto [r, c] = Functions::convertToSquare(promotionPosition);
         ChessPiece old = b[r][c];
         b[r][c] = pawn;
-        b[r][c].setPosition(promotionPosition);
+        b[r][c].setCoordinates(r, c);
 
-        ChessPiece promotionPiece(PieceType::QUEEN, pawn.getColor(), promotionPosition);
+        ChessPiece promotionPiece(PieceType::QUEEN, pawn.getColor(), r, c);
+        sf::Vector2f promotionPosition = Functions::convertToPosition(r, c);
 
         PieceColor color = pawn.getColor();
         sf::FloatRect bounds;
@@ -92,7 +92,7 @@ namespace ChessGame {
                             promotionPiece.setPieceType(PieceType::KNIGHT);
                         }
                         b[r][c] = promotionPiece;
-                        b[r][c].setPosition(promotionPosition);
+                        b[r][c].setCoordinates(r, c);
 
                         return std::make_pair(std::abs(r - x), true);
                     }
@@ -120,6 +120,7 @@ namespace ChessGame {
                         window.draw(square);
                     }
                 }
+                sf::Vector2f position;
 
                 for (int r = 0; r < boardSize; r++) {
 
@@ -127,8 +128,9 @@ namespace ChessGame {
 
                         if (b[r][c].getPieceType() != PieceType::EMPTY) {
                             bounds = spritesBoard[r][c].getLocalBounds();
+                            position = Functions::convertToPosition(r, c);
                             spritesBoard[r][c].setScale(sf::Vector2f(squareSize / bounds.size.x, squareSize / bounds.size.y));
-                            spritesBoard[r][c].setPosition(b[r][c].getPosition());
+                            spritesBoard[r][c].setPosition(position);
                             window.draw(spritesBoard[r][c]);
                         }
                     }

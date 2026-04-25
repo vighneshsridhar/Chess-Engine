@@ -14,93 +14,103 @@ namespace ChessGame {
 	Pawn::Pawn(PieceColor color): color(color) {
 	};
 
-	std::vector<Move> Pawn::getMoves(ChessBoard chessBoard, ChessPiece pawn) {
-		std::vector<std::vector<ChessGame::ChessPiece>> b = chessBoard.getChessBoard();
-		sf::Vector2f position = pawn.getPosition();
+	std::vector<Move> Pawn::getMoves(ChessBoard& chessBoard, ChessPiece& pawn) {
+		PieceColor color = pawn.getColor();
+		PieceColor enemy = color == PieceColor::WHITE ? PieceColor::BLACK : PieceColor::WHITE;
+
 		std::vector<Move> moves;
-		sf::Vector2f y;
 		int boardSize = 8;
-		float squareSize = 100.f;
-		auto [r, c] = Functions::convertToSquare(position);
+		auto [r, c] = pawn.getCoordinates();
+
+		int dr = color == PieceColor::WHITE ? -1 : 1;
+		std::vector<std::vector<int>> pawnDirs = { {dr, 0}, {dr, 1}, {dr, -1} };
+		int startRow = color == PieceColor::WHITE ? 6 : 1;
+		int promotionRow = startRow + dr * 5;
 		int enPassantFile = chessBoard.getEnPassantFile();
-		
-		if (pawn.getColor() == PieceColor::WHITE) {
-			
-			if (r > 0 && b[r - 1][c].getPieceType() == PieceType::EMPTY) {
-				y = Functions::convertToPosition(r - 1, c);
-				Move move(position, y, -1, pawn, b[r - 1][c]);
-				moves.push_back(move);
 
-				if (r == 6 && b[r - 2][c].getPieceType() == PieceType::EMPTY) {
-					y = Functions::convertToPosition(r - 2, c);
-					Move move(position, y, -1, pawn, b[r - 2][c]);
-					moves.push_back(move);
+		int s;
+		int t;
+
+		for (auto& d : pawnDirs) {
+			s = r + d[0];
+			t = c + d[1];
+
+			if (s >= 0 && s < boardSize && t >= 0 && t < boardSize) {
+				auto piece1 = chessBoard.pieceAt(s, t);
+
+				if (t == c) {
+
+					if (piece1.getPieceType() == PieceType::EMPTY) {
+						Move move(r, c, s, t, pawn, piece1);
+
+						if (s != promotionRow) {
+							moves.push_back(move);
+						}
+						
+						else {
+							promotion(move, color, moves);
+						}
+
+						if (r == startRow) {
+							auto piece2 = chessBoard.pieceAt(s + d[0], t);
+
+							if (piece2.getPieceType() == PieceType::EMPTY) {
+								Move move(r, c, s + d[0], t, pawn, piece2);
+								moves.push_back(move);
+							}
+						}
+					}
 				}
-			}
 
-			if (r > 0 && c - 1 >= 0 && b[r - 1][c - 1].getColor() == PieceColor::BLACK) {
-				y = Functions::convertToPosition(r - 1, c - 1);
-				Move move(position, y, -1, pawn, b[r - 1][c - 1]);
-				moves.push_back(move);
-			}
+				else {
+					auto piece3 = chessBoard.pieceAt(s, t);
 
-			if (r > 0 && c + 1 < boardSize && b[r - 1][c + 1].getColor() == PieceColor::BLACK) {
-				y = Functions::convertToPosition(r - 1, c + 1);
-				Move move(position, y, -1, pawn, b[r - 1][c + 1]);
-				moves.push_back(move);
-			}
+					if (piece3.getColor() == enemy) {
+						Move move(r, c, s, t, pawn, piece3);
 
-			if (r == 3 && c + 1 == enPassantFile) {
-				y = Functions::convertToPosition(r - 1, c + 1);
-				Move move(position, y, -1, pawn, b[r - 1][c + 1]);
-				moves.push_back(move);
-			}
+						if (s != promotionRow) {
+							moves.push_back(move);
+						}
 
-			if (r == 3 && c - 1 == enPassantFile) {
-				y = Functions::convertToPosition(r - 1, c - 1);
-				Move move(position, y, -1, pawn, b[r - 1][c - 1]);
-				moves.push_back(move);
-			}
-		}
+						else {
+							promotion(move, color, moves);
+						}
+					}
 
-		if (pawn.getColor() == PieceColor::BLACK) {
+					if (r == startRow + dr * 3) {
 
-			if (r < 7 && b[r + 1][c].getPieceType() == PieceType::EMPTY) {
-				y = Functions::convertToPosition(r + 1, c);
-				Move move(position, y, -1, pawn, b[r + 1][c]);
-				moves.push_back(move);
+						if (enPassantFile == c + 1) {
+							Move move(r, c, s, c + 1, pawn, chessBoard.pieceAt(s, c + 1));
+							moves.push_back(move);
+						}
 
-				if (r == 1 && b[r + 2][c].getPieceType() == PieceType::EMPTY) {
-					y = Functions::convertToPosition(r + 2, c);
-					Move move(position, y, -1, pawn, b[r + 2][c]);
-					moves.push_back(move);
+						if (enPassantFile == c - 1) {
+							Move move(r, c, s, c - 1, pawn, chessBoard.pieceAt(s, c - 1));
+							moves.push_back(move);
+						}
+					}
 				}
-			}
-
-			if (r < 7 && c - 1 >= 0 && b[r + 1][c - 1].getColor() == PieceColor::WHITE) {
-				y = Functions::convertToPosition(r + 1, c - 1);
-				Move move(position, y, -1, pawn, b[r + 1][c - 1]);
-				moves.push_back(move);
-			}
-
-			if (r < 7 && c + 1 < boardSize && b[r + 1][c + 1].getColor() == PieceColor::WHITE) {
-				y = Functions::convertToPosition(r + 1, c + 1);
-				Move move(position, y, -1, pawn, b[r + 1][c + 1]);
-				moves.push_back(move);
-			}
-
-			if (r == 4 && c + 1 == enPassantFile) {
-				y = Functions::convertToPosition(r + 1, c + 1);
-				Move move(position, y, -1, pawn, b[r + 1][c + 1]);
-				moves.push_back(move);
-			}
-
-			if (r == 4 && c - 1 == enPassantFile) {
-				y = Functions::convertToPosition(r + 1, c - 1);
-				Move move(position, y, -1, pawn, b[r + 1][c - 1]);
-				moves.push_back(move);
 			}
 		}
 		return moves;
+	}
+
+	void Pawn::promotion(Move move, PieceColor color, std::vector<Move>& moves) {
+		auto [r, c] = move.getEndSquare();
+		ChessPiece knight(PieceType::KNIGHT, color, r, c);
+		ChessPiece bishop(PieceType::BISHOP, color, r, c);
+		ChessPiece rook(PieceType::ROOK, color, r, c);
+		ChessPiece queen(PieceType::QUEEN, color, r, c);
+
+		move.setPromotionPiece(knight);
+		moves.push_back(move);
+		move.setPromotionPiece(bishop);
+		moves.push_back(move);
+		move.setPromotionPiece(rook);
+		moves.push_back(move);
+		move.setPromotionPiece(queen);
+		moves.push_back(move);
+
+		return;
 	}
 }

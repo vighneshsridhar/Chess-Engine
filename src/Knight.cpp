@@ -12,14 +12,12 @@ namespace ChessGame {
 	Knight::Knight(PieceColor color) : color(color) {
 	};
 
-	std::vector<Move> Knight::getMoves(ChessBoard chessBoard, ChessPiece knight) {
-		sf::Vector2f position = knight.getPosition();
-		std::vector<std::vector<ChessPiece>> b = chessBoard.getChessBoard();
+	std::vector<Move> Knight::getMoves(ChessBoard& chessBoard, ChessPiece knight) {
 		std::vector<Move> moves;
 		sf::Vector2f y;
 		int boardSize = 8;
 		float squareSize = 100.f;
-		auto [r, c] = Functions::convertToSquare(position);
+		auto [r, c] = knight.getCoordinates();
 		int s;
 		int t;
 		std::vector<std::vector<int>> squares = { {r - 1, c + 2}, {r - 1, c - 2}, {r + 1, c + 2}, {r + 1, c - 2}, {r - 2, c + 1}, {r - 2, c - 1}, {r + 2, c + 1}, {r + 2, c - 1} };
@@ -28,10 +26,13 @@ namespace ChessGame {
 			s = square[0];
 			t = square[1];
 
-			if (s >= 0 && s < boardSize && t >= 0 && t < boardSize && b[s][t].getColor() != b[r][c].getColor()) {
-				y = Functions::convertToPosition(s, t);
-				Move move(position, y, -1, knight, b[s][t]);
-				moves.push_back(move);
+			if (s >= 0 && s < boardSize && t >= 0 && t < boardSize) {
+				auto piece = chessBoard.pieceAt(s, t);
+
+				if (piece.getColor() != knight.getColor()) {
+					Move move(r, c, s, t, knight, chessBoard.pieceAt(s, t));
+					moves.push_back(move);
+				}
 			}
 		}
 

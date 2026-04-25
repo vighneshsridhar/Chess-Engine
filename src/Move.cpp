@@ -10,16 +10,16 @@
 namespace ChessGame {
 	
 	Move::Move() {
-		moveNumber = 0;
 		check = false;
 		score = 0;
-		initialSquare = sf::Vector2f(0, 0);
-		endSquare = sf::Vector2f(0, 0);
+		r1 = -1;
+		c1 = -1;
+		r2 = -1;
+		c2 = -1;
 	};
 
-	Move::Move(sf::Vector2f initialSquare, sf::Vector2f endSquare, int moveNumber, ChessPiece piece, ChessPiece capturedPiece) : initialSquare(initialSquare), 
-		endSquare(endSquare), moveNumber(moveNumber), piece(piece), capturedPiece(capturedPiece) {
-		ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, sf::Vector2(20.f, 20.f));
+	Move::Move(int r1, int c1, int r2, int c2, ChessPiece piece, ChessPiece capturedPiece) : r1(r1), c1(c1), r2(r2), c2(c2), piece(piece), capturedPiece(capturedPiece) {
+		ChessPiece empty;
 		promotionPiece = empty;
 		pieceValues = {
 			{PieceType::PAWN, 100},
@@ -33,12 +33,12 @@ namespace ChessGame {
 		score = 0;
 	};
 
-	sf::Vector2f Move::getInitialSquare() const {
-		return initialSquare;
+	std::pair<int, int> Move::getInitialSquare() const {
+		return std::make_pair(r1, c1);
 	}
 
-	sf::Vector2f Move::getEndSquare() const {
-		return endSquare;
+	std::pair<int, int> Move::getEndSquare() const {
+		return std::make_pair(r2, c2);
 	}
 
 	ChessPiece Move::getAttacker() const {
@@ -62,8 +62,6 @@ namespace ChessGame {
 	}
 
 	std::pair<bool, bool> Move::isCastling() const {
-		auto [r1, c1] = Functions::convertToSquare(initialSquare);
-		auto [r2, c2] = Functions::convertToSquare(endSquare);
 		bool kingSide = false;
 		bool queenSide = false;
 
@@ -79,13 +77,13 @@ namespace ChessGame {
 	}
 
 	bool Move::isEnPassant() const {
-		if (piece.getPieceType() == PieceType::PAWN && std::abs(endSquare.x - initialSquare.x) > 0 && capturedPiece.getPosition().y == initialSquare.y) {
+		if (piece.getPieceType() == PieceType::PAWN && std::abs(c2 - c1) > 0 && capturedPiece.getCoordinates().first == r1) {
 			return true;
 		}
 		return false;
 	}
 
-	ChessPiece Move::getPromotionPiece() {
+	ChessPiece Move::getPromotionPiece() const {
 		return promotionPiece;
 	}
 
@@ -97,25 +95,25 @@ namespace ChessGame {
 		int score = 0;
 
 		if (isCapture()) {
-			score += 100 + pieceValues[capturedPiece.getPieceType()] - pieceValues[piece.getPieceType()];
+			score += 10000 + pieceValues[capturedPiece.getPieceType()] - pieceValues[piece.getPieceType()];
 		}
 
 		if (promotionPiece.getPieceType() != PieceType::EMPTY) {
-			score += 90;
+			score += 9000;
 		}
 
 		if (isCheck()) {
-			score += 50;
+			score += 5000;
 		}
 
-		if (*this == killerMoves[depth - 1][0] || *this == killerMoves[depth - 1][1]) {
-			score += 90;
+		if (*this == killerMoves[depth][0] || *this == killerMoves[depth][1]) {
+			score += 9000;
 		}
 
 		return score;
 	}
 
 	bool Move::operator == (const Move m) const {
-		return initialSquare == m.getInitialSquare() && endSquare == m.getEndSquare();
+		return std::make_pair(r1, c1) == m.getInitialSquare() && std::make_pair(r2, c2) == m.getEndSquare() && promotionPiece.getPieceType() == m.getPromotionPiece().getPieceType();
 	}
 }

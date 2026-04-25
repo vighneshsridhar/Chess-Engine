@@ -7,6 +7,12 @@
 
 #include "ChessBoard.h"
 #include "ChessPiece.h"
+#include "Pawn.h"
+#include "Knight.h"
+#include "Bishop.h"
+#include "Rook.h"
+#include "Queen.h"
+#include "King.h"
 #include "Functions.h"
 
 namespace ChessGame {
@@ -14,17 +20,17 @@ namespace ChessGame {
 	class Bitboard {
 	public:
 		Bitboard();
-		void updatePawnAttackSquares(ChessBoard chessBoard);
-		std::vector<long long> getBitboard();
-		void resetBitboard();
-		void updateBitboard(ChessBoard chessBoard, bool castling);
-		bool isValidBoard(ChessBoard chessBoard, bool castling);
+		struct GMagic {
+			long long mask;
+			long long magic;
+		};
+		static bool isValidBoard(ChessBoard& chessBoard);
+		static bool kingAttacked(ChessBoard& chessBoard, int r, int c, PieceColor color);
 
 	private:
 		int numSquares;
 		int boardSize;
 		std::vector<long long> squaresAttacked;
-		std::vector<long long> squaresAttackedInverse;
 	};
 
 }
