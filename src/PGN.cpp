@@ -31,7 +31,7 @@ namespace ChessGame {
 		return square;
 	}
 
-	std::string PGN::convertMoveToPGN(Move* move, int moveNumber, ChessBoard chessBoard) {
+	std::string PGN::convertMoveToPGN(Move* move, int moveNumber, ChessBoard chessBoard, std::vector<Move> legalMoves) {
 		std::vector<std::vector<ChessPiece>> b = chessBoard.getChessBoard();
 		auto [r1, c1] = move->getInitialSquare();
 		auto [r2, c2] = move->getEndSquare();
@@ -93,50 +93,29 @@ namespace ChessGame {
 			ans += s;
 			return ans;
 		}
-		std::vector<Move> moves = chessBoard.getPieceMoves(b[r1][c1]);
 		int boardSize = 8;
 
-		for (int r3 = 0; r3 < boardSize; r3++) {
+		for (const auto& move2: legalMoves){
+			auto [r3, c3] = move2.getInitialSquare();
 
-			for (int c3 = 0; c3 < boardSize; c3++) {
+			if ((r1 == r3 && c1 == c3) || !(move2.getAttacker() == piece)) {
+				continue;
+			}
 
-				if (r1 == r3 && c1 == c3) {
-					continue;
-				}
-				ChessPiece piece2 = b[r3][c3];
-
-				if (piece2 == piece) {
-					std::vector<Move> moves2 = chessBoard.getPieceMoves(piece2);
-
-					for (const auto& move2 : moves2) {
-
-						if (move2.getEndSquare() == move->getEndSquare() && c1 == c3) {
-							disambiguateRank = convertSquareToPGN(r1, c1)[1];
-						}
-					}
-				}
+			if (move2.getEndSquare() == move->getEndSquare() && c1 == c3) {
+				disambiguateRank = convertSquareToPGN(r1, c1)[1];
 			}
 		}
 
-		for (int r3 = 0; r3 < boardSize; r3++) {
+		for (const auto& move2 : legalMoves) {
+			auto [r3, c3] = move2.getInitialSquare();
 
-			for (int c3 = 0; c3 < boardSize; c3++) {
+			if ((r1 == r3 && c1 == c3) || !(move2.getAttacker() == piece)) {
+				continue;
+			}
 
-				if (r1 == r3 && c1 == c3) {
-					continue;
-				}
-				ChessPiece piece2 = b[r3][c3];
-
-				if (piece2 == piece) {
-					std::vector<Move> moves2 = chessBoard.getPieceMoves(piece2);
-
-					for (const auto& move2 : moves2) {
-
-						if (move2.getEndSquare() == move->getEndSquare() && (r1 == r3 || disambiguateRank.length() == 0)) {
-							disambiguateFile = convertSquareToPGN(r1, c1)[0];
-						}
-					}
-				}
+			if (move2.getEndSquare() == move->getEndSquare() && (r1 == r3 || disambiguateRank.length() == 0)) {
+				disambiguateFile = convertSquareToPGN(r1, c1)[0];
 			}
 		}
 
@@ -158,7 +137,7 @@ namespace ChessGame {
 		bool priorityLine = false;
 
 		if (root->move) {
-			move_pgn = convertMoveToPGN(root->move, moveNumber, chessBoard) + root->checkSymbol;
+			move_pgn = convertMoveToPGN(root->move, moveNumber, chessBoard, root->legalMoves) + root->checkSymbol;
 			pgn_ans = move_pgn + " ";
 		}
 		std::vector<Move::MoveNode*> siblings;

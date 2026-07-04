@@ -20,6 +20,7 @@ namespace ChessGame {
 			MoveNode* parent;
 			size_t moveNumber;
 			std::vector<std::vector<ChessPiece>> b;
+			std::vector<Move> legalMoves;
 			std::string checkSymbol;
 		};
 		std::pair<int, int> getInitialSquare() const;
@@ -34,7 +35,7 @@ namespace ChessGame {
 		ChessPiece getPromotionPiece() const;
 		void setPromotionPiece(ChessPiece p);
 		int getOrderingScore(std::vector<std::vector<Move>> killerMoves, int depth);
-		bool operator == (const Move m) const;
+		bool operator == (const Move& m) const;
 
 	private:
 		int r1;
@@ -45,7 +46,6 @@ namespace ChessGame {
 		ChessPiece capturedPiece;
 		ChessPiece promotionPiece;
 		bool check;
-		int score;
 		std::unordered_map<PieceType, int> pieceValues;
 	};
 

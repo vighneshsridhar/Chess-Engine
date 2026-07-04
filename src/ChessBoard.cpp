@@ -212,10 +212,10 @@ namespace ChessGame {
                 b[r][rookC] = empty;
             }
         }
+        this->changeTurn();
         b[r][c].setPieceHasMoved();
         b[initial_r][initial_c] = empty;
         b[initial_r][initial_c].setCoordinates(initial_r, initial_c);
-        this->changeTurn();
 
         return;
     }
@@ -253,7 +253,6 @@ namespace ChessGame {
             }
 
             if (c - initial_c == -2) {
-                auto square3 = Functions::convertToPosition(r, 0);
                 b[r][0] = b[r][3];
                 b[r][0].setCoordinates(r, 7);
                 b[r][3] = empty;
@@ -291,9 +290,6 @@ namespace ChessGame {
     }
 
     bool ChessBoard::isCheckOrCheckmate() {
-        Bitboard bb;
-        bool k = bb.isValidBoard(*this);
-        
-        return k;
+        return Bitboard::isValidBoard(*this);
     }
 }

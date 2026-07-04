@@ -44,23 +44,8 @@ namespace ChessGame {
 		if (capturedPiece.getColor() == PieceColor::BLACK) {
 			t2 += 6;
 		}
-		/*if (s1 == 42 && s2 == 57) {
-			std::cout << "h before = " << h << std::endl;
-		}
-
-		if (s1 == 57 && s2 == 42) {
-			std::cout << "h before = " << h << std::endl;
-		} */
 		h ^= hashTable[s1][t1];
 		h ^= hashTable[s2][t1];
-
-		/*if (s1 == 42 && s2 == 57) {
-			std::cout << "knight to b1 h = " << h << std::endl;
-		}
-
-		if (s1 == 57 && s2 == 42) {
-			std::cout << "knight to c3 h = " << h << std::endl;
-		} */
 
 		if (capturedPiece.getPieceType() != PieceType::EMPTY) {
 			h ^= hashTable[s2][t2];
@@ -108,5 +93,20 @@ namespace ChessGame {
 		}
 
 		return h;
+	}
+
+	TranspositionTable::TTEntry TranspositionTable::getTT(unsigned long long h) {
+		if (tt.find(h) != tt.end()) {
+			return tt[h];
+		}
+		Move move;
+		TTEntry entry = { 0, -1, TTFlag::EXACT_EVAL, move };
+
+		return entry;
+	}
+
+	void TranspositionTable::updateTT(unsigned long long h, TranspositionTable::TTEntry entry) {
+		tt[h] = entry;
+		return;
 	}
 }

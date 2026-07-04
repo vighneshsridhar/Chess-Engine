@@ -17,22 +17,19 @@ namespace ChessGame {
 		boardSize = 8;
 	};
 
-	bool Bitboard::isValidBoard(ChessBoard& chessBoard) {
+	bool Bitboard::isValidBoard(ChessBoard chessBoard) {
 		auto [r, c] = chessBoard.getKingPosition();
 		ChessPiece kg = chessBoard.pieceAt(r, c);
 		PieceColor color = kg.getColor();
-		sf::Vector2f kingPosition = Functions::convertToPosition(r, c);
-		ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, r, c);
 
 		if (kingAttacked(chessBoard, r, c, color)) {
-			chessBoard.setPieceAt(kg, r, c);
 			return false;
 		}
 
 		return true;
 	}
 
-	bool Bitboard::kingAttacked(ChessBoard& chessBoard, int r, int c, PieceColor color) {
+	bool Bitboard::kingAttacked(ChessBoard chessBoard, int r, int c, PieceColor color) {
 		PieceColor enemy = color == PieceColor::WHITE ? PieceColor::BLACK : PieceColor::WHITE;
 		std::vector<std::vector<int>> pawnDirs;
 		int boardSize = 8;
@@ -59,7 +56,7 @@ namespace ChessGame {
 				}
 			}
 		}
-		std::vector<std::vector<int>> knightDirs = { {-1, 2}, {1, 2}, {1, 2}, {1, 2}, {2, 1}, {2, 1}, {2, 1}, {2, 1} };
+		std::vector<std::vector<int>> knightDirs = { {1, 2}, {1, -2}, {-1, 2}, {-1, -2}, {2, 1}, {2, -1}, {-2, 1}, {-2, -1} };
 
 		for (const auto& d: knightDirs) {
 			s = r + d[0];
@@ -74,8 +71,9 @@ namespace ChessGame {
 			}
 		}
 		static int bishopDirs[4][2] = { {-1, -1}, {-1, 1}, {1, -1}, {1, 1} };
+		// std::vector<std::vector<int>> bishopDirs = { {-1, -1}, {-1, 1}, {1, -1}, {1, 1} };
 
-		for (auto& d : bishopDirs) {
+		for (const auto& d : bishopDirs) {
 			s = r + d[0];
 			t = c + d[1];
 			
@@ -87,7 +85,7 @@ namespace ChessGame {
 				}
 
 				if (p.getColor() == enemy) {
-
+					
 					if (p.getPieceType() == PieceType::BISHOP || p.getPieceType() == PieceType::QUEEN) {
 						return true;
 					}

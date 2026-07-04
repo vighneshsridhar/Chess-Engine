@@ -11,7 +11,6 @@ namespace ChessGame {
 	
 	Move::Move() {
 		check = false;
-		score = 0;
 		r1 = -1;
 		c1 = -1;
 		r2 = -1;
@@ -30,7 +29,6 @@ namespace ChessGame {
 			{PieceType::KING, 0}
 		};
 		check = false;
-		score = 0;
 	};
 
 	std::pair<int, int> Move::getInitialSquare() const {
@@ -113,7 +111,7 @@ namespace ChessGame {
 		return score;
 	}
 
-	bool Move::operator == (const Move m) const {
-		return std::make_pair(r1, c1) == m.getInitialSquare() && std::make_pair(r2, c2) == m.getEndSquare() && promotionPiece.getPieceType() == m.getPromotionPiece().getPieceType();
+	bool Move::operator == (const Move& m) const {
+		return r1 == m.r1 && c1 == m.c1 && r2 == m.r2 && c2 == m.c2 && promotionPiece.getPieceType() == m.promotionPiece.getPieceType();
 	}
 }

@@ -25,9 +25,7 @@ namespace ChessGame {
 	private:
 		int boardSize;
 		int maxDepth;
-		std::unordered_map<unsigned long long, int> tt;
-		std::unordered_map<unsigned long long, int> tt_depth;
-		TranspositionTable tt_zobrist;
+		TranspositionTable tt;
 		unsigned long long h;
 		std::vector<std::vector<Move>> killerMoves;
 		Evaluate e;

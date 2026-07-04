@@ -17,8 +17,8 @@ namespace ChessGame {
 	public:
 		Evaluate();
 		int evaluatePosition(ChessBoard& chessBoard);
-		int quiescenceMax(ChessBoard& chessBoard, int alpha, int beta, std::unordered_map<unsigned long long, int>& tt, unsigned long long h);
-		int quiescenceMin(ChessBoard& chessBoard, int alpha, int beta, std::unordered_map<unsigned long long, int>& tt, unsigned long long h);
+		int quiescenceMax(ChessBoard& chessBoard, int alpha, int beta, unsigned long long h, TranspositionTable& tt);
+		int quiescenceMin(ChessBoard& chessBoard, int alpha, int beta, unsigned long long h, TranspositionTable& tt);
 
 	private:
 		int boardSize;
@@ -39,7 +39,6 @@ namespace ChessGame {
 		std::vector<std::vector<int>> kingActivityScoreBlack;
 
 		std::unordered_map<PieceType, std::pair<std::vector<std::vector<int>>, std::vector<std::vector<int>>>> pieceTables;
-		TranspositionTable tt_zobrist;
 	};
 
 }
