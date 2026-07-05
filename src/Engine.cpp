@@ -26,26 +26,6 @@ namespace ChessGame {
         }
     };
 
-    /*Move Engine::analyze(ChessBoard& chessBoard) {
-        std::vector<Move> legalMoves = chessBoard.getLegalMoves();
-        Move bestMove;
-        int bestScore = 0;
-        constexpr int alpha = std::numeric_limits<int>::min();
-        constexpr int beta = std::numeric_limits<int>::max();
-        int h = tt_zobrist.getInitialH();
-        tt.insert({ h, 0 });
-
-        if (chessBoard.whiteTurn()) {
-            bestScore = alphaBetaMax(chessBoard, alpha, beta, depth, h);
-        }
-
-        else {
-            bestScore = alphaBetaMin(chessBoard, alpha, beta, depth, h);
-        }
-
-        return bestMove;
-    } */
-
     Move Engine::iterative_deepening(ChessBoard chessBoard) {
         std::vector<Move> legalMoves = chessBoard.getLegalMoves();
         Move bestMove;
@@ -118,11 +98,24 @@ namespace ChessGame {
 
     int Engine::alphaBetaMax(ChessBoard& chessBoard, int alpha, int beta, int depthLeft, unsigned long long h) {
         if (depthLeft == 0) {
-            return e.quiescenceMax(chessBoard, alpha, beta, h, tt);
+            auto start = std::chrono::high_resolution_clock::now();
+            auto ans = e.quiescenceMax(chessBoard, alpha, beta, h, tt);
+            auto end = std::chrono::high_resolution_clock::now();
+
+            /*std::cout << "Quiescence: "
+                << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()
+                << " ms\n"; */
+            return ans;
         }
 
         int bestValue = std::numeric_limits<int>::min();
-        std::vector<Move> legalMoves = chessBoard.getLegalMoves();
+        auto start = std::chrono::high_resolution_clock::now();
+        auto legalMoves = chessBoard.getLegalMoves();
+        auto end = std::chrono::high_resolution_clock::now();
+
+        /*std::cout << "Legal move generation: "
+            << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()
+            << " ms\n"; */
         TranspositionTable::TTEntry entry = tt.getTT(h);
 
         if (entry.depth >= depthLeft) {
@@ -156,7 +149,7 @@ namespace ChessGame {
         }
 
         if (legalMoves.size() == 0) {
-            return e.quiescenceMax(chessBoard, alpha, beta, h, tt);
+            return bestValue;
         }
         /*auto comp = [&, depthLeft](Move& a, Move& b) {
             return a.getOrderingScore(killerMoves, depthLeft) >
@@ -166,7 +159,6 @@ namespace ChessGame {
         Move bestMove;
         unsigned long long newH;
 
-        // for (auto& move : legalMoves) {
         for (int i = 0; i < legalMoves.size(); i++) {
             Move& move = legalMoves[i];
             newH = tt.updateHash(move, h);
@@ -209,7 +201,7 @@ namespace ChessGame {
         std::vector<Move> legalMoves = chessBoard.getLegalMoves();
 
         if (legalMoves.size() == 0) {
-            return e.quiescenceMin(chessBoard, alpha, beta, h, tt);
+            return bestValue;
         }
         /*auto comp = [&, depthLeft](Move& a, Move& b) {
             return a.getOrderingScore(killerMoves, depthLeft) >
@@ -250,7 +242,7 @@ namespace ChessGame {
                 }
             }
         }
-        // for (auto& move : legalMoves) {
+
         for (int i = 0; i < legalMoves.size(); i++) {
             Move& move = legalMoves[i];
             newH = tt.updateHash(move, h);

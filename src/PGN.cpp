@@ -187,8 +187,8 @@ namespace ChessGame {
 			c = "+";
 		}
 
-		else if (numLegalMoves == 0) {
-			return "";
+		else {
+			c = "";
 		}
 
 		return c;

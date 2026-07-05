@@ -35,11 +35,11 @@ namespace ChessGame {
 		int boardSize = 8;
 
 		if (color == PieceColor::WHITE) {
-			pawnDirs = { { 1, -1 }, { 1, 1 } };
+			pawnDirs = { { -1, -1 }, { -1, 1 } };
 		}
 
 		else {
-			pawnDirs = { { -1, -1 }, {-1, 1} };
+			pawnDirs = { { 1, -1 }, {1, 1} };
 		}
 		int s = r;
 		int t = c;

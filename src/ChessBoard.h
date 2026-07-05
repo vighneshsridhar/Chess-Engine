@@ -21,6 +21,7 @@ namespace ChessGame {
 		ChessPiece pieceAt(int r, int c);
 		void setPieceAt(ChessPiece piece, int r, int c);
 		std::vector<Move> getLegalMoves();
+		std::vector<Move> getCaptureMoves();
 		std::vector<Move> getPieceMoves(ChessPiece& piece);
 		void push(Move move);
 		void unmakeMove(Move move);

@@ -44,7 +44,7 @@ namespace ChessGame {
             {-10, 5, 5, 10, 10, 5, 5, -10},
             {-10, 0, 10, 10, 10, 10, 0, -10},
             {-10, 10, 10, 10, 10, 10, 10, -10},
-            {-10, 5, 0, 0, 0, 0, 5, -10},
+            {-10, 5, 0, 5, 5, 0, 5, -10},
             {-20, -10, -10, -10, -10, -10, -10, -20} };
 
         rookActivityScoreWhite = { {0, 0, 0, 0, 0, 0, 0, 0},
@@ -134,41 +134,52 @@ namespace ChessGame {
         if (bestValue >= beta) {
             return bestValue;
         }
+        /*int BIG_DELTA = 975;
+
+        if (bestValue < alpha - BIG_DELTA) {
+            return alpha;
+        } */
 
         if (alpha < bestValue) {
             alpha = bestValue;
         }
-        std::vector<Move> legalMoves = chessBoard.getLegalMoves();
+        std::vector<Move> captures = chessBoard.getCaptureMoves();
+        auto comp = [&](Move& a, Move& b) {
+            return a.getCaptureScore() > b.getCaptureScore();
+            };
+        std::sort(captures.begin(), captures.end(), comp);
 
-        for (auto& move : legalMoves) {
+        for (auto& move : captures) {
 
-            if (move.isCapture()) {
-                chessBoard.push(move);
-                newH = tt.updateHash(move, h);
-                score = quiescenceMin(chessBoard, alpha, beta, newH, tt);
-                chessBoard.unmakeMove(move);
+            if (pieceValues[move.getAttacker().getPieceType()] - pieceValues[move.getCapturedPiece().getPieceType()] > 50 || bestValue +
+                pieceValues[move.getCapturedPiece().getPieceType()] < alpha) {
+                continue;
+            }
+            chessBoard.push(move);
+            newH = tt.updateHash(move, h);
+            score = quiescenceMin(chessBoard, alpha, beta, newH, tt);
+            chessBoard.unmakeMove(move);
 
-                if (score >= beta) {
-                    TranspositionTable::TTEntry entry = { score, 0, TranspositionTable::TTFlag::LOWER_BOUND, move };
-                    tt.updateTT(h, entry);
+            if (score >= beta) {
+                TranspositionTable::TTEntry entry = { score, 0, TranspositionTable::TTFlag::LOWER_BOUND, move };
+                tt.updateTT(h, entry);
 
-                    return score;
-                }
+                return score;
+            }
 
-                if (score > bestValue) {
-                    bestValue = score;
-                    bestMove = move;
-                }
+            if (score > bestValue) {
+                bestValue = score;
+                bestMove = move;
+            }
 
-                if (score > alpha) {
-                    alpha = score;
-                }
+            if (score > alpha) {
+                alpha = score;
             }
         }
         entry = { bestValue, 0, TranspositionTable::TTFlag::EXACT_EVAL, bestMove };
         tt.updateTT(h, entry);
 
-        return bestValue;
+        return alpha;
     }
 
     int Evaluate::quiescenceMin(ChessBoard& chessBoard, int alpha, int beta, unsigned long long h, TranspositionTable& tt) {
@@ -182,44 +193,50 @@ namespace ChessGame {
         int bestValue = evaluatePosition(chessBoard);
         int score;
         Move bestMove;
+
         if (bestValue <= alpha) {
             return bestValue;
         }
 
-
         if (beta > bestValue) {
             beta = bestValue;
         }
-        std::vector<Move> legalMoves = chessBoard.getLegalMoves();
+        std::vector<Move> captures = chessBoard.getCaptureMoves();
+        auto comp = [&](Move& a, Move& b) {
+            return a.getCaptureScore() > b.getCaptureScore();
+            };
+        std::sort(captures.begin(), captures.end(), comp);
 
-        for (auto& move : legalMoves) {
+        for (auto& move : captures) {
+            
+            if (pieceValues[move.getAttacker().getPieceType()] - pieceValues[move.getCapturedPiece().getPieceType()] > 50 || bestValue - 
+                pieceValues[move.getCapturedPiece().getPieceType()] > beta) {
+                continue;
+            }
+            chessBoard.push(move);
+            newH = tt.updateHash(move, h);
+            score = quiescenceMax(chessBoard, alpha, beta, newH, tt);
+            chessBoard.unmakeMove(move);
 
-            if (move.isCapture()) {
-                chessBoard.push(move);
-                newH = tt.updateHash(move, h);
-                score = quiescenceMax(chessBoard, alpha, beta, newH, tt);
-                chessBoard.unmakeMove(move);
+            if (score <= alpha) {
+                TranspositionTable::TTEntry entry = { score, 0, TranspositionTable::TTFlag::UPPER_BOUND, move };
+                tt.updateTT(h, entry);
 
-                if (score <= alpha) {
-                    TranspositionTable::TTEntry entry = { score, 0, TranspositionTable::TTFlag::UPPER_BOUND, move };
-                    tt.updateTT(h, entry);
+                return score;
+            }
 
-                    return score;
-                }
+            if (score < bestValue) {
+                bestValue = score;
+                bestMove = move;
+            }
 
-                if (score < bestValue) {
-                    bestValue = score;
-                    bestMove = move;
-                }
-
-                if (score < beta) {
-                    beta = score;
-                }
+            if (score < beta) {
+                beta = score;
             }
         }
         entry = { bestValue, 0, TranspositionTable::TTFlag::EXACT_EVAL, bestMove };
         tt.updateTT(h, entry);
 
-        return bestValue;
+        return beta;
     }
 }

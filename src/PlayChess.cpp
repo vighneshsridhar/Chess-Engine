@@ -74,8 +74,6 @@ namespace ChessGame {
         ChessPiece rook(PieceType::ROOK, color, r, c);
         ChessPiece queen(PieceType::QUEEN, color, r, c);
         std::vector<ChessPiece> promotionPieces = { queen, rook, bishop, knight };
-        
-        n->checkSymbol = move.isCheck() ? "+" : "";
         spritesBoard[r][c] = spritesBoard[initial_r][initial_c];
 
         if (initialPiece.getPieceType() == PieceType::PAWN && (r == 0 || r == 7)) {
@@ -116,6 +114,7 @@ namespace ChessGame {
         }
         chessBoard.setChessBoard(b);
         legalMoves = chessBoard.getLegalMoves();
+        n->checkSymbol = m.checkOrCheckmate(chessBoard, legalMoves.size());
         chessBoard.setEnPassantFile(-1);
 
         return true;
@@ -236,6 +235,7 @@ namespace ChessGame {
         size_t moveNumber = 0;
         Move::MoveNode* root = new Move::MoveNode{ nullptr, children, nullptr, moveNumber, b, {}, "" };
         Move::MoveNode* orig_root = root;
+        std::string check;
 
         int depth = 3;
         Engine e(depth);
@@ -320,7 +320,10 @@ namespace ChessGame {
                                 pgn = m.generatePGN(orig_root, startingPosition, 0);
                                 // std::cout << "\033[2J\033[H";
                                 std::cout << pgn + "\n" << std::endl;
-                                makeEngineMove = true;
+
+                                if (legalMoves.size() > 0) {
+                                    makeEngineMove = true;
+                                }
                             }
                         } 
 

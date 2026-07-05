@@ -111,6 +111,11 @@ namespace ChessGame {
 		return score;
 	}
 
+	int Move::getCaptureScore() {
+		int score = 10 * pieceValues[capturedPiece.getPieceType()] + pieceValues[piece.getPieceType()];
+		return score;
+	}
+
 	bool Move::operator == (const Move& m) const {
 		return r1 == m.r1 && c1 == m.c1 && r2 == m.r2 && c2 == m.c2 && promotionPiece.getPieceType() == m.promotionPiece.getPieceType();
 	}

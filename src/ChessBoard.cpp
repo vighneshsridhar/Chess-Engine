@@ -113,8 +113,6 @@ namespace ChessGame {
                     if (piece.getPieceType() == PieceType::KING) {
                         setKingPosition(std::make_pair(x, y));
                     }
-                    // check = isCheckOrCheckmate();
-                    // move.setCheck(check);
 
                     if (Bitboard::isValidBoard(*this)) {
                         legalMoves.push_back(move);
@@ -129,6 +127,51 @@ namespace ChessGame {
             }
         }
         return legalMoves;
+    }
+
+    std::vector<Move> ChessBoard::getCaptureMoves() {
+        std::vector<Move> captureMoves;
+        std::vector<Move> moves;
+
+        for (int r = 0; r < boardSize; r++) {
+
+            for (int c = 0; c < boardSize; c++) {
+                ChessPiece piece = b[r][c];
+
+                if ((wTurn && piece.getColor() != PieceColor::WHITE) || (!wTurn && piece.getColor() != PieceColor::BLACK)) {
+                    continue;
+                }
+                moves = getPieceMoves(piece);
+
+                for (auto& move : moves) {
+
+                    if (!move.isCapture()) {
+                        continue;
+                    }
+                    auto [x, y] = move.getEndSquare();
+                    ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, x, y);
+                    ChessPiece old = b[x][y];
+
+                    b[x][y] = piece;
+                    b[r][c] = empty;
+
+                    if (piece.getPieceType() == PieceType::KING) {
+                        setKingPosition(std::make_pair(x, y));
+                    }
+
+                    if (Bitboard::isValidBoard(*this)) {
+                        captureMoves.push_back(move);
+                    }
+                    b[r][c] = piece;
+                    b[x][y] = old;
+
+                    if (piece.getPieceType() == PieceType::KING) {
+                        setKingPosition(std::make_pair(r, c));
+                    }
+                }
+            }
+        }
+        return captureMoves;
     }
 
     std::vector<Move> ChessBoard::getPieceMoves(ChessPiece& piece) {
@@ -290,6 +333,6 @@ namespace ChessGame {
     }
 
     bool ChessBoard::isCheckOrCheckmate() {
-        return Bitboard::isValidBoard(*this);
+        return !Bitboard::isValidBoard(*this);
     }
 }
