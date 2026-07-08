@@ -22,7 +22,7 @@ namespace ChessGame {
 		sf::Vector2f y;
 		int boardSize = 8;
 		float squareSize = 100.f;
-		static int bishopDirs[4][2] = {{-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
+		int bishopDirs[4][2] = {{-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
 		int s;
 		int t;
 

@@ -21,11 +21,11 @@ namespace ChessGame {
 		std::vector<Move> moves;
 		int boardSize = 8;
 		auto [r, c] = pawn.getCoordinates();
-
 		int dr = color == PieceColor::WHITE ? -1 : 1;
-		std::vector<std::vector<int>> pawnDirs = { {dr, 0}, {dr, 1}, {dr, -1} };
 		int startRow = color == PieceColor::WHITE ? 6 : 1;
-		int promotionRow = startRow + dr * 5;
+		int promotionRow = color == PieceColor::WHITE ? 1 : 6;
+		int pawnDirs[3][2] = { {dr, 0}, {dr, 1}, {dr, -1} };
+
 		int enPassantFile = chessBoard.getEnPassantFile();
 
 		int s;
@@ -92,6 +92,7 @@ namespace ChessGame {
 				}
 			}
 		}
+
 		return moves;
 	}
 

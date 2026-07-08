@@ -18,8 +18,8 @@ namespace ChessGame {
 	public:
 		PlayChess();
 		void draw(sf::RenderWindow& window, float squareSize, std::vector<std::vector<ChessPiece>> b, std::vector<std::vector<sf::Sprite>>& spritesBoard) const;
-		void undoMove(ChessBoard& chessBoard, std::vector<std::vector<sf::Sprite>>& spritesBoard, Move::MoveNode* n, std::vector<std::vector<sf::Sprite>> sprites) const;
-		bool makeMove(sf::RenderWindow& window, ChessBoard& chessBoard, std::vector<std::vector<sf::Sprite>>& spritesBoard, Move::MoveNode* n,
+		void undoMove(ChessBoard& chessBoard, std::vector<std::vector<sf::Sprite>>& spritesBoard, MoveNode* n, std::vector<std::vector<sf::Sprite>> sprites) const;
+		bool makeMove(sf::RenderWindow& window, ChessBoard& chessBoard, std::vector<std::vector<sf::Sprite>>& spritesBoard, MoveNode* n, bool rightArrow,
 			std::vector<std::vector<sf::Sprite>>& promotionSprites, std::vector<Move>& legalMoves, PGN& m) const;
 		void playGame();
 

@@ -130,7 +130,7 @@ namespace ChessGame {
 		return ans;
 	}
 
-	std::string PGN::generatePGN(Move::MoveNode* root, ChessBoard chessBoard, int index) {
+	std::string PGN::generatePGN(MoveNode* root, ChessBoard chessBoard, int index) {
 		std::string pgn_ans = "";
 		std::string move_pgn;
 		int moveNumber = root->moveNumber;
@@ -140,7 +140,7 @@ namespace ChessGame {
 			move_pgn = convertMoveToPGN(root->move, moveNumber, chessBoard, root->legalMoves) + root->checkSymbol;
 			pgn_ans = move_pgn + " ";
 		}
-		std::vector<Move::MoveNode*> siblings;
+		std::vector<MoveNode*> siblings;
 
 		if (root->parent) {
 			siblings = root->parent->children;
@@ -162,7 +162,7 @@ namespace ChessGame {
 		}
 
 		if (root->children.size() > 0) {
-			Move::MoveNode* n = root->children[0];
+			MoveNode* n = root->children[0];
 			chessBoard.setChessBoard(n->b);
 			chessBoard.changeTurn();
 

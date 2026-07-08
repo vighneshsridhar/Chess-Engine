@@ -14,7 +14,7 @@ namespace ChessGame {
 	public:
 		Move();
 		Move(int r1, int c1, int r2, int c2, ChessPiece piece, ChessPiece capturedPiece);
-		struct MoveNode {
+		/*struct MoveNode {
 			Move* move;
 			std::vector<MoveNode*> children;
 			MoveNode* parent;
@@ -22,7 +22,7 @@ namespace ChessGame {
 			std::vector<std::vector<ChessPiece>> b;
 			std::vector<Move> legalMoves;
 			std::string checkSymbol;
-		};
+		}; */
 		std::pair<int, int> getInitialSquare() const;
 		std::pair<int, int> getEndSquare() const;
 		ChessPiece getAttacker() const;
@@ -50,6 +50,15 @@ namespace ChessGame {
 		bool check;
 	};
 
+	struct MoveNode {
+		Move* move;
+		std::vector<MoveNode*> children;
+		MoveNode* parent;
+		size_t moveNumber;
+		std::vector<std::vector<ChessPiece>> b;
+		std::vector<Move> legalMoves;
+		std::string checkSymbol;
+	};
 }
 
 #endif

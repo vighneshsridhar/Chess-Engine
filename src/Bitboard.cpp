@@ -31,16 +31,10 @@ namespace ChessGame {
 
 	bool Bitboard::kingAttacked(ChessBoard& chessBoard, int r, int c, PieceColor color) {
 		PieceColor enemy = color == PieceColor::WHITE ? PieceColor::BLACK : PieceColor::WHITE;
-		std::vector<std::vector<int>> pawnDirs;
 		int boardSize = 8;
+		int dr = color == PieceColor::WHITE ? -1 : 1;
+		int pawnDirs[2][2] = { {dr, -1}, {dr, 1} };
 
-		if (color == PieceColor::WHITE) {
-			pawnDirs = { { -1, -1 }, { -1, 1 } };
-		}
-
-		else {
-			pawnDirs = { { 1, -1 }, {1, 1} };
-		}
 		int s = r;
 		int t = c;
 
@@ -56,7 +50,7 @@ namespace ChessGame {
 				}
 			}
 		}
-		std::vector<std::vector<int>> knightDirs = { {1, 2}, {1, -2}, {-1, 2}, {-1, -2}, {2, 1}, {2, -1}, {-2, 1}, {-2, -1} };
+		int knightDirs[8][2] = {{1, 2}, {1, -2}, {-1, 2}, {-1, -2}, {2, 1}, {2, -1}, {-2, 1}, {-2, -1}};
 
 		for (const auto& d : knightDirs) {
 			s = r + d[0];
@@ -70,7 +64,7 @@ namespace ChessGame {
 				}
 			}
 		}
-		static int bishopDirs[4][2] = { {-1, -1}, {-1, 1}, {1, -1}, {1, 1} };
+		int bishopDirs[4][2] = { {-1, -1}, {-1, 1}, {1, -1}, {1, 1} };
 
 		for (const auto& d : bishopDirs) {
 			s = r + d[0];
@@ -94,7 +88,7 @@ namespace ChessGame {
 				t += d[1];
 			}
 		}
-		static int rookDirs[4][2] = { {-1, 0}, {1,0}, {0, -1}, {0, 1} };
+		int rookDirs[4][2] = { {-1, 0}, {1,0}, {0, -1}, {0, 1} };
 
 		for (auto& d : rookDirs) {
 			s = r + d[0];
@@ -118,7 +112,7 @@ namespace ChessGame {
 				t += d[1];
 			}
 		}
-		static int kingDirs[8][2] = { {-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1} };
+		int kingDirs[8][2] = { {-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1} };
 
 		for (auto& d : kingDirs) {
 			s = r + d[0];
@@ -138,17 +132,11 @@ namespace ChessGame {
 
 	ChessPiece Bitboard::getSmallestAttacker(ChessBoard& chessBoard, int r, int c, PieceColor side) {
 		PieceColor enemy = side == PieceColor::WHITE ? PieceColor::BLACK : PieceColor::WHITE;
-		std::vector<std::vector<int>> pawnDirs;
 		int boardSize = 8;
 		ChessPiece ans(PieceType::EMPTY, PieceColor::NONE, r, c);
+		int dr = side == PieceColor::WHITE ? -1 : 1;
+		int pawnDirs[2][2] = { {dr, -1}, {dr, 1} };
 
-		if (side == PieceColor::WHITE) {
-			pawnDirs = { { -1, -1 }, { -1, 1 } };
-		}
-
-		else {
-			pawnDirs = { { 1, -1 }, {1, 1} };
-		}
 		int s = r;
 		int t = c;
 
@@ -164,7 +152,7 @@ namespace ChessGame {
 				}
 			}
 		}
-		static int kingDirs[8][2] = { {-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1} };
+		int kingDirs[8][2] = { {-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1} };
 
 		for (auto& d : kingDirs) {
 			s = r + d[0];
@@ -178,7 +166,7 @@ namespace ChessGame {
 				}
 			}
 		}
-		std::vector<std::vector<int>> knightDirs = { {1, 2}, {1, -2}, {-1, 2}, {-1, -2}, {2, 1}, {2, -1}, {-2, 1}, {-2, -1} };
+		int knightDirs[8][2] = {{1, 2}, {1, -2}, {-1, 2}, {-1, -2}, {2, 1}, {2, -1}, {-2, 1}, {-2, -1}};
 
 		for (const auto& d : knightDirs) {
 			s = r + d[0];
@@ -192,7 +180,7 @@ namespace ChessGame {
 				}
 			}
 		}
-		static int bishopDirs[4][2] = { {-1, -1}, {-1, 1}, {1, -1}, {1, 1} };
+		int bishopDirs[4][2] = { {-1, -1}, {-1, 1}, {1, -1}, {1, 1} };
 
 		for (const auto& d : bishopDirs) {
 			s = r + d[0];
@@ -219,7 +207,7 @@ namespace ChessGame {
 				t += d[1];
 			}
 		}
-		static int rookDirs[4][2] = { {-1, 0}, {1,0}, {0, -1}, {0, 1} };
+		int rookDirs[4][2] = { {-1, 0}, {1,0}, {0, -1}, {0, 1} };
 
 		for (auto& d : rookDirs) {
 			s = r + d[0];

@@ -22,7 +22,7 @@ namespace ChessGame {
 		auto [r, c] = queen.getCoordinates();
 		int s;
 		int t;
-		static int queenDirs[8][2] = { {-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1} };
+		int queenDirs[8][2] = { {-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1} };
 
 		for (auto& d : queenDirs) {
 			s = r + d[0];

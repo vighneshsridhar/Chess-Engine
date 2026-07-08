@@ -20,11 +20,11 @@ namespace ChessGame {
 		auto [r, c] = knight.getCoordinates();
 		int s;
 		int t;
-		std::vector<std::vector<int>> squares = { {r - 1, c + 2}, {r - 1, c - 2}, {r + 1, c + 2}, {r + 1, c - 2}, {r - 2, c + 1}, {r - 2, c - 1}, {r + 2, c + 1}, {r + 2, c - 1} };
+		int knightDirs[8][2] = {{-1, 2}, {-1, -2}, {1, 2}, {1, -2}, {-2, 1}, {-2, -1}, {2, 1}, {2, -1}};
 
-		for (const auto& square : squares) {
-			s = square[0];
-			t = square[1];
+		for (const auto& d: knightDirs) {
+			s = r + d[0];
+			t = c + d[1];
 
 			if (s >= 0 && s < boardSize && t >= 0 && t < boardSize) {
 				auto piece = chessBoard.pieceAt(s, t);

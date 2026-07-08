@@ -158,6 +158,10 @@ namespace ChessGame {
         std::sort(captures.begin(), captures.end(), comp);
 
         for (auto& move : captures) {
+
+            if (seeCapture(move, chessBoard) < 0) {
+                continue;
+            }
             chessBoard.push(move);
             newH = tt.updateHash(move, h);
             auto [r1, c1] = move.getInitialSquare();
@@ -235,6 +239,10 @@ namespace ChessGame {
         std::sort(captures.begin(), captures.end(), comp);
 
         for (auto& move : captures) {
+
+            if (seeCapture(move, chessBoard) > 0) {
+                continue;
+            }
             chessBoard.push(move);
             newH = tt.updateHash(move, h);
             auto [r1, c1] = move.getInitialSquare();
@@ -270,5 +278,49 @@ namespace ChessGame {
         tt.updateTT(h, entry);
 
         return bestValue;
+    }
+
+    int Evaluate::see(int r, int c, ChessBoard& chessBoard) {
+        int value = 0;
+        PieceColor side = chessBoard.whiteTurn() ? PieceColor::WHITE : PieceColor::BLACK;
+        ChessPiece attacker = Bitboard::getSmallestAttacker(chessBoard, r, c, side);
+        ChessPiece capturedPiece = chessBoard.pieceAt(r, c);
+        bool wTurn = chessBoard.whiteTurn();
+
+        if (attacker.getPieceType() != PieceType::EMPTY) {
+            auto [s, t] = attacker.getCoordinates();
+            Move move(s, t, r, c, attacker, capturedPiece);
+            chessBoard.push(move);
+
+            if (wTurn) {
+                value = std::max(0, pieceValues[static_cast<int>(capturedPiece.getPieceType())] + see(r, c, chessBoard));
+            }
+
+            else {
+                value = std::min(0, -pieceValues[static_cast<int>(capturedPiece.getPieceType())] + see(r, c, chessBoard));
+            }
+            chessBoard.unmakeMove(move);
+        }
+
+        return value;
+    }
+
+    int Evaluate::seeCapture(Move& move, ChessBoard& chessBoard) {
+        int value = 0;
+        ChessPiece piece = move.getAttacker();
+        bool wTurn = chessBoard.whiteTurn();
+        auto [r, c] = move.getEndSquare();
+        chessBoard.push(move);
+
+        if (wTurn) {
+            value = pieceValues[static_cast<int>(move.getCapturedPiece().getPieceType())] + see(r, c, chessBoard);
+        }
+
+        else {
+            value = -pieceValues[static_cast<int>(move.getCapturedPiece().getPieceType())] + see(r, c, chessBoard);
+        }
+        chessBoard.unmakeMove(move);
+
+        return value;
     }
 }

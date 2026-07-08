@@ -174,18 +174,18 @@ namespace ChessGame {
                 }
             }
         }
-        /*auto comp = [&, depthLeft](Move& a, Move& b) {
+        auto comp = [&, depthLeft](Move& a, Move& b) {
             return a.getOrderingScore(killerMoves, depthLeft) >
                 b.getOrderingScore(killerMoves, depthLeft);
             };
-        std::sort(legalMoves.begin(), legalMoves.end(), comp); */
+        std::sort(legalMoves.begin(), legalMoves.end(), comp);
         Move bestMove;
         unsigned long long newH;
 
         for (int i = 0; i < legalMoves.size(); i++) {
             Move& move = legalMoves[i];
 
-            if (move.getCaptureScore() < 0) {
+            if (move.isCapture() && e.seeCapture(move, chessBoard) < 0) {
                 continue;
             }
             newH = tt.updateHash(move, h);
@@ -246,11 +246,11 @@ namespace ChessGame {
 
             return 0;
         }
-        /*auto comp = [&, depthLeft](Move& a, Move& b) {
+        auto comp = [&, depthLeft](Move& a, Move& b) {
             return a.getOrderingScore(killerMoves, depthLeft) >
                 b.getOrderingScore(killerMoves, depthLeft);
-            }; */
-            //std::sort(legalMoves.begin(), legalMoves.end(), comp);
+            };
+        std::sort(legalMoves.begin(), legalMoves.end(), comp);
 
         Move bestMove;
         unsigned long long newH;
@@ -289,7 +289,7 @@ namespace ChessGame {
         for (int i = 0; i < legalMoves.size(); i++) {
             Move& move = legalMoves[i];
 
-            if (move.getCaptureScore() < 0) {
+            if (move.isCapture() && e.seeCapture(move, chessBoard) > 0) {
                 continue;
             }
             newH = tt.updateHash(move, h);
@@ -332,49 +332,5 @@ namespace ChessGame {
         tt.updateTT(h, entry);
 
         return bestValue;
-    }
-
-    int Engine::see(int r, int c, ChessBoard& chessBoard) {
-        int value = 0;
-        PieceColor side = chessBoard.whiteTurn() ? PieceColor::WHITE : PieceColor::BLACK;
-        ChessPiece attacker = Bitboard::getSmallestAttacker(chessBoard, r, c, side);
-        ChessPiece capturedPiece = chessBoard.pieceAt(r, c);
-        bool wTurn = chessBoard.whiteTurn();
-
-        if (attacker.getPieceType() != PieceType::EMPTY) {
-            auto [s, t] = attacker.getCoordinates();
-            Move move(s, t, r, c, attacker, capturedPiece);
-            chessBoard.push(move);
-
-            if (wTurn) {
-                value = std::max(0, e.pieceValues[static_cast<int>(capturedPiece.getPieceType())] + see(r, c, chessBoard));
-            }
-
-            else {
-                value = std::min(0, -e.pieceValues[static_cast<int>(capturedPiece.getPieceType())] + see(r, c, chessBoard));
-            }
-            chessBoard.unmakeMove(move);
-        }
-
-        return value;
-    }
-
-    int Engine::seeCapture(Move& move, ChessBoard& chessBoard) {
-        int value = 0;
-        ChessPiece piece = move.getAttacker();
-        bool wTurn = chessBoard.whiteTurn();
-        auto [r, c] = move.getEndSquare();
-        chessBoard.push(move);
-
-        if (wTurn) {
-            value = e.pieceValues[static_cast<int>(move.getCapturedPiece().getPieceType())] + see(r, c, chessBoard);
-        }
-
-        else {
-            value = -e.pieceValues[static_cast<int>(move.getCapturedPiece().getPieceType())] + see(r, c, chessBoard);
-        }
-        chessBoard.unmakeMove(move);
-
-        return value;
     }
 }

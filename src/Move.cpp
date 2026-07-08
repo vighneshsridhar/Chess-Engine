@@ -15,6 +15,14 @@ namespace ChessGame {
 		c1 = -1;
 		r2 = -1;
 		c2 = -1;
+
+		pieceValues[0] = 0;
+		pieceValues[1] = 100;
+		pieceValues[2] = 300;
+		pieceValues[3] = 330;
+		pieceValues[4] = 500;
+		pieceValues[5] = 900;
+		pieceValues[6] = 0;
 	};
 
 	Move::Move(int r1, int c1, int r2, int c2, ChessPiece piece, ChessPiece capturedPiece) : r1(r1), c1(c1), r2(r2), c2(c2), piece(piece), capturedPiece(capturedPiece) {

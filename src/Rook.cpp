@@ -23,7 +23,7 @@ namespace ChessGame {
 		auto [r, c] = rook.getCoordinates();
 		int s = r;
 		int t = c;
-		static int rookDirs[4][2] = { {-1, 0}, {1,0}, {0, -1}, {0, 1} };
+		int rookDirs[4][2] = { {-1, 0}, {1,0}, {0, -1}, {0, 1} };
 
 		for (auto& d : rookDirs) {
 			s = r + d[0];

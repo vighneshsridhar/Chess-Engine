@@ -57,7 +57,7 @@ namespace ChessGame {
         }
     }
 
-    bool PlayChess::makeMove(sf::RenderWindow& window, ChessBoard& chessBoard, std::vector<std::vector<sf::Sprite>>& spritesBoard, Move::MoveNode* n,
+    bool PlayChess::makeMove(sf::RenderWindow& window, ChessBoard& chessBoard, std::vector<std::vector<sf::Sprite>>& spritesBoard, MoveNode* n, bool rightArrow,
     std::vector<std::vector<sf::Sprite>>& promotionSprites, std::vector<Move>& legalMoves, PGN& m) const {
         Move move = *n->move;
         chessBoard.push(move);
@@ -74,6 +74,11 @@ namespace ChessGame {
         ChessPiece rook(PieceType::ROOK, color, r, c);
         ChessPiece queen(PieceType::QUEEN, color, r, c);
         std::vector<ChessPiece> promotionPieces = { queen, rook, bishop, knight };
+        std::unordered_map<PieceType, int> pieceToIndex;
+        pieceToIndex[PieceType::QUEEN] = 0;
+        pieceToIndex[PieceType::ROOK] = 1;
+        pieceToIndex[PieceType::BISHOP] = 2;
+        pieceToIndex[PieceType::KNIGHT] = 3;
         spritesBoard[r][c] = spritesBoard[initial_r][initial_c];
 
         if (initialPiece.getPieceType() == PieceType::PAWN && (r == 0 || r == 7)) {
@@ -86,15 +91,23 @@ namespace ChessGame {
             else {
                 j = 1;
             }
-            auto [i, didPromote] = PromotionClicker::promotePawn(window, b, initialPiece, spritesBoard, promotionSprites[j], r, c);
 
-            if (didPromote) {
-                spritesBoard[r][c] = promotionSprites[j][i];
-                n->move->setPromotionPiece(promotionPieces[i]);
+            if (!rightArrow) {
+                auto [i, didPromote] = PromotionClicker::promotePawn(window, b, initialPiece, spritesBoard, promotionSprites[j], r, c);
+
+                if (didPromote) {
+                    spritesBoard[r][c] = promotionSprites[j][i];
+                    n->move->setPromotionPiece(promotionPieces[i]);
+                }
+
+                else {
+                    return false;
+                }
             }
 
             else {
-                return false;
+                auto i = pieceToIndex[n->move->getPromotionPiece().getPieceType()];
+                spritesBoard[r][c] = promotionSprites[j][i];
             }
         }
         spritesBoard[r][c].setPosition(Functions::convertToPosition(r, c));
@@ -120,7 +133,7 @@ namespace ChessGame {
         return true;
     }
 
-    void PlayChess::undoMove(ChessBoard& chessBoard, std::vector<std::vector<sf::Sprite>>& spritesBoard, Move::MoveNode* n, std::vector<std::vector<sf::Sprite>> sprites) const {
+    void PlayChess::undoMove(ChessBoard& chessBoard, std::vector<std::vector<sf::Sprite>>& spritesBoard, MoveNode* n, std::vector<std::vector<sf::Sprite>> sprites) const {
         Move move = *n->move;
         auto [r1, c1] = move.getInitialSquare();
         auto [r2, c2] = move.getEndSquare();
@@ -231,13 +244,13 @@ namespace ChessGame {
         float y;
 
         std::vector<Move> legalMoves = chessBoard.getLegalMoves();
-        std::vector<Move::MoveNode*> children = {};
+        std::vector<MoveNode*> children = {};
         size_t moveNumber = 0;
-        Move::MoveNode* root = new Move::MoveNode{ nullptr, children, nullptr, moveNumber, b, {}, "" };
-        Move::MoveNode* orig_root = root;
+        MoveNode* root = new MoveNode{ nullptr, children, nullptr, moveNumber, b, {}, "" };
+        MoveNode* orig_root = root;
         std::string check;
 
-        int depth = 3;
+        int depth = 4;
         Engine e(depth);
         Move engineMove;
         bool makeEngineMove = false;
@@ -250,7 +263,7 @@ namespace ChessGame {
                     window.close();
                 }
 
-                if (false) {
+                if (makeEngineMove) {
                     engineMove = e.iterative_deepening(chessBoard);
                     moveNumber = chessBoard.whiteTurn() ? moveNumber + 1 : moveNumber;
                     pgn = m.convertMoveToPGN(&engineMove, moveNumber, chessBoard, legalMoves);
@@ -297,11 +310,11 @@ namespace ChessGame {
                         });
 
                         if (it != legalMoves.end()) {
-                            std::vector<Move::MoveNode*> children;
+                            std::vector<MoveNode*> children;
                             moveNumber = chessBoard.whiteTurn() ? root->moveNumber + 1 : root->moveNumber;
-                            Move::MoveNode* n = new Move::MoveNode{ move, children, root, moveNumber, b, legalMoves, "" };
+                            MoveNode* n = new MoveNode{ move, children, root, moveNumber, b, legalMoves, "" };
 
-                            if (makeMove(window, chessBoard, spritesBoard, n, promotionSprites, legalMoves, m)) {
+                            if (makeMove(window, chessBoard, spritesBoard, n, false, promotionSprites, legalMoves, m)) {
                                 bool newMove = true;
 
                                 for (const auto node : root->children) {
@@ -341,7 +354,7 @@ namespace ChessGame {
 
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) && root->children.size() > 0) {
                     root = root->children[0];
-                    bool _ = makeMove(window, chessBoard, spritesBoard, root, promotionSprites, legalMoves, m);
+                    bool _ = makeMove(window, chessBoard, spritesBoard, root, true, promotionSprites, legalMoves, m);
                 }
                 b = chessBoard.getChessBoard();
 
