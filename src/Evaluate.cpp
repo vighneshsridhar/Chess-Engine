@@ -11,21 +11,21 @@ namespace ChessGame {
 
     Evaluate::Evaluate() {
         boardSize = 8;
-        pieceValues = {
-            {PieceType::PAWN, 100},
-            {PieceType::KNIGHT, 320},
-            {PieceType::BISHOP, 330},
-            {PieceType::ROOK, 500},
-            {PieceType::QUEEN, 900},
-            {PieceType::KING, 0}
-        };
+
+        pieceValues[0] = 0;
+        pieceValues[1] = 100;
+        pieceValues[2] = 300;
+        pieceValues[3] = 330;
+        pieceValues[4] = 500;
+        pieceValues[5] = 900;
+        pieceValues[6] = 0;
 
         pawnActivityScoreWhite = { {0, 0, 0, 0, 0, 0, 0, 0},
             {50, 50, 50, 50, 50, 50, 50, 50},
             {10, 10, 20, 30, 30, 20, 10, 10},
             {5, 5, 10, 25, 25, 10, 5, 5},
             {0, 0, 0, 30, 30, 0, 0, 0},
-            {5, -5, 10, 0, 0, 10, -5, 5},
+            {5, -5, 0, 0, 0, -20, -5, 5},
             {5, 10, 10, -35, -35, 10, 10, 5},
             {0, 0, 0, 0, 0, 0, 0, 0} };
 
@@ -88,13 +88,12 @@ namespace ChessGame {
         std::reverse(queenActivityScoreBlack.begin(), queenActivityScoreBlack.end());
         std::reverse(kingActivityScoreBlack.begin(), kingActivityScoreBlack.end());
 
-        pieceTables = {
-            {PieceType::PAWN, std::make_pair(pawnActivityScoreWhite, pawnActivityScoreBlack)},
-            {PieceType::KNIGHT, std::make_pair(knightActivityScoreWhite, knightActivityScoreBlack)},
-            {PieceType::BISHOP, std::make_pair(bishopActivityScoreWhite, bishopActivityScoreBlack)},
-            {PieceType::ROOK, std::make_pair(rookActivityScoreWhite, rookActivityScoreBlack)},
-            {PieceType::QUEEN, std::make_pair(queenActivityScoreWhite, queenActivityScoreBlack)},
-            {PieceType::KING, std::make_pair(kingActivityScoreWhite, kingActivityScoreBlack)} };
+        pieceTables[0] = std::make_pair(pawnActivityScoreWhite, pawnActivityScoreBlack);
+        pieceTables[1] = std::make_pair(knightActivityScoreWhite, knightActivityScoreBlack);
+        pieceTables[2] = std::make_pair(bishopActivityScoreWhite, bishopActivityScoreBlack);
+        pieceTables[3] = std::make_pair(rookActivityScoreWhite, rookActivityScoreBlack);
+        pieceTables[4] = std::make_pair(queenActivityScoreWhite, queenActivityScoreBlack);
+        pieceTables[5] = std::make_pair(kingActivityScoreWhite, kingActivityScoreBlack);
     }
 
     int Evaluate::evaluatePosition(ChessBoard& chessBoard) {
@@ -107,38 +106,47 @@ namespace ChessGame {
                 ChessPiece piece = chessBoard.pieceAt(r, c);
 
                 if (piece.getColor() == PieceColor::WHITE) {
-                    score += pieceValues[piece.getPieceType()] + pieceTables[piece.getPieceType()].first[r][c];
+                    score += pieceValues[static_cast<int>(piece.getPieceType())] + pieceTables[static_cast<int>(piece.getPieceType()) - 1].first[r][c];
                 }
 
                 else if (piece.getColor() == PieceColor::BLACK) {
-                    score -= pieceValues[piece.getPieceType()] + pieceTables[piece.getPieceType()].second[r][c];
+                    score -= pieceValues[static_cast<int>(piece.getPieceType())] + pieceTables[static_cast<int>(piece.getPieceType()) - 1].second[r][c];
                 }
-                
             }
         }
         
         return score;
     }
 
-    int Evaluate::quiescenceMax(ChessBoard& chessBoard, int alpha, int beta, unsigned long long h, TranspositionTable& tt) {
+    int Evaluate::quiescenceMax(ChessBoard& chessBoard, int alpha, int beta, unsigned long long h, TranspositionTable& tt, int runningScore) {
         TranspositionTable::TTEntry entry = tt.getTT(h);
         unsigned long long newH;
 
-        if (entry.depth != -1) {
-            return entry.eval;
+        if (entry.depth >= 0) {
+
+            if (entry.flag == TranspositionTable::TTFlag::EXACT_EVAL) {
+                return entry.eval;
+            }
+
+            if (entry.flag == TranspositionTable::TTFlag::LOWER_BOUND) {
+                alpha = std::max(alpha, entry.eval);
+            }
+
+            if (entry.flag == TranspositionTable::TTFlag::UPPER_BOUND) {
+                beta = std::min(beta, entry.eval);
+            }
+
+            if (alpha >= beta) {
+                return entry.eval;
+            }
         }
-        int bestValue = evaluatePosition(chessBoard);
-        int score;
+        // int bestValue = evaluatePosition(chessBoard);
+        int bestValue = runningScore;
         Move bestMove;
 
         if (bestValue >= beta) {
             return bestValue;
         }
-        /*int BIG_DELTA = 975;
-
-        if (bestValue < alpha - BIG_DELTA) {
-            return alpha;
-        } */
 
         if (alpha < bestValue) {
             alpha = bestValue;
@@ -150,14 +158,19 @@ namespace ChessGame {
         std::sort(captures.begin(), captures.end(), comp);
 
         for (auto& move : captures) {
-
-            if (pieceValues[move.getAttacker().getPieceType()] - pieceValues[move.getCapturedPiece().getPieceType()] > 50 || bestValue +
-                pieceValues[move.getCapturedPiece().getPieceType()] < alpha) {
-                continue;
-            }
             chessBoard.push(move);
             newH = tt.updateHash(move, h);
-            score = quiescenceMin(chessBoard, alpha, beta, newH, tt);
+            auto [r1, c1] = move.getInitialSquare();
+            auto [r2, c2] = move.getEndSquare();
+            
+            auto captureValue = pieceValues[static_cast<int>(move.getCapturedPiece().getPieceType())];
+            auto pieceSquare = pieceTables[static_cast<int>(move.getAttacker().getPieceType()) - 1].first[r2][c2] -
+                pieceTables[static_cast<int>(move.getAttacker().getPieceType()) - 1].first[r1][c1];
+            runningScore += captureValue;
+            runningScore += pieceSquare;
+            auto score = quiescenceMin(chessBoard, alpha, beta, newH, tt, runningScore);
+            runningScore -= captureValue;
+            runningScore -= pieceSquare;
             chessBoard.unmakeMove(move);
 
             if (score >= beta) {
@@ -179,19 +192,33 @@ namespace ChessGame {
         entry = { bestValue, 0, TranspositionTable::TTFlag::EXACT_EVAL, bestMove };
         tt.updateTT(h, entry);
 
-        return alpha;
+        return bestValue;
     }
 
-    int Evaluate::quiescenceMin(ChessBoard& chessBoard, int alpha, int beta, unsigned long long h, TranspositionTable& tt) {
+    int Evaluate::quiescenceMin(ChessBoard& chessBoard, int alpha, int beta, unsigned long long h, TranspositionTable& tt, int runningScore) {
         TranspositionTable::TTEntry entry = tt.getTT(h);
         unsigned long long newH;
 
-        if (entry.depth != -1) {
-            return entry.eval;
+        if (entry.depth >= 0) {
+
+            if (entry.flag == TranspositionTable::TTFlag::EXACT_EVAL) {
+                return entry.eval;
+            }
+
+            if (entry.flag == TranspositionTable::TTFlag::LOWER_BOUND) {
+                alpha = std::max(alpha, entry.eval);
+            }
+
+            if (entry.flag == TranspositionTable::TTFlag::UPPER_BOUND) {
+                beta = std::min(beta, entry.eval);
+            }
+
+            if (alpha >= beta) {
+                return entry.eval;
+            }
         }
 
-        int bestValue = evaluatePosition(chessBoard);
-        int score;
+        int bestValue = runningScore;
         Move bestMove;
 
         if (bestValue <= alpha) {
@@ -208,14 +235,19 @@ namespace ChessGame {
         std::sort(captures.begin(), captures.end(), comp);
 
         for (auto& move : captures) {
-            
-            if (pieceValues[move.getAttacker().getPieceType()] - pieceValues[move.getCapturedPiece().getPieceType()] > 50 || bestValue - 
-                pieceValues[move.getCapturedPiece().getPieceType()] > beta) {
-                continue;
-            }
             chessBoard.push(move);
             newH = tt.updateHash(move, h);
-            score = quiescenceMax(chessBoard, alpha, beta, newH, tt);
+            auto [r1, c1] = move.getInitialSquare();
+            auto [r2, c2] = move.getEndSquare();
+
+            auto captureValue = pieceValues[static_cast<int>(move.getCapturedPiece().getPieceType())];
+            auto pieceSquare = pieceTables[static_cast<int>(move.getAttacker().getPieceType()) - 1].second[r2][c2] -
+                pieceTables[static_cast<int>(move.getAttacker().getPieceType()) - 1].second[r1][c1];
+            runningScore -= captureValue;
+            runningScore -= pieceSquare;
+            auto score = quiescenceMax(chessBoard, alpha, beta, newH, tt, runningScore);
+            runningScore += captureValue;
+            runningScore += pieceSquare;
             chessBoard.unmakeMove(move);
 
             if (score <= alpha) {
@@ -237,6 +269,6 @@ namespace ChessGame {
         entry = { bestValue, 0, TranspositionTable::TTFlag::EXACT_EVAL, bestMove };
         tt.updateTT(h, entry);
 
-        return beta;
+        return bestValue;
     }
 }

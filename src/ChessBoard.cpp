@@ -281,8 +281,9 @@ namespace ChessGame {
             }
 
             if (move.isEnPassant()) {
+                b[r][c] = empty;
                 int rank = initialPiece.getColor() == PieceColor::WHITE ? r + 1 : r - 1;
-                b[rank][c] = empty;
+                b[rank][c] = capturedPiece;
             }
         }
 

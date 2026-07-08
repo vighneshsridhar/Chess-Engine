@@ -17,12 +17,13 @@ namespace ChessGame {
 	public:
 		Evaluate();
 		int evaluatePosition(ChessBoard& chessBoard);
-		int quiescenceMax(ChessBoard& chessBoard, int alpha, int beta, unsigned long long h, TranspositionTable& tt);
-		int quiescenceMin(ChessBoard& chessBoard, int alpha, int beta, unsigned long long h, TranspositionTable& tt);
+		int quiescenceMax(ChessBoard& chessBoard, int alpha, int beta, unsigned long long h, TranspositionTable& tt, int runningScore);
+		int quiescenceMin(ChessBoard& chessBoard, int alpha, int beta, unsigned long long h, TranspositionTable& tt, int runningScore);
+		int pieceValues[7];
+		std::pair<std::vector<std::vector<int>>, std::vector<std::vector<int>>> pieceTables[6];
 
 	private:
 		int boardSize;
-		std::unordered_map<PieceType, int> pieceValues;
 
 		std::vector<std::vector<int>> pawnActivityScoreWhite;
 		std::vector<std::vector<int>> knightActivityScoreWhite;
@@ -37,8 +38,6 @@ namespace ChessGame {
 		std::vector<std::vector<int>> rookActivityScoreBlack;
 		std::vector<std::vector<int>> queenActivityScoreBlack;
 		std::vector<std::vector<int>> kingActivityScoreBlack;
-
-		std::unordered_map<PieceType, std::pair<std::vector<std::vector<int>>, std::vector<std::vector<int>>>> pieceTables;
 	};
 
 }

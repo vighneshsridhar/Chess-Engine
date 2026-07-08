@@ -152,7 +152,7 @@ namespace ChessGame {
 
         if (move.isEnPassant()) {
 
-            if (b[r1][c1].getColor() == PieceColor::WHITE) {
+            if (b[r1][c1].getColor() == PieceColor::WHITE) {;
                 spritesBoard[r2 + 1][c2] = sprites[1][0];
                 b[r2 + 1][c2].setPosition(Functions::convertToPosition(r2 + 1, c2));
             }
@@ -250,7 +250,7 @@ namespace ChessGame {
                     window.close();
                 }
 
-                if (makeEngineMove) {
+                if (false) {
                     engineMove = e.iterative_deepening(chessBoard);
                     moveNumber = chessBoard.whiteTurn() ? moveNumber + 1 : moveNumber;
                     pgn = m.convertMoveToPGN(&engineMove, moveNumber, chessBoard, legalMoves);

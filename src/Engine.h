@@ -17,10 +17,11 @@ namespace ChessGame {
 	class Engine {
 	public:
 		Engine(int maxDepth);
-		// Move analyze(ChessBoard& chessBoard);
 		Move iterative_deepening(ChessBoard chessBoard);
-		int alphaBetaMax(ChessBoard& chessBoard, int alpha, int beta, int depthLeft, unsigned long long h);
-		int alphaBetaMin(ChessBoard& chessBoard, int alpha, int beta, int depthLeft, unsigned long long h);
+		int alphaBetaMax(ChessBoard& chessBoard, int alpha, int beta, int depthLeft, unsigned long long h, int runningScore);
+		int alphaBetaMin(ChessBoard& chessBoard, int alpha, int beta, int depthLeft, unsigned long long h, int runningScore);
+		int see(int r, int c, ChessBoard& chessBoard);
+		int seeCapture(Move& move, ChessBoard& chessBoard);
 
 	private:
 		int boardSize;

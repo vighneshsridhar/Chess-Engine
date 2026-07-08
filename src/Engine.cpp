@@ -10,6 +10,7 @@
 #include "ChessBoard.h"
 #include "ChessPiece.h"
 #include "Evaluate.h"
+#include "Bitboard.h"
 
 
 
@@ -31,7 +32,8 @@ namespace ChessGame {
         Move bestMove;
         unsigned long long oldH = h;
         unsigned long long newH;
-        int score;
+
+        int runningScore = e.evaluatePosition(chessBoard);
         bool wTurn = chessBoard.whiteTurn();
 
         for (int d = 1; d < maxDepth + 1; d++) {
@@ -59,9 +61,18 @@ namespace ChessGame {
             for (auto& move : legalMoves) {
                 chessBoard.push(move);
                 newH = tt.updateHash(move, oldH);
+                auto [r1, c1] = move.getInitialSquare();
+                auto [r2, c2] = move.getEndSquare();
 
                 if (wTurn) {
-                    score = alphaBetaMin(chessBoard, alpha, beta, d - 1, newH);
+                    auto captureValue = e.pieceValues[static_cast<int>(move.getCapturedPiece().getPieceType())];
+                    auto pieceSquare = e.pieceTables[static_cast<int>(move.getAttacker().getPieceType()) - 1].first[r2][c2] -
+                        e.pieceTables[static_cast<int>(move.getAttacker().getPieceType()) - 1].first[r1][c1];
+                    runningScore += captureValue;
+                    runningScore += pieceSquare;
+                    auto score = alphaBetaMin(chessBoard, alpha, beta, d - 1, newH, runningScore);
+                    runningScore -= captureValue;
+                    runningScore -= pieceSquare;
 
                     if (score > bestScore) {
                         bestMove = move;
@@ -75,7 +86,14 @@ namespace ChessGame {
                 }
 
                 else {
-                    score = alphaBetaMax(chessBoard, alpha, beta, d - 1, newH);
+                    auto captureValue = e.pieceValues[static_cast<int>(move.getCapturedPiece().getPieceType())];
+                    auto pieceSquare = e.pieceTables[static_cast<int>(move.getAttacker().getPieceType()) - 1].second[r2][c2] -
+                        e.pieceTables[static_cast<int>(move.getAttacker().getPieceType()) - 1].second[r1][c1];
+                    runningScore -= captureValue;
+                    runningScore -= pieceSquare;
+                    auto score = alphaBetaMax(chessBoard, alpha, beta, d - 1, newH, runningScore);
+                    runningScore += captureValue;
+                    runningScore += pieceSquare;
 
                     if (score < bestScore) {
                         bestMove = move;
@@ -96,10 +114,10 @@ namespace ChessGame {
         return bestMove;
     }
 
-    int Engine::alphaBetaMax(ChessBoard& chessBoard, int alpha, int beta, int depthLeft, unsigned long long h) {
+    int Engine::alphaBetaMax(ChessBoard& chessBoard, int alpha, int beta, int depthLeft, unsigned long long h, int runningScore) {
         if (depthLeft == 0) {
             auto start = std::chrono::high_resolution_clock::now();
-            auto ans = e.quiescenceMax(chessBoard, alpha, beta, h, tt);
+            auto ans = e.quiescenceMax(chessBoard, alpha, beta, h, tt, runningScore);
             auto end = std::chrono::high_resolution_clock::now();
 
             /*std::cout << "Quiescence: "
@@ -116,6 +134,15 @@ namespace ChessGame {
         /*std::cout << "Legal move generation: "
             << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()
             << " ms\n"; */
+
+        if (legalMoves.size() == 0) {
+
+            if (chessBoard.isCheckOrCheckmate()) {
+                return bestValue;
+            }
+
+            return 0;
+        }
         TranspositionTable::TTEntry entry = tt.getTT(h);
 
         if (entry.depth >= depthLeft) {
@@ -138,7 +165,7 @@ namespace ChessGame {
         }
 
         if (entry.depth != -1) {
-            
+
             for (int i = 0; i < legalMoves.size(); i++) {
 
                 if (legalMoves[i] == entry.bestMove) {
@@ -146,10 +173,6 @@ namespace ChessGame {
                     break;
                 }
             }
-        }
-
-        if (legalMoves.size() == 0) {
-            return bestValue;
         }
         /*auto comp = [&, depthLeft](Move& a, Move& b) {
             return a.getOrderingScore(killerMoves, depthLeft) >
@@ -161,9 +184,24 @@ namespace ChessGame {
 
         for (int i = 0; i < legalMoves.size(); i++) {
             Move& move = legalMoves[i];
+
+            if (move.getCaptureScore() < 0) {
+                continue;
+            }
             newH = tt.updateHash(move, h);
             chessBoard.push(move);
-            auto score = alphaBetaMin(chessBoard, alpha, beta, depthLeft - 1, newH);
+            auto [r1, c1] = move.getInitialSquare();
+            auto [r2, c2] = move.getEndSquare();
+            
+            auto captureValue = e.pieceValues[static_cast<int>(move.getCapturedPiece().getPieceType())];
+            auto pieceSquare = e.pieceTables[static_cast<int>(move.getAttacker().getPieceType()) - 1].first[r2][c2] -
+                e.pieceTables[static_cast<int>(move.getAttacker().getPieceType()) - 1].first[r1][c1];
+            runningScore += captureValue;
+            runningScore += pieceSquare;
+            auto score = alphaBetaMin(chessBoard, alpha, beta, depthLeft - 1, newH, runningScore);
+            runningScore -= captureValue;
+            runningScore -= pieceSquare;
+
             chessBoard.unmakeMove(move);
 
             if (score > bestValue) {
@@ -176,7 +214,7 @@ namespace ChessGame {
             }
 
             if (score >= beta) {
-                
+
                 if (!move.isCapture()) {
                     killerMoves[depthLeft][1] = killerMoves[depthLeft][0];
                     killerMoves[depthLeft][0] = move;
@@ -193,28 +231,33 @@ namespace ChessGame {
         return bestValue;
     }
 
-    int Engine::alphaBetaMin(ChessBoard& chessBoard, int alpha, int beta, int depthLeft, unsigned long long h) {
+    int Engine::alphaBetaMin(ChessBoard& chessBoard, int alpha, int beta, int depthLeft, unsigned long long h, int runningScore) {
         if (depthLeft == 0) {
-            return e.quiescenceMin(chessBoard, alpha, beta, h, tt);
+            return e.quiescenceMin(chessBoard, alpha, beta, h, tt, runningScore);
         }
         int bestValue = std::numeric_limits<int>::max();
         std::vector<Move> legalMoves = chessBoard.getLegalMoves();
 
         if (legalMoves.size() == 0) {
-            return bestValue;
+            
+            if (chessBoard.isCheckOrCheckmate()) {
+                return bestValue;
+            }
+
+            return 0;
         }
         /*auto comp = [&, depthLeft](Move& a, Move& b) {
             return a.getOrderingScore(killerMoves, depthLeft) >
                 b.getOrderingScore(killerMoves, depthLeft);
             }; */
-        //std::sort(legalMoves.begin(), legalMoves.end(), comp);
+            //std::sort(legalMoves.begin(), legalMoves.end(), comp);
 
         Move bestMove;
         unsigned long long newH;
         TranspositionTable::TTEntry entry = tt.getTT(h);
 
         if (entry.depth >= depthLeft) {
-            
+
             if (entry.flag == TranspositionTable::TTFlag::EXACT_EVAL) {
                 return entry.eval;
             }
@@ -245,9 +288,23 @@ namespace ChessGame {
 
         for (int i = 0; i < legalMoves.size(); i++) {
             Move& move = legalMoves[i];
+
+            if (move.getCaptureScore() < 0) {
+                continue;
+            }
             newH = tt.updateHash(move, h);
             chessBoard.push(move);
-            auto score = alphaBetaMax(chessBoard, alpha, beta, depthLeft - 1, newH);
+            auto [r1, c1] = move.getInitialSquare();
+            auto [r2, c2] = move.getEndSquare();
+
+            auto captureValue = e.pieceValues[static_cast<int>(move.getCapturedPiece().getPieceType())];
+            auto pieceSquare = e.pieceTables[static_cast<int>(move.getAttacker().getPieceType()) - 1].second[r2][c2] -
+                e.pieceTables[static_cast<int>(move.getAttacker().getPieceType()) - 1].second[r1][c1];
+            runningScore -= captureValue;
+            runningScore -= pieceSquare;
+            auto score = alphaBetaMax(chessBoard, alpha, beta, depthLeft - 1, newH, runningScore);
+            runningScore += captureValue;
+            runningScore += pieceSquare;
             chessBoard.unmakeMove(move);
 
             if (score < bestValue) {
@@ -275,5 +332,49 @@ namespace ChessGame {
         tt.updateTT(h, entry);
 
         return bestValue;
+    }
+
+    int Engine::see(int r, int c, ChessBoard& chessBoard) {
+        int value = 0;
+        PieceColor side = chessBoard.whiteTurn() ? PieceColor::WHITE : PieceColor::BLACK;
+        ChessPiece attacker = Bitboard::getSmallestAttacker(chessBoard, r, c, side);
+        ChessPiece capturedPiece = chessBoard.pieceAt(r, c);
+        bool wTurn = chessBoard.whiteTurn();
+
+        if (attacker.getPieceType() != PieceType::EMPTY) {
+            auto [s, t] = attacker.getCoordinates();
+            Move move(s, t, r, c, attacker, capturedPiece);
+            chessBoard.push(move);
+
+            if (wTurn) {
+                value = std::max(0, e.pieceValues[static_cast<int>(capturedPiece.getPieceType())] + see(r, c, chessBoard));
+            }
+
+            else {
+                value = std::min(0, -e.pieceValues[static_cast<int>(capturedPiece.getPieceType())] + see(r, c, chessBoard));
+            }
+            chessBoard.unmakeMove(move);
+        }
+
+        return value;
+    }
+
+    int Engine::seeCapture(Move& move, ChessBoard& chessBoard) {
+        int value = 0;
+        ChessPiece piece = move.getAttacker();
+        bool wTurn = chessBoard.whiteTurn();
+        auto [r, c] = move.getEndSquare();
+        chessBoard.push(move);
+
+        if (wTurn) {
+            value = e.pieceValues[static_cast<int>(move.getCapturedPiece().getPieceType())] + see(r, c, chessBoard);
+        }
+
+        else {
+            value = -e.pieceValues[static_cast<int>(move.getCapturedPiece().getPieceType())] + see(r, c, chessBoard);
+        }
+        chessBoard.unmakeMove(move);
+
+        return value;
     }
 }

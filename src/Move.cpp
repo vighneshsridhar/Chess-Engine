@@ -20,14 +20,14 @@ namespace ChessGame {
 	Move::Move(int r1, int c1, int r2, int c2, ChessPiece piece, ChessPiece capturedPiece) : r1(r1), c1(c1), r2(r2), c2(c2), piece(piece), capturedPiece(capturedPiece) {
 		ChessPiece empty;
 		promotionPiece = empty;
-		pieceValues = {
-			{PieceType::PAWN, 100},
-			{PieceType::KNIGHT, 320},
-			{PieceType::BISHOP, 330},
-			{PieceType::ROOK, 500},
-			{PieceType::QUEEN, 900},
-			{PieceType::KING, 0}
-		};
+
+		pieceValues[0] = 0;
+		pieceValues[1] = 100;
+		pieceValues[2] = 300;
+		pieceValues[3] = 330;
+		pieceValues[4] = 500;
+		pieceValues[5] = 900;
+		pieceValues[6] = 0;
 		check = false;
 	};
 
@@ -93,7 +93,7 @@ namespace ChessGame {
 		int score = 0;
 
 		if (isCapture()) {
-			score += 10000 + pieceValues[capturedPiece.getPieceType()] - pieceValues[piece.getPieceType()];
+			score += 10000 + pieceValues[static_cast<int>(capturedPiece.getPieceType())] - pieceValues[static_cast<int>(piece.getPieceType())];
 		}
 
 		if (promotionPiece.getPieceType() != PieceType::EMPTY) {
@@ -112,7 +112,7 @@ namespace ChessGame {
 	}
 
 	int Move::getCaptureScore() {
-		int score = 10 * pieceValues[capturedPiece.getPieceType()] + pieceValues[piece.getPieceType()];
+		int score = 10 * pieceValues[static_cast<int>(capturedPiece.getPieceType())] + pieceValues[static_cast<int>(piece.getPieceType())];
 		return score;
 	}
 

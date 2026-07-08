@@ -35,6 +35,7 @@ namespace ChessGame {
 		ChessPiece getPromotionPiece() const;
 		void setPromotionPiece(ChessPiece p);
 		int getOrderingScore(std::vector<std::vector<Move>> killerMoves, int depth);
+		int pieceValues[7];
 		int getCaptureScore();
 		bool operator == (const Move& m) const;
 
@@ -47,7 +48,6 @@ namespace ChessGame {
 		ChessPiece capturedPiece;
 		ChessPiece promotionPiece;
 		bool check;
-		std::unordered_map<PieceType, int> pieceValues;
 	};
 
 }
