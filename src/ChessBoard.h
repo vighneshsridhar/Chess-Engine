@@ -18,13 +18,14 @@ namespace ChessGame {
 		void changeTurn();
 		std::vector<std::vector<ChessPiece>> getChessBoard();
 		void setChessBoard(std::vector<std::vector<ChessPiece>> newChessBoard);
-		ChessPiece pieceAt(int r, int c);
+		ChessPiece& pieceAt(int r, int c);
 		void setPieceAt(ChessPiece piece, int r, int c);
 		std::vector<Move> getLegalMoves();
 		std::vector<Move> getCaptureMoves();
 		std::vector<Move> getPieceMoves(ChessPiece& piece);
-		void push(Move move);
-		void unmakeMove(Move move);
+		std::vector<Move> getPieceCaptures(ChessPiece& piece);
+		void push(Move& move);
+		void unmakeMove(Move& move);
 		std::pair<int, int> getKingPosition();
 		void setKingPosition(std::pair<int, int> coordinates);
 		int getEnPassantFile();

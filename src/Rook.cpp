@@ -17,9 +17,7 @@ namespace ChessGame {
 
 	std::vector<Move> Rook::getMoves(ChessBoard& chessBoard, ChessPiece& rook) {
 		std::vector<Move> moves;
-		sf::Vector2f y;
 		int boardSize = 8;
-		float squareSize = 100.f;
 		auto [r, c] = rook.getCoordinates();
 		int s = r;
 		int t = c;
@@ -31,7 +29,7 @@ namespace ChessGame {
 
 			while (s >= 0 && s < boardSize && t >= 0 && t < boardSize) {
 
-				if (chessBoard.pieceAt(s, t).getColor() == chessBoard.pieceAt(r, c).getColor()) {
+				if (chessBoard.pieceAt(s, t).getColor() == rook.getColor()) {
 					break;
 				}
 				Move move(r, c, s, t, rook, chessBoard.pieceAt(s, t));
@@ -46,5 +44,36 @@ namespace ChessGame {
 		}
 
 		return moves;
+	}
+
+	std::vector<Move> Rook::getCaptures(ChessBoard& chessBoard, ChessPiece& rook) {
+		std::vector<Move> captures;
+		int boardSize = 8;
+		auto [r, c] = rook.getCoordinates();
+		int s = r;
+		int t = c;
+		int rookDirs[4][2] = { {-1, 0}, {1,0}, {0, -1}, {0, 1} };
+
+		for (auto& d : rookDirs) {
+			s = r + d[0];
+			t = c + d[1];
+
+			while (s >= 0 && s < boardSize && t >= 0 && t < boardSize) {
+
+				if (chessBoard.pieceAt(s, t).getColor() == rook.getColor()) {
+					break;
+				}
+				Move move(r, c, s, t, rook, chessBoard.pieceAt(s, t));
+
+				if (chessBoard.pieceAt(s, t).getPieceType() != PieceType::EMPTY) {
+					captures.push_back(move);
+					break;
+				}
+				s += d[0];
+				t += d[1];
+			}
+		}
+
+		return captures;
 	}
 }

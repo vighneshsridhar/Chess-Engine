@@ -16,9 +16,11 @@ namespace ChessGame {
 	public:
 		Rook(PieceColor color);
 		static std::vector<Move> getMoves(ChessBoard& chessBoard, ChessPiece& rook);
+		static std::vector<Move> getCaptures(ChessBoard& chessBoard, ChessPiece& rook);
 
 	private:
 		PieceColor color;
+		static int boardSize;
 	};
 
 }

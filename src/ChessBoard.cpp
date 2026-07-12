@@ -80,7 +80,7 @@ namespace ChessGame {
         b = newChessBoard;
     }
 
-    ChessPiece ChessBoard::pieceAt(int r, int c) {
+    ChessPiece& ChessBoard::pieceAt(int r, int c) {
         return b[r][c];
     }
 
@@ -91,6 +91,9 @@ namespace ChessGame {
     std::vector<Move> ChessBoard::getLegalMoves() {
         std::vector<Move> legalMoves;
         std::vector<Move> moves;
+        float x = 0;
+        float y = 0;
+        ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, x, y);
 
         for (int r = 0; r < boardSize; r++) {
 
@@ -104,7 +107,7 @@ namespace ChessGame {
 
                 for (auto& move : moves) {
                     auto [x, y] = move.getEndSquare();
-                    ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, x, y);
+                    empty.setCoordinates(x, y);
                     ChessPiece old = b[x][y];
                     
                     b[x][y] = piece;
@@ -132,42 +135,26 @@ namespace ChessGame {
     std::vector<Move> ChessBoard::getCaptureMoves() {
         std::vector<Move> captureMoves;
         std::vector<Move> moves;
+        float x = 0;
+        float y = 0;
+        ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, x, y);
 
         for (int r = 0; r < boardSize; r++) {
 
             for (int c = 0; c < boardSize; c++) {
-                ChessPiece piece = b[r][c];
 
-                if ((wTurn && piece.getColor() != PieceColor::WHITE) || (!wTurn && piece.getColor() != PieceColor::BLACK)) {
+                if ((wTurn && b[r][c].getColor() != PieceColor::WHITE) || (!wTurn && b[r][c].getColor() != PieceColor::BLACK)) {
                     continue;
                 }
-                moves = getPieceMoves(piece);
+                moves = getPieceCaptures(b[r][c]);
 
                 for (auto& move : moves) {
-
-                    if (!move.isCapture()) {
-                        continue;
-                    }
-                    auto [x, y] = move.getEndSquare();
-                    ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, x, y);
-                    ChessPiece old = b[x][y];
-
-                    b[x][y] = piece;
-                    b[r][c] = empty;
-
-                    if (piece.getPieceType() == PieceType::KING) {
-                        setKingPosition(std::make_pair(x, y));
-                    }
+                    this->push(move);
 
                     if (Bitboard::isValidBoard(*this)) {
                         captureMoves.push_back(move);
                     }
-                    b[r][c] = piece;
-                    b[x][y] = old;
-
-                    if (piece.getPieceType() == PieceType::KING) {
-                        setKingPosition(std::make_pair(r, c));
-                    }
+                    this->unmakeMove(move);
                 }
             }
         }
@@ -204,12 +191,42 @@ namespace ChessGame {
         return moves;
     }
 
-    void ChessBoard::push(Move move) {
+    std::vector<Move> ChessBoard::getPieceCaptures(ChessPiece& piece) {
+        std::vector<Move> captures;
+
+        if (piece.getPieceType() == PieceType::PAWN) {
+            captures = Pawn::getCaptures(*this, piece);
+        }
+
+        if (piece.getPieceType() == PieceType::KNIGHT) {
+            captures = Knight::getCaptures(*this, piece);
+        }
+
+        if (piece.getPieceType() == PieceType::BISHOP) {
+            captures = Bishop::getCaptures(*this, piece);
+        }
+
+        if (piece.getPieceType() == PieceType::ROOK) {
+            captures = Rook::getCaptures(*this, piece);
+        }
+
+        if (piece.getPieceType() == PieceType::QUEEN) {
+            captures = Queen::getCaptures(*this, piece);
+        }
+
+        if (piece.getPieceType() == PieceType::KING) {
+            captures = King::getCaptures(*this, piece);
+        }
+
+        return captures;
+    }
+
+    void ChessBoard::push(Move& move) {
         auto [initial_r, initial_c] = move.getInitialSquare();
         auto [r, c] = move.getEndSquare();
 
-        ChessPiece initialPiece = b[initial_r][initial_c];
-        ChessPiece capturedPiece = move.getCapturedPiece();
+        ChessPiece& initialPiece = move.getAttacker();
+        ChessPiece& capturedPiece = move.getCapturedPiece();
         ChessPiece empty;
 
         if (initialPiece.getPieceType() == PieceType::PAWN && (r == 0 || r == 7)) {
@@ -263,13 +280,13 @@ namespace ChessGame {
         return;
     }
 
-    void ChessBoard::unmakeMove(Move move) {
+    void ChessBoard::unmakeMove(Move& move) {
         this->changeTurn();
         auto [initial_r, initial_c] = move.getInitialSquare();
         auto [r, c] = move.getEndSquare();
 
-        ChessPiece initialPiece = move.getAttacker();
-        ChessPiece capturedPiece = move.getCapturedPiece();
+        ChessPiece& initialPiece = move.getAttacker();
+        ChessPiece& capturedPiece = move.getCapturedPiece();
         ChessPiece empty;
         b[r][c] = capturedPiece;
         b[initial_r][initial_c] = initialPiece;

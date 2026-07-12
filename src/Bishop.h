@@ -16,6 +16,7 @@ namespace ChessGame {
 	public:
 		Bishop(PieceColor color);
 		static std::vector<Move> getMoves(ChessBoard& chessBoard, ChessPiece& bishop);
+		static std::vector<Move> getCaptures(ChessBoard& chessBoard, ChessPiece& bishop);
 
 	private:
 		PieceColor color;

@@ -22,7 +22,6 @@ namespace ChessGame {
 
     PlayChess::PlayChess() {
         boardSize = 8;
-        PGN m;
     };
 
     void PlayChess::draw(sf::RenderWindow& window, float squareSize, std::vector<std::vector<ChessPiece>> b, std::vector<std::vector<sf::Sprite>>& spritesBoard) const {
@@ -185,6 +184,32 @@ namespace ChessGame {
         chessBoard.setChessBoard(b);
     }
 
+    void PlayChess::printMove(Move* move, MoveNode*& root, MoveNode* orig_root, MoveNode* n, bool& makeEngineMove, std::vector<Move> legalMoves) {
+        bool newMove = true;
+        std::string pgn;
+
+        for (const auto node : root->children) {
+
+            if (node->move->getInitialSquare() == move->getInitialSquare() && node->move->getEndSquare() == move->getEndSquare() &&
+                node->move->getPromotionPiece().getPieceType() == move->getPromotionPiece().getPieceType()) {
+                newMove = false;
+                n = node;
+            }
+        }
+
+        if (newMove) {
+            root->children.push_back(n);
+        }
+        root = n;
+        pgn = m.generatePGN(orig_root, startingPosition, 0);
+        // std::cout << "\033[2J\033[H";
+        std::cout << pgn + "\n" << std::endl;
+
+        if (legalMoves.size() > 0) {
+            makeEngineMove = true;
+        }
+    }
+
     void PlayChess::playGame() {
         sf::RenderWindow window(sf::VideoMode({ 800, 800 }), "Chess Board with Pieces!");
         auto windowSize = window.getSize();
@@ -200,7 +225,6 @@ namespace ChessGame {
         sf::Vector2f square3;
 
         ChessGame::ChessBoard chessBoard;
-        ChessGame::ChessBoard startingPosition;
         startingPosition.changeTurn();
         std::vector<std::vector<ChessGame::ChessPiece>> b = chessBoard.getChessBoard();
 
@@ -233,9 +257,6 @@ namespace ChessGame {
         spritesBoard[0] = { blackRookSprite, blackKnightSprite, blackBishopSprite, blackQueenSprite, blackKingSprite, blackBishopSprite, blackKnightSprite, blackRookSprite };
         spritesBoard[7] = { whiteRookSprite, whiteKnightSprite, whiteBishopSprite, whiteQueenSprite, whiteKingSprite, whiteBishopSprite, whiteKnightSprite, whiteRookSprite };
 
-        PGN m;
-        std::string pgn;
-
         int initial_r = 0;
         int initial_c = 0;
         int r;
@@ -249,8 +270,9 @@ namespace ChessGame {
         MoveNode* root = new MoveNode{ nullptr, children, nullptr, moveNumber, b, {}, "" };
         MoveNode* orig_root = root;
         std::string check;
+        std::string pgn;
 
-        int depth = 4;
+        int depth = 5;
         Engine e(depth);
         Move engineMove;
         bool makeEngineMove = false;
@@ -315,28 +337,7 @@ namespace ChessGame {
                             MoveNode* n = new MoveNode{ move, children, root, moveNumber, b, legalMoves, "" };
 
                             if (makeMove(window, chessBoard, spritesBoard, n, false, promotionSprites, legalMoves, m)) {
-                                bool newMove = true;
-
-                                for (const auto node : root->children) {
-
-                                    if (node->move->getInitialSquare() == move->getInitialSquare() && node->move->getEndSquare() == move->getEndSquare() && 
-                                        node->move->getPromotionPiece().getPieceType() == move->getPromotionPiece().getPieceType()) {
-                                        newMove = false;
-                                        n = node;
-                                    }
-                                }
-
-                                if (newMove) {
-                                    root->children.push_back(n);
-                                }
-                                root = n;
-                                pgn = m.generatePGN(orig_root, startingPosition, 0);
-                                // std::cout << "\033[2J\033[H";
-                                std::cout << pgn + "\n" << std::endl;
-
-                                if (legalMoves.size() > 0) {
-                                    makeEngineMove = true;
-                                }
+                                printMove(move, root, orig_root, n, makeEngineMove, legalMoves);
                             }
                         } 
 

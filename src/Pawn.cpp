@@ -17,9 +17,9 @@ namespace ChessGame {
 	std::vector<Move> Pawn::getMoves(ChessBoard& chessBoard, ChessPiece& pawn) {
 		PieceColor color = pawn.getColor();
 		PieceColor enemy = color == PieceColor::WHITE ? PieceColor::BLACK : PieceColor::WHITE;
+		int boardSize = 8;
 
 		std::vector<Move> moves;
-		int boardSize = 8;
 		auto [r, c] = pawn.getCoordinates();
 		int dr = color == PieceColor::WHITE ? -1 : 1;
 		int startRow = color == PieceColor::WHITE ? 6 : 1;
@@ -77,7 +77,7 @@ namespace ChessGame {
 						}
 					}
 
-					if (r == startRow + dr * 3) {
+					if (enPassantFile != -1 && r == startRow + dr * 3) {
 
 						if (enPassantFile == c + 1) {
 							Move move(r, c, s, c + 1, pawn, chessBoard.pieceAt(s, c + 1));
@@ -113,5 +113,59 @@ namespace ChessGame {
 		moves.push_back(move);
 
 		return;
+	}
+
+	std::vector<Move> Pawn::getCaptures(ChessBoard& chessBoard, ChessPiece& pawn) {
+		PieceColor color = pawn.getColor();
+		PieceColor enemy = color == PieceColor::WHITE ? PieceColor::BLACK : PieceColor::WHITE;
+
+		std::vector<Move> captures;
+		int boardSize = 8;
+		auto [r, c] = pawn.getCoordinates();
+		int dr = color == PieceColor::WHITE ? -1 : 1;
+		int startRow = color == PieceColor::WHITE ? 6 : 1;
+		int promotionRow = color == PieceColor::WHITE ? 1 : 6;
+		int pawnDirs[2][2] = { {dr, 1}, {dr, -1} };
+
+		int enPassantFile = chessBoard.getEnPassantFile();
+
+		int s;
+		int t;
+
+		for (auto& d : pawnDirs) {
+			s = r + d[0];
+			t = c + d[1];
+
+			if (s >= 0 && s < boardSize && t >= 0 && t < boardSize) {
+				auto piece1 = chessBoard.pieceAt(s, t);
+
+				if (piece1.getColor() == enemy) {
+					Move move(r, c, s, t, pawn, piece1);
+
+					if (s != promotionRow) {
+						captures.push_back(move);
+					}
+
+					else {
+						promotion(move, color, captures);
+					}
+				}
+
+				if (enPassantFile != -1 && r == startRow + dr * 3) {
+
+					if (enPassantFile == c + 1) {
+						Move move(r, c, s, c + 1, pawn, chessBoard.pieceAt(s, c + 1));
+						captures.push_back(move);
+					}
+
+					if (enPassantFile == c - 1) {
+						Move move(r, c, s, c - 1, pawn, chessBoard.pieceAt(s, c - 1));
+						captures.push_back(move);
+					}
+				}
+			}
+		}
+
+		return captures;
 	}
 }

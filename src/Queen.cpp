@@ -18,7 +18,6 @@ namespace ChessGame {
 	std::vector<Move> Queen::getMoves(ChessBoard& chessBoard, ChessPiece& queen) {
 		std::vector<Move> moves;
 		int boardSize = 8;
-		float squareSize = 100.f;
 		auto [r, c] = queen.getCoordinates();
 		int s;
 		int t;
@@ -45,5 +44,36 @@ namespace ChessGame {
 		}
 
 		return moves;
+	}
+
+	std::vector<Move> Queen::getCaptures(ChessBoard& chessBoard, ChessPiece& queen) {
+		std::vector<Move> captures;
+		int boardSize = 8;
+		auto [r, c] = queen.getCoordinates();
+		int s;
+		int t;
+		int queenDirs[8][2] = { {-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1} };
+
+		for (auto& d : queenDirs) {
+			s = r + d[0];
+			t = c + d[1];
+
+			while (s >= 0 && s < boardSize && t >= 0 && t < boardSize) {
+
+				if (chessBoard.pieceAt(s, t).getColor() == queen.getColor()) {
+					break;
+				}
+				Move move(r, c, s, t, queen, chessBoard.pieceAt(s, t));
+
+				if (chessBoard.pieceAt(s, t).getPieceType() != PieceType::EMPTY) {
+					captures.push_back(move);
+					break;
+				}
+				s += d[0];
+				t += d[1];
+			}
+		}
+
+		return captures;
 	}
 }

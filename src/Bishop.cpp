@@ -19,9 +19,7 @@ namespace ChessGame {
 	std::vector<Move> Bishop::getMoves(ChessBoard& chessBoard, ChessPiece& bishop) {
 		auto [r, c] = bishop.getCoordinates();
 		std::vector<Move> moves;
-		sf::Vector2f y;
 		int boardSize = 8;
-		float squareSize = 100.f;
 		int bishopDirs[4][2] = {{-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
 		int s;
 		int t;
@@ -48,5 +46,38 @@ namespace ChessGame {
 		}
 
 		return moves;
+	}
+
+	std::vector<Move> Bishop::getCaptures(ChessBoard& chessBoard, ChessPiece& bishop) {
+		auto [r, c] = bishop.getCoordinates();
+		std::vector<Move> captures;
+		int boardSize = 8;
+		
+		int bishopDirs[4][2] = { {-1, -1}, {-1, 1}, {1, -1}, {1, 1} };
+		int s;
+		int t;
+
+		for (auto& d : bishopDirs) {
+			s = r + d[0];
+			t = c + d[1];
+
+			while (s >= 0 && s < boardSize && t >= 0 && t < boardSize) {
+				auto piece = chessBoard.pieceAt(s, t);
+
+				if (piece.getColor() == bishop.getColor()) {
+					break;
+				}
+				Move move(r, c, s, t, bishop, chessBoard.pieceAt(s, t));
+
+				if (piece.getPieceType() != PieceType::EMPTY) {
+					captures.push_back(move);
+					break;
+				}
+				s += d[0];
+				t += d[1];
+			}
+		}
+
+		return captures;
 	}
 }

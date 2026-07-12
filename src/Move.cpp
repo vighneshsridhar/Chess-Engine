@@ -47,11 +47,11 @@ namespace ChessGame {
 		return std::make_pair(r2, c2);
 	}
 
-	ChessPiece Move::getAttacker() const {
+	ChessPiece& Move::getAttacker() {
 		return piece;
 	}
 
-	ChessPiece Move::getCapturedPiece() const {
+	ChessPiece& Move::getCapturedPiece() {
 		return capturedPiece;
 	}
 
@@ -89,7 +89,7 @@ namespace ChessGame {
 		return false;
 	}
 
-	ChessPiece Move::getPromotionPiece() const {
+	ChessPiece& Move::getPromotionPiece() {
 		return promotionPiece;
 	}
 
@@ -124,7 +124,7 @@ namespace ChessGame {
 		return score;
 	}
 
-	bool Move::operator == (const Move& m) const {
+	bool Move::operator == (const Move& m) const{
 		return r1 == m.r1 && c1 == m.c1 && r2 == m.r2 && c2 == m.c2 && promotionPiece.getPieceType() == m.promotionPiece.getPieceType();
 	}
 }

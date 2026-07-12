@@ -152,6 +152,16 @@ namespace ChessGame {
             alpha = bestValue;
         }
         std::vector<Move> captures = chessBoard.getCaptureMoves();
+
+        if (captures.size() == 0) {
+
+            if (chessBoard.isCheckOrCheckmate()) {
+                auto e = std::numeric_limits<int>::min();
+                return e;
+            }
+
+            return 0;
+        }
         auto comp = [&](Move& a, Move& b) {
             return a.getCaptureScore() > b.getCaptureScore();
             };
@@ -233,6 +243,16 @@ namespace ChessGame {
             beta = bestValue;
         }
         std::vector<Move> captures = chessBoard.getCaptureMoves();
+
+        if (captures.size() == 0) {
+
+            if (chessBoard.isCheckOrCheckmate()) {
+                auto e = std::numeric_limits<int>::max();
+                return e;
+            }
+
+            return 0;
+        }
         auto comp = [&](Move& a, Move& b) {
             return a.getCaptureScore() > b.getCaptureScore();
             };
@@ -283,8 +303,8 @@ namespace ChessGame {
     int Evaluate::see(int r, int c, ChessBoard& chessBoard) {
         int value = 0;
         PieceColor side = chessBoard.whiteTurn() ? PieceColor::WHITE : PieceColor::BLACK;
-        ChessPiece attacker = Bitboard::getSmallestAttacker(chessBoard, r, c, side);
-        ChessPiece capturedPiece = chessBoard.pieceAt(r, c);
+        ChessPiece& attacker = Bitboard::getSmallestAttacker(chessBoard, r, c, side);
+        ChessPiece& capturedPiece = chessBoard.pieceAt(r, c);
         bool wTurn = chessBoard.whiteTurn();
 
         if (attacker.getPieceType() != PieceType::EMPTY) {
@@ -307,7 +327,7 @@ namespace ChessGame {
 
     int Evaluate::seeCapture(Move& move, ChessBoard& chessBoard) {
         int value = 0;
-        ChessPiece piece = move.getAttacker();
+        ChessPiece& piece = move.getAttacker();
         bool wTurn = chessBoard.whiteTurn();
         auto [r, c] = move.getEndSquare();
         chessBoard.push(move);

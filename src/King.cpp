@@ -15,9 +15,8 @@ namespace ChessGame {
 
 	std::vector<Move> King::getMoves(ChessBoard& chessBoard, ChessPiece& king) {
 		std::vector<Move> moves;
-		int boardSize = 8;
-		float squareSize = 100.f;
 		auto [r, c] = king.getCoordinates();
+		int boardSize = 8;
 
 		PieceColor color = king.getColor();
 
@@ -88,5 +87,35 @@ namespace ChessGame {
 		}
 
 		return moves;
+	}
+
+	std::vector<Move> King::getCaptures(ChessBoard& chessBoard, ChessPiece& king) {
+		std::vector<Move> captures;
+		auto [r, c] = king.getCoordinates();
+		int boardSize = 8;
+
+		PieceColor color = king.getColor();
+		PieceColor enemy = color == PieceColor::WHITE ? PieceColor::BLACK : PieceColor::WHITE;
+
+		for (int s = r - 1; s <= r + 1; s++) {
+
+			if (s < 0 || s >= boardSize) {
+				continue;
+			}
+			for (int t = c - 1; t <= c + 1; t++) {
+
+				if (t < 0 || t >= boardSize) {
+					continue;
+				}
+				auto piece = chessBoard.pieceAt(s, t);
+
+				if (piece.getColor() == enemy) {
+					Move move(r, c, s, t, king, piece);
+					captures.push_back(move);
+				}
+			}
+		}
+
+		return captures;
 	}
 }

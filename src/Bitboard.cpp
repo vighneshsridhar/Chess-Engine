@@ -130,10 +130,10 @@ namespace ChessGame {
 		return false;
 	}
 
-	ChessPiece Bitboard::getSmallestAttacker(ChessBoard& chessBoard, int r, int c, PieceColor side) {
+	ChessPiece& Bitboard::getSmallestAttacker(ChessBoard& chessBoard, int r, int c, PieceColor side) {
 		PieceColor enemy = side == PieceColor::WHITE ? PieceColor::BLACK : PieceColor::WHITE;
 		int boardSize = 8;
-		ChessPiece ans(PieceType::EMPTY, PieceColor::NONE, r, c);
+		ChessPiece ans;
 		int dr = side == PieceColor::WHITE ? -1 : 1;
 		int pawnDirs[2][2] = { {dr, -1}, {dr, 1} };
 
@@ -222,8 +222,12 @@ namespace ChessGame {
 
 				if (p.getColor() == enemy) {
 
-					if (p.getPieceType() == PieceType::ROOK || p.getPieceType() == PieceType::QUEEN) {
+					if (p.getPieceType() == PieceType::ROOK) {
 						return p;
+					}
+
+					else if (p.getPieceType() == PieceType::QUEEN) {
+						ans = p;
 					}
 					break;
 				}

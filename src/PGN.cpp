@@ -95,7 +95,7 @@ namespace ChessGame {
 		}
 		int boardSize = 8;
 
-		for (const auto& move2: legalMoves){
+		for (auto& move2: legalMoves){
 			auto [r3, c3] = move2.getInitialSquare();
 
 			if ((r1 == r3 && c1 == c3) || !(move2.getAttacker() == piece)) {
@@ -107,7 +107,7 @@ namespace ChessGame {
 			}
 		}
 
-		for (const auto& move2 : legalMoves) {
+		for (auto& move2 : legalMoves) {
 			auto [r3, c3] = move2.getInitialSquare();
 
 			if ((r1 == r3 && c1 == c3) || !(move2.getAttacker() == piece)) {

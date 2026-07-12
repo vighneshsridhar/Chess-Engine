@@ -26,7 +26,7 @@ namespace ChessGame {
 		};
 		static bool isValidBoard(ChessBoard& chessBoard);
 		static bool kingAttacked(ChessBoard& chessBoard, int r, int c, PieceColor color);
-		static ChessPiece getSmallestAttacker(ChessBoard& chessBoard, int r, int c, PieceColor side);
+		static ChessPiece& getSmallestAttacker(ChessBoard& chessBoard, int r, int c, PieceColor side);
 
 	private:
 		int numSquares;

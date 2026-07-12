@@ -12,11 +12,9 @@ namespace ChessGame {
 	Knight::Knight(PieceColor color) : color(color) {
 	};
 
-	std::vector<Move> Knight::getMoves(ChessBoard& chessBoard, ChessPiece knight) {
+	std::vector<Move> Knight::getMoves(ChessBoard& chessBoard, ChessPiece& knight) {
 		std::vector<Move> moves;
-		sf::Vector2f y;
 		int boardSize = 8;
-		float squareSize = 100.f;
 		auto [r, c] = knight.getCoordinates();
 		int s;
 		int t;
@@ -37,5 +35,31 @@ namespace ChessGame {
 		}
 
 		return moves;
+	}
+
+	std::vector<Move> Knight::getCaptures(ChessBoard& chessBoard, ChessPiece& knight) {
+		std::vector<Move> captures;
+		int boardSize = 8;
+		auto [r, c] = knight.getCoordinates();
+		int s;
+		int t;
+		int knightDirs[8][2] = { {-1, 2}, {-1, -2}, {1, 2}, {1, -2}, {-2, 1}, {-2, -1}, {2, 1}, {2, -1} };
+		PieceColor enemy = knight.getColor() == PieceColor::WHITE ? PieceColor::BLACK : PieceColor::WHITE;
+
+		for (const auto& d : knightDirs) {
+			s = r + d[0];
+			t = c + d[1];
+
+			if (s >= 0 && s < boardSize && t >= 0 && t < boardSize) {
+				auto piece = chessBoard.pieceAt(s, t);
+
+				if (piece.getColor() == enemy) {
+					Move move(r, c, s, t, knight, piece);
+					captures.push_back(move);
+				}
+			}
+		}
+
+		return captures;
 	}
 }

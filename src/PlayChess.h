@@ -21,10 +21,13 @@ namespace ChessGame {
 		void undoMove(ChessBoard& chessBoard, std::vector<std::vector<sf::Sprite>>& spritesBoard, MoveNode* n, std::vector<std::vector<sf::Sprite>> sprites) const;
 		bool makeMove(sf::RenderWindow& window, ChessBoard& chessBoard, std::vector<std::vector<sf::Sprite>>& spritesBoard, MoveNode* n, bool rightArrow,
 			std::vector<std::vector<sf::Sprite>>& promotionSprites, std::vector<Move>& legalMoves, PGN& m) const;
+		void printMove(Move* move, MoveNode*& root, MoveNode* orig_root, MoveNode* n, bool& makeEngineMove, std::vector<Move> legalMoves);
 		void playGame();
 
 	private:
 		int boardSize;
+		ChessBoard startingPosition;
+		PGN m;
 	};
 
 }
