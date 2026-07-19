@@ -45,7 +45,7 @@ namespace ChessGame {
                     b.getOrderingScore(killerMoves, d - 1);
                 };
             std::sort(legalMoves.begin(), legalMoves.end(), comp);
-            TranspositionTable::TTEntry entry = tt.getTT(h);
+            TranspositionTable::TTEntry& entry = tt.getTT(h);
 
             if (entry.depth != -1) {
 
@@ -143,7 +143,7 @@ namespace ChessGame {
 
             return 0;
         }
-        TranspositionTable::TTEntry entry = tt.getTT(h);
+        TranspositionTable::TTEntry& entry = tt.getTT(h);
 
         if (entry.depth >= depthLeft) {
 
@@ -254,7 +254,7 @@ namespace ChessGame {
 
         Move bestMove;
         unsigned long long newH;
-        TranspositionTable::TTEntry entry = tt.getTT(h);
+        TranspositionTable::TTEntry& entry = tt.getTT(h);
 
         if (entry.depth >= depthLeft) {
 

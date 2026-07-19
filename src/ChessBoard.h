@@ -5,6 +5,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <stack>
 
 #include "ChessPiece.h"
 #include "Move.h"
@@ -29,13 +30,12 @@ namespace ChessGame {
 		std::pair<int, int> getKingPosition();
 		void setKingPosition(std::pair<int, int> coordinates);
 		int getEnPassantFile();
-		void setEnPassantFile(int file);
 		bool isCheckOrCheckmate();
 
 	private:
 		int boardSize;
 		bool wTurn;
-		int enPassantFile;
+		std::stack<int> enPassantFiles;
 		std::vector<std::vector<ChessPiece>> b;
 		std::unordered_map<std::string, std::pair<int, int>> kingPosition;
 	};

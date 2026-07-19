@@ -13,6 +13,7 @@ namespace ChessGame {
 		hasMoved = false;
 		pieceType = PieceType::EMPTY;
 		color = PieceColor::NONE;
+		coordinates = std::make_pair(0, 0);
 	};
 
 	ChessPiece::ChessPiece(PieceType pieceType, PieceColor color, int r, int c): pieceType(pieceType), color(color) {

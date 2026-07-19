@@ -28,10 +28,10 @@ namespace ChessGame {
 			TTFlag flag;
 			Move bestMove;
 		};
-		unsigned long long updateHash(Move move, unsigned long long h);
+		unsigned long long updateHash(Move& move, unsigned long long h);
 		unsigned long long getInitialH();
-		TTEntry getTT(unsigned long long h);
-		void updateTT(unsigned long long h, TTEntry entry);
+		TTEntry& getTT(unsigned long long h);
+		void updateTT(unsigned long long h, TTEntry& entry);
 
 	private:
 		std::vector<std::vector<unsigned long long>> hashTable;

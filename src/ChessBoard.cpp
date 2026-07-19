@@ -4,8 +4,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <bitset>
-#include <filesystem> // Requires C++17 or later
-#include <windows.h>
+#include <stack>
 
 #include "ChessBoard.h"
 #include "ChessPiece.h"
@@ -23,8 +22,7 @@ namespace ChessGame {
     ChessBoard::ChessBoard() {
         boardSize = 8;
         wTurn = true;
-        enPassantFile = -1;
-        float squareSize = 100.f;
+        enPassantFiles.push(-1);
         int x = -1;
         int y = -1;
 
@@ -91,53 +89,6 @@ namespace ChessGame {
     std::vector<Move> ChessBoard::getLegalMoves() {
         std::vector<Move> legalMoves;
         std::vector<Move> moves;
-        float x = 0;
-        float y = 0;
-        ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, x, y);
-
-        for (int r = 0; r < boardSize; r++) {
-
-            for (int c = 0; c < boardSize; c++) {
-                ChessPiece piece = b[r][c];
-
-                if ((wTurn && piece.getColor() != PieceColor::WHITE) || (!wTurn && piece.getColor() != PieceColor::BLACK)) {
-                    continue;
-                }
-                moves = getPieceMoves(piece);
-
-                for (auto& move : moves) {
-                    auto [x, y] = move.getEndSquare();
-                    empty.setCoordinates(x, y);
-                    ChessPiece old = b[x][y];
-                    
-                    b[x][y] = piece;
-                    b[r][c] = empty;
-
-                    if (piece.getPieceType() == PieceType::KING) {
-                        setKingPosition(std::make_pair(x, y));
-                    }
-
-                    if (Bitboard::isValidBoard(*this)) {
-                        legalMoves.push_back(move);
-                    }
-                    b[r][c] = piece;
-                    b[x][y] = old;
-
-                    if (piece.getPieceType() == PieceType::KING) {
-                        setKingPosition(std::make_pair(r, c));
-                    }
-                }
-            }
-        }
-        return legalMoves;
-    }
-
-    std::vector<Move> ChessBoard::getCaptureMoves() {
-        std::vector<Move> captureMoves;
-        std::vector<Move> moves;
-        float x = 0;
-        float y = 0;
-        ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, x, y);
 
         for (int r = 0; r < boardSize; r++) {
 
@@ -146,19 +97,45 @@ namespace ChessGame {
                 if ((wTurn && b[r][c].getColor() != PieceColor::WHITE) || (!wTurn && b[r][c].getColor() != PieceColor::BLACK)) {
                     continue;
                 }
-                moves = getPieceCaptures(b[r][c]);
+                moves = getPieceMoves(b[r][c]);
 
                 for (auto& move : moves) {
                     this->push(move);
 
                     if (Bitboard::isValidBoard(*this)) {
-                        captureMoves.push_back(move);
+                        legalMoves.push_back(move);
                     }
                     this->unmakeMove(move);
                 }
             }
         }
-        return captureMoves;
+        return legalMoves;
+    }
+
+    std::vector<Move> ChessBoard::getCaptureMoves() {
+        std::vector<Move> legalCaptures;
+        std::vector<Move> captures;
+
+        for (int r = 0; r < boardSize; r++) {
+
+            for (int c = 0; c < boardSize; c++) {
+
+                if ((wTurn && b[r][c].getColor() != PieceColor::WHITE) || (!wTurn && b[r][c].getColor() != PieceColor::BLACK)) {
+                    continue;
+                }
+                captures = getPieceCaptures(b[r][c]);
+
+                for (auto& capture : captures) {
+                    this->push(capture);
+
+                    if (Bitboard::isValidBoard(*this)) {
+                        legalCaptures.push_back(capture);
+                    }
+                    this->unmakeMove(capture);
+                }
+            }
+        }
+        return legalCaptures;
     }
 
     std::vector<Move> ChessBoard::getPieceMoves(ChessPiece& piece) {
@@ -242,13 +219,21 @@ namespace ChessGame {
         if (initialPiece.getPieceType() == PieceType::PAWN) {
 
             if (std::abs(r - initial_r) == 2) {
-                this->setEnPassantFile(c);
+                enPassantFiles.push(c);
+            }
+
+            else {
+                enPassantFiles.push(-1);
             }
 
             if (move.isEnPassant()) {
                 int rank = initialPiece.getColor() == PieceColor::WHITE ? r + 1 : r - 1;
                 b[rank][c] = empty;
             }
+        }
+
+        else {
+            enPassantFiles.push(-1);
         }
 
         if (initialPiece.getPieceType() == PieceType::KING) {
@@ -282,6 +267,7 @@ namespace ChessGame {
 
     void ChessBoard::unmakeMove(Move& move) {
         this->changeTurn();
+        enPassantFiles.pop();
         auto [initial_r, initial_c] = move.getInitialSquare();
         auto [r, c] = move.getEndSquare();
 
@@ -292,10 +278,6 @@ namespace ChessGame {
         b[initial_r][initial_c] = initialPiece;
 
         if (initialPiece.getPieceType() == PieceType::PAWN) {
-
-            if (std::abs(r - initial_r) == 2) {
-                this->setEnPassantFile(c);
-            }
 
             if (move.isEnPassant()) {
                 b[r][c] = empty;
@@ -342,15 +324,11 @@ namespace ChessGame {
     }
 
     int ChessBoard::getEnPassantFile() {
-        return enPassantFile;
-    }
-
-    void ChessBoard::setEnPassantFile(int file) {
-        enPassantFile = file;
-        return;
+        return enPassantFiles.top();
     }
 
     bool ChessBoard::isCheckOrCheckmate() {
+        this->changeTurn();
         return !Bitboard::isValidBoard(*this);
     }
 }

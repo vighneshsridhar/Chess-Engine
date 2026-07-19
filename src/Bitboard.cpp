@@ -13,18 +13,19 @@
 
 namespace ChessGame {
 	Bitboard::Bitboard() {
-		numSquares = 64;
 		boardSize = 8;
 	};
 
 	bool Bitboard::isValidBoard(ChessBoard& chessBoard) {
+		chessBoard.changeTurn();
 		auto [r, c] = chessBoard.getKingPosition();
-		ChessPiece kg = chessBoard.pieceAt(r, c);
-		PieceColor color = kg.getColor();
+		PieceColor color = chessBoard.whiteTurn() ? PieceColor::WHITE : PieceColor::BLACK;
 
 		if (kingAttacked(chessBoard, r, c, color)) {
+			chessBoard.changeTurn();
 			return false;
 		}
+		chessBoard.changeTurn();
 
 		return true;
 	}
@@ -136,6 +137,7 @@ namespace ChessGame {
 		ChessPiece ans;
 		int dr = side == PieceColor::WHITE ? -1 : 1;
 		int pawnDirs[2][2] = { {dr, -1}, {dr, 1} };
+		ChessPiece p;
 
 		int s = r;
 		int t = c;
@@ -145,9 +147,9 @@ namespace ChessGame {
 			t = c + d[1];
 
 			if (s >= 0 && s < boardSize && t >= 0 && t < boardSize) {
-				auto p = chessBoard.pieceAt(s, t);
+				p = chessBoard.pieceAt(s, t);
 
-				if (p.getColor() == enemy && p.getPieceType() == PieceType::PAWN) {
+				if (p.getColor() == side && p.getPieceType() == PieceType::PAWN) {
 					return p;
 				}
 			}
@@ -159,9 +161,9 @@ namespace ChessGame {
 			t = c + d[1];
 
 			if (s >= 0 && s < boardSize && t >= 0 && t < boardSize) {
-				auto p = chessBoard.pieceAt(s, t);
+				p = chessBoard.pieceAt(s, t);
 
-				if (p.getColor() == enemy && p.getPieceType() == PieceType::KING) {
+				if (p.getColor() == side && p.getPieceType() == PieceType::KING) {
 					return p;
 				}
 			}
@@ -173,9 +175,9 @@ namespace ChessGame {
 			t = c + d[1];
 
 			if (s >= 0 && s < boardSize && t >= 0 && t < boardSize) {
-				auto p = chessBoard.pieceAt(s, t);
+				p = chessBoard.pieceAt(s, t);
 
-				if (p.getColor() == enemy && p.getPieceType() == PieceType::KNIGHT) {
+				if (p.getColor() == side && p.getPieceType() == PieceType::KNIGHT) {
 					return p;
 				}
 			}
@@ -187,13 +189,13 @@ namespace ChessGame {
 			t = c + d[1];
 
 			while (s >= 0 && s < boardSize && t >= 0 && t < boardSize) {
-				auto p = chessBoard.pieceAt(s, t);
+				p = chessBoard.pieceAt(s, t);
 
-				if (p.getColor() == side) {
+				if (p.getColor() == enemy) {
 					break;
 				}
 
-				if (p.getColor() == enemy) {
+				if (p.getColor() == side) {
 
 					if (p.getPieceType() == PieceType::BISHOP) {
 						return p;
@@ -214,13 +216,13 @@ namespace ChessGame {
 			t = c + d[1];
 
 			while (s >= 0 && s < boardSize && t >= 0 && t < boardSize) {
-				auto p = chessBoard.pieceAt(s, t);
+				p = chessBoard.pieceAt(s, t);
 
-				if (p.getColor() == side) {
+				if (p.getColor() == enemy) {
 					break;
 				}
 
-				if (p.getColor() == enemy) {
+				if (p.getColor() == side) {
 
 					if (p.getPieceType() == PieceType::ROOK) {
 						return p;

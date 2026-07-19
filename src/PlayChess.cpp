@@ -127,7 +127,6 @@ namespace ChessGame {
         chessBoard.setChessBoard(b);
         legalMoves = chessBoard.getLegalMoves();
         n->checkSymbol = m.checkOrCheckmate(chessBoard, legalMoves.size());
-        chessBoard.setEnPassantFile(-1);
 
         return true;
     }
@@ -224,11 +223,11 @@ namespace ChessGame {
         sf::Vector2f square2;
         sf::Vector2f square3;
 
-        ChessGame::ChessBoard chessBoard;
+        ChessBoard chessBoard;
         startingPosition.changeTurn();
         std::vector<std::vector<ChessGame::ChessPiece>> b = chessBoard.getChessBoard();
 
-        ChessGame::ChessPiece empty;
+        ChessPiece empty;
         std::unordered_map<std::string, sf::Texture> textures = TextureManager::getTextures();
         sf::Sprite whitePawnSprite(textures["WHITE_PAWN"]);
         sf::Sprite whiteKnightSprite(textures["WHITE_KNIGHT"]);
@@ -272,7 +271,7 @@ namespace ChessGame {
         std::string check;
         std::string pgn;
 
-        int depth = 5;
+        int depth = 3;
         Engine e(depth);
         Move engineMove;
         bool makeEngineMove = false;

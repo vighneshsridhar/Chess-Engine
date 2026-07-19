@@ -23,7 +23,7 @@ namespace ChessGame {
 		auto [r, c] = pawn.getCoordinates();
 		int dr = color == PieceColor::WHITE ? -1 : 1;
 		int startRow = color == PieceColor::WHITE ? 6 : 1;
-		int promotionRow = color == PieceColor::WHITE ? 1 : 6;
+		int promotionRow = color == PieceColor::WHITE ? 0 : 7;
 		int pawnDirs[3][2] = { {dr, 0}, {dr, 1}, {dr, -1} };
 
 		int enPassantFile = chessBoard.getEnPassantFile();
@@ -36,7 +36,7 @@ namespace ChessGame {
 			t = c + d[1];
 
 			if (s >= 0 && s < boardSize && t >= 0 && t < boardSize) {
-				auto piece1 = chessBoard.pieceAt(s, t);
+				auto& piece1 = chessBoard.pieceAt(s, t);
 
 				if (t == c) {
 
@@ -52,7 +52,7 @@ namespace ChessGame {
 						}
 
 						if (r == startRow) {
-							auto piece2 = chessBoard.pieceAt(s + d[0], t);
+							auto& piece2 = chessBoard.pieceAt(s + d[0], t);
 
 							if (piece2.getPieceType() == PieceType::EMPTY) {
 								Move move(r, c, s + d[0], t, pawn, piece2);
@@ -63,7 +63,7 @@ namespace ChessGame {
 				}
 
 				else {
-					auto piece3 = chessBoard.pieceAt(s, t);
+					auto& piece3 = chessBoard.pieceAt(s, t);
 
 					if (piece3.getColor() == enemy) {
 						Move move(r, c, s, t, pawn, piece3);
@@ -80,12 +80,12 @@ namespace ChessGame {
 					if (enPassantFile != -1 && r == startRow + dr * 3) {
 
 						if (enPassantFile == c + 1) {
-							Move move(r, c, s, c + 1, pawn, chessBoard.pieceAt(s, c + 1));
+							Move move(r, c, s, c + 1, pawn, chessBoard.pieceAt(r, c + 1));
 							moves.push_back(move);
 						}
 
 						if (enPassantFile == c - 1) {
-							Move move(r, c, s, c - 1, pawn, chessBoard.pieceAt(s, c - 1));
+							Move move(r, c, s, c - 1, pawn, chessBoard.pieceAt(r, c - 1));
 							moves.push_back(move);
 						}
 					}
@@ -124,7 +124,7 @@ namespace ChessGame {
 		auto [r, c] = pawn.getCoordinates();
 		int dr = color == PieceColor::WHITE ? -1 : 1;
 		int startRow = color == PieceColor::WHITE ? 6 : 1;
-		int promotionRow = color == PieceColor::WHITE ? 1 : 6;
+		int promotionRow = color == PieceColor::WHITE ? 0 : 7;
 		int pawnDirs[2][2] = { {dr, 1}, {dr, -1} };
 
 		int enPassantFile = chessBoard.getEnPassantFile();
@@ -137,7 +137,7 @@ namespace ChessGame {
 			t = c + d[1];
 
 			if (s >= 0 && s < boardSize && t >= 0 && t < boardSize) {
-				auto piece1 = chessBoard.pieceAt(s, t);
+				auto& piece1 = chessBoard.pieceAt(s, t);
 
 				if (piece1.getColor() == enemy) {
 					Move move(r, c, s, t, pawn, piece1);
@@ -154,12 +154,12 @@ namespace ChessGame {
 				if (enPassantFile != -1 && r == startRow + dr * 3) {
 
 					if (enPassantFile == c + 1) {
-						Move move(r, c, s, c + 1, pawn, chessBoard.pieceAt(s, c + 1));
+						Move move(r, c, s, c + 1, pawn, chessBoard.pieceAt(r, c + 1));
 						captures.push_back(move);
 					}
 
 					if (enPassantFile == c - 1) {
-						Move move(r, c, s, c - 1, pawn, chessBoard.pieceAt(s, c - 1));
+						Move move(r, c, s, c - 1, pawn, chessBoard.pieceAt(r, c - 1));
 						captures.push_back(move);
 					}
 				}

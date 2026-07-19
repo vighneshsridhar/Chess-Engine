@@ -29,7 +29,6 @@ namespace ChessGame {
 		static ChessPiece& getSmallestAttacker(ChessBoard& chessBoard, int r, int c, PieceColor side);
 
 	private:
-		int numSquares;
 		int boardSize;
 		std::vector<long long> squaresAttacked;
 	};

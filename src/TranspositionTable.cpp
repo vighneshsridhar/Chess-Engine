@@ -29,7 +29,7 @@ namespace ChessGame {
 		}
 	};
 
-	unsigned long long TranspositionTable::updateHash(Move move, unsigned long long h) {
+	unsigned long long TranspositionTable::updateHash(Move& move, unsigned long long h) {
 		int s1 = move.getInitialSquare().first * 8 + move.getInitialSquare().second;
 		int s2 = move.getEndSquare().first * 8 + move.getEndSquare().second;
 		ChessPiece piece = move.getAttacker();
@@ -95,7 +95,7 @@ namespace ChessGame {
 		return h;
 	}
 
-	TranspositionTable::TTEntry TranspositionTable::getTT(unsigned long long h) {
+	TranspositionTable::TTEntry& TranspositionTable::getTT(unsigned long long h) {
 		if (tt.find(h) != tt.end()) {
 			return tt[h];
 		}
@@ -105,7 +105,7 @@ namespace ChessGame {
 		return entry;
 	}
 
-	void TranspositionTable::updateTT(unsigned long long h, TranspositionTable::TTEntry entry) {
+	void TranspositionTable::updateTT(unsigned long long h, TranspositionTable::TTEntry& entry) {
 		tt[h] = entry;
 		return;
 	}

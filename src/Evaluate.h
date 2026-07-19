@@ -20,7 +20,8 @@ namespace ChessGame {
 		int evaluatePosition(ChessBoard& chessBoard);
 		int quiescenceMax(ChessBoard& chessBoard, int alpha, int beta, unsigned long long h, TranspositionTable& tt, int runningScore);
 		int quiescenceMin(ChessBoard& chessBoard, int alpha, int beta, unsigned long long h, TranspositionTable& tt, int runningScore);
-		int see(int r, int c, ChessBoard& chessBoard);
+		int seeMax(int r, int c, ChessBoard& chessBoard);
+		int seeMin(int r, int c, ChessBoard& chessBoard);
 		int seeCapture(Move& move, ChessBoard& chessBoard);
 		int pieceValues[7];
 		std::pair<std::vector<std::vector<int>>, std::vector<std::vector<int>>> pieceTables[6];

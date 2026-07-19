@@ -122,7 +122,7 @@ namespace ChessGame {
         TranspositionTable::TTEntry entry = tt.getTT(h);
         unsigned long long newH;
 
-        if (entry.depth >= 0) {
+        /*if (entry.depth >= 0) {
 
             if (entry.flag == TranspositionTable::TTFlag::EXACT_EVAL) {
                 return entry.eval;
@@ -139,8 +139,7 @@ namespace ChessGame {
             if (alpha >= beta) {
                 return entry.eval;
             }
-        }
-        // int bestValue = evaluatePosition(chessBoard);
+        } */
         int bestValue = runningScore;
         Move bestMove;
 
@@ -152,16 +151,6 @@ namespace ChessGame {
             alpha = bestValue;
         }
         std::vector<Move> captures = chessBoard.getCaptureMoves();
-
-        if (captures.size() == 0) {
-
-            if (chessBoard.isCheckOrCheckmate()) {
-                auto e = std::numeric_limits<int>::min();
-                return e;
-            }
-
-            return 0;
-        }
         auto comp = [&](Move& a, Move& b) {
             return a.getCaptureScore() > b.getCaptureScore();
             };
@@ -213,7 +202,7 @@ namespace ChessGame {
         TranspositionTable::TTEntry entry = tt.getTT(h);
         unsigned long long newH;
 
-        if (entry.depth >= 0) {
+        /*if (entry.depth >= 0) {
 
             if (entry.flag == TranspositionTable::TTFlag::EXACT_EVAL) {
                 return entry.eval;
@@ -230,8 +219,7 @@ namespace ChessGame {
             if (alpha >= beta) {
                 return entry.eval;
             }
-        }
-
+        } */
         int bestValue = runningScore;
         Move bestMove;
 
@@ -243,16 +231,6 @@ namespace ChessGame {
             beta = bestValue;
         }
         std::vector<Move> captures = chessBoard.getCaptureMoves();
-
-        if (captures.size() == 0) {
-
-            if (chessBoard.isCheckOrCheckmate()) {
-                auto e = std::numeric_limits<int>::max();
-                return e;
-            }
-
-            return 0;
-        }
         auto comp = [&](Move& a, Move& b) {
             return a.getCaptureScore() > b.getCaptureScore();
             };
@@ -300,25 +278,32 @@ namespace ChessGame {
         return bestValue;
     }
 
-    int Evaluate::see(int r, int c, ChessBoard& chessBoard) {
+    int Evaluate::seeMax(int r, int c, ChessBoard& chessBoard) {
         int value = 0;
-        PieceColor side = chessBoard.whiteTurn() ? PieceColor::WHITE : PieceColor::BLACK;
-        ChessPiece& attacker = Bitboard::getSmallestAttacker(chessBoard, r, c, side);
+        ChessPiece attacker = Bitboard::getSmallestAttacker(chessBoard, r, c, PieceColor::WHITE);
         ChessPiece& capturedPiece = chessBoard.pieceAt(r, c);
-        bool wTurn = chessBoard.whiteTurn();
 
         if (attacker.getPieceType() != PieceType::EMPTY) {
             auto [s, t] = attacker.getCoordinates();
             Move move(s, t, r, c, attacker, capturedPiece);
             chessBoard.push(move);
+            value = std::max(0, pieceValues[static_cast<int>(capturedPiece.getPieceType())] + seeMin(r, c, chessBoard));
+            chessBoard.unmakeMove(move);
+        }
 
-            if (wTurn) {
-                value = std::max(0, pieceValues[static_cast<int>(capturedPiece.getPieceType())] + see(r, c, chessBoard));
-            }
+        return value;
+    }
 
-            else {
-                value = std::min(0, -pieceValues[static_cast<int>(capturedPiece.getPieceType())] + see(r, c, chessBoard));
-            }
+    int Evaluate::seeMin(int r, int c, ChessBoard& chessBoard) {
+        int value = 0;
+        ChessPiece& attacker = Bitboard::getSmallestAttacker(chessBoard, r, c, PieceColor::BLACK);
+        ChessPiece& capturedPiece = chessBoard.pieceAt(r, c);
+
+        if (attacker.getPieceType() != PieceType::EMPTY) {
+            auto [s, t] = attacker.getCoordinates();
+            Move move(s, t, r, c, attacker, capturedPiece);
+            chessBoard.push(move);
+            value = std::min(0, -pieceValues[static_cast<int>(capturedPiece.getPieceType())] + seeMax(r, c, chessBoard));
             chessBoard.unmakeMove(move);
         }
 
@@ -328,16 +313,15 @@ namespace ChessGame {
     int Evaluate::seeCapture(Move& move, ChessBoard& chessBoard) {
         int value = 0;
         ChessPiece& piece = move.getAttacker();
-        bool wTurn = chessBoard.whiteTurn();
         auto [r, c] = move.getEndSquare();
         chessBoard.push(move);
 
-        if (wTurn) {
-            value = pieceValues[static_cast<int>(move.getCapturedPiece().getPieceType())] + see(r, c, chessBoard);
+        if (chessBoard.whiteTurn()) {
+            value = -pieceValues[static_cast<int>(move.getCapturedPiece().getPieceType())] + seeMax(r, c, chessBoard);
         }
 
         else {
-            value = -pieceValues[static_cast<int>(move.getCapturedPiece().getPieceType())] + see(r, c, chessBoard);
+            value = pieceValues[static_cast<int>(move.getCapturedPiece().getPieceType())] + seeMin(r, c, chessBoard);
         }
         chessBoard.unmakeMove(move);
 

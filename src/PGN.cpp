@@ -31,7 +31,7 @@ namespace ChessGame {
 		return square;
 	}
 
-	std::string PGN::convertMoveToPGN(Move* move, int moveNumber, ChessBoard chessBoard, std::vector<Move> legalMoves) {
+	std::string PGN::convertMoveToPGN(Move* move, size_t moveNumber, ChessBoard chessBoard, std::vector<Move> legalMoves) {
 		std::vector<std::vector<ChessPiece>> b = chessBoard.getChessBoard();
 		auto [r1, c1] = move->getInitialSquare();
 		auto [r2, c2] = move->getEndSquare();
