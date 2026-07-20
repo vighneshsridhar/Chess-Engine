@@ -280,7 +280,7 @@ namespace ChessGame {
 
     int Evaluate::seeMax(int r, int c, ChessBoard& chessBoard) {
         int value = 0;
-        ChessPiece attacker = Bitboard::getSmallestAttacker(chessBoard, r, c, PieceColor::WHITE);
+        ChessPiece& attacker = Bitboard::getSmallestAttacker(chessBoard, r, c, PieceColor::WHITE);
         ChessPiece& capturedPiece = chessBoard.pieceAt(r, c);
 
         if (attacker.getPieceType() != PieceType::EMPTY) {
@@ -312,7 +312,7 @@ namespace ChessGame {
 
     int Evaluate::seeCapture(Move& move, ChessBoard& chessBoard) {
         int value = 0;
-        ChessPiece& piece = move.getAttacker();
+        const ChessPiece& piece = move.getAttacker();
         auto [r, c] = move.getEndSquare();
         chessBoard.push(move);
 

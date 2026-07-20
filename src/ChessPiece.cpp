@@ -30,7 +30,7 @@ namespace ChessGame {
 		return;
 	}
 
-	PieceColor ChessPiece::getColor() {
+	const PieceColor ChessPiece::getColor() const{
 		return color;
 	}
 

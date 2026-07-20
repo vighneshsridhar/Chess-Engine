@@ -16,8 +16,8 @@ namespace ChessGame {
 		Move(int r1, int c1, int r2, int c2, ChessPiece piece, ChessPiece capturedPiece);
 		std::pair<int, int> getInitialSquare() const;
 		std::pair<int, int> getEndSquare() const;
-		ChessPiece& getAttacker();
-		ChessPiece& getCapturedPiece();
+		const ChessPiece& getAttacker() const;
+		const ChessPiece& getCapturedPiece() const;
 		bool isCheck() const;
 		void setCheck(bool check);
 		bool isCapture();

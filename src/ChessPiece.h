@@ -31,7 +31,7 @@ namespace ChessGame {
 		ChessPiece(PieceType pieceType, PieceColor color, int r, int c);
 		PieceType getPieceType() const;
 		void setPieceType(PieceType newPieceType);
-		PieceColor getColor();
+		const PieceColor getColor() const;
 		void setColor(PieceColor color);
 		sf::Texture getTexture() const;
 		sf::Vector2f getPosition() const;

@@ -112,32 +112,6 @@ namespace ChessGame {
         return legalMoves;
     }
 
-    std::vector<Move> ChessBoard::getCaptureMoves() {
-        std::vector<Move> legalCaptures;
-        std::vector<Move> captures;
-
-        for (int r = 0; r < boardSize; r++) {
-
-            for (int c = 0; c < boardSize; c++) {
-
-                if ((wTurn && b[r][c].getColor() != PieceColor::WHITE) || (!wTurn && b[r][c].getColor() != PieceColor::BLACK)) {
-                    continue;
-                }
-                captures = getPieceCaptures(b[r][c]);
-
-                for (auto& capture : captures) {
-                    this->push(capture);
-
-                    if (Bitboard::isValidBoard(*this)) {
-                        legalCaptures.push_back(capture);
-                    }
-                    this->unmakeMove(capture);
-                }
-            }
-        }
-        return legalCaptures;
-    }
-
     std::vector<Move> ChessBoard::getPieceMoves(ChessPiece& piece) {
         std::vector<Move> moves;
 
@@ -166,6 +140,32 @@ namespace ChessGame {
         }
 
         return moves;
+    }
+
+    std::vector<Move> ChessBoard::getCaptureMoves() {
+        std::vector<Move> legalCaptures;
+        std::vector<Move> captures;
+
+        for (int r = 0; r < boardSize; r++) {
+
+            for (int c = 0; c < boardSize; c++) {
+
+                if ((wTurn && b[r][c].getColor() != PieceColor::WHITE) || (!wTurn && b[r][c].getColor() != PieceColor::BLACK)) {
+                    continue;
+                }
+                captures = getPieceCaptures(b[r][c]);
+
+                for (auto& capture : captures) {
+                    this->push(capture);
+
+                    if (Bitboard::isValidBoard(*this)) {
+                        legalCaptures.push_back(capture);
+                    }
+                    this->unmakeMove(capture);
+                }
+            }
+        }
+        return legalCaptures;
     }
 
     std::vector<Move> ChessBoard::getPieceCaptures(ChessPiece& piece) {
@@ -198,12 +198,12 @@ namespace ChessGame {
         return captures;
     }
 
-    void ChessBoard::push(Move& move) {
+    void ChessBoard::push(Move move) {
         auto [initial_r, initial_c] = move.getInitialSquare();
         auto [r, c] = move.getEndSquare();
 
-        ChessPiece& initialPiece = move.getAttacker();
-        ChessPiece& capturedPiece = move.getCapturedPiece();
+        const ChessPiece& initialPiece = move.getAttacker();
+        const ChessPiece& capturedPiece = move.getCapturedPiece();
         ChessPiece empty;
 
         if (initialPiece.getPieceType() == PieceType::PAWN && (r == 0 || r == 7)) {
@@ -265,25 +265,28 @@ namespace ChessGame {
         return;
     }
 
-    void ChessBoard::unmakeMove(Move& move) {
+    void ChessBoard::unmakeMove(Move move) {
         this->changeTurn();
         enPassantFiles.pop();
         auto [initial_r, initial_c] = move.getInitialSquare();
         auto [r, c] = move.getEndSquare();
 
-        ChessPiece& initialPiece = move.getAttacker();
-        ChessPiece& capturedPiece = move.getCapturedPiece();
+        const ChessPiece& initialPiece = move.getAttacker();
+        const ChessPiece& capturedPiece = move.getCapturedPiece();
         ChessPiece empty;
-        b[r][c] = capturedPiece;
+
         b[initial_r][initial_c] = initialPiece;
+        b[initial_r][initial_c].setCoordinates(initial_r, initial_c);
 
-        if (initialPiece.getPieceType() == PieceType::PAWN) {
+        if (!move.isEnPassant()) {
+            b[r][c] = capturedPiece;
+            b[r][c].setCoordinates(r, c);
+        }
 
-            if (move.isEnPassant()) {
-                b[r][c] = empty;
-                int rank = initialPiece.getColor() == PieceColor::WHITE ? r + 1 : r - 1;
-                b[rank][c] = capturedPiece;
-            }
+        else {
+            b[r][c] = empty;
+            b[initial_r][c] = capturedPiece;
+            b[initial_r][c].setCoordinates(initial_r, c);
         }
 
         if (initialPiece.getPieceType() == PieceType::KING) {
@@ -297,7 +300,7 @@ namespace ChessGame {
 
             if (c - initial_c == -2) {
                 b[r][0] = b[r][3];
-                b[r][0].setCoordinates(r, 7);
+                b[r][0].setCoordinates(r, 0);
                 b[r][3] = empty;
             }
         }
@@ -329,6 +332,9 @@ namespace ChessGame {
 
     bool ChessBoard::isCheckOrCheckmate() {
         this->changeTurn();
-        return !Bitboard::isValidBoard(*this);
+        bool ans = !Bitboard::isValidBoard(*this);
+        this->changeTurn();
+
+        return ans;
     }
 }

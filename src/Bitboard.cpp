@@ -135,7 +135,7 @@ namespace ChessGame {
 		PieceColor enemy = side == PieceColor::WHITE ? PieceColor::BLACK : PieceColor::WHITE;
 		int boardSize = 8;
 		ChessPiece ans;
-		int dr = side == PieceColor::WHITE ? -1 : 1;
+		int dr = side == PieceColor::WHITE ? 1 : -1;
 		int pawnDirs[2][2] = { {dr, -1}, {dr, 1} };
 		ChessPiece p;
 

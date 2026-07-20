@@ -47,11 +47,11 @@ namespace ChessGame {
 		return std::make_pair(r2, c2);
 	}
 
-	ChessPiece& Move::getAttacker() {
+	const ChessPiece& Move::getAttacker() const {
 		return piece;
 	}
 
-	ChessPiece& Move::getCapturedPiece() {
+	const ChessPiece& Move::getCapturedPiece() const {
 		return capturedPiece;
 	}
 

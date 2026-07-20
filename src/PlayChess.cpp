@@ -24,7 +24,8 @@ namespace ChessGame {
         boardSize = 8;
     };
 
-    void PlayChess::draw(sf::RenderWindow& window, float squareSize, std::vector<std::vector<ChessPiece>> b, std::vector<std::vector<sf::Sprite>>& spritesBoard) const {
+    void PlayChess::draw(sf::RenderWindow& window, float squareSize, std::vector<std::vector<ChessPiece>> b, std::vector<std::vector<sf::Sprite>>& spritesBoard, 
+        int initial_r, int initial_c) const {
         for (int r = 0; r < boardSize; r++) {
 
             for (int c = 0; c < boardSize; c++) {
@@ -46,17 +47,24 @@ namespace ChessGame {
 
             for (int c = 0; c < boardSize; c++) {
 
-                if (b[r][c].getPieceType() != PieceType::EMPTY) {
+                if (b[r][c].getPieceType() != PieceType::EMPTY && (r != initial_r || c != initial_c)) {
                     sf::FloatRect bounds = spritesBoard[r][c].getLocalBounds();
                     spritesBoard[r][c].setScale(sf::Vector2f(squareSize / bounds.size.x, squareSize / bounds.size.y));
-                    spritesBoard[r][c].setPosition(b[r][c].getPosition());
+                    spritesBoard[r][c].setPosition(Functions::convertToPosition(r, c));
                     window.draw(spritesBoard[r][c]);
+                }
+
+                else if (r == initial_r && c == initial_c && b[initial_r][initial_c].getPieceType() != PieceType::EMPTY) {
+                    sf::FloatRect bounds = spritesBoard[initial_r][initial_c].getLocalBounds();
+                    spritesBoard[initial_r][initial_c].setScale(sf::Vector2f(squareSize / bounds.size.x, squareSize / bounds.size.y));
+                    spritesBoard[initial_r][initial_c].setPosition(b[initial_r][initial_c].getPosition());
+                    window.draw(spritesBoard[initial_r][initial_c]);
                 }
             }
         }
     }
 
-    bool PlayChess::makeMove(sf::RenderWindow& window, ChessBoard& chessBoard, std::vector<std::vector<sf::Sprite>>& spritesBoard, MoveNode* n, bool rightArrow,
+    bool PlayChess::push(sf::RenderWindow& window, ChessBoard& chessBoard, std::vector<std::vector<sf::Sprite>>& spritesBoard, MoveNode* n, bool rightArrow,
     std::vector<std::vector<sf::Sprite>>& promotionSprites, std::vector<Move>& legalMoves, PGN& m) const {
         Move move = *n->move;
         chessBoard.push(move);
@@ -73,6 +81,7 @@ namespace ChessGame {
         ChessPiece rook(PieceType::ROOK, color, r, c);
         ChessPiece queen(PieceType::QUEEN, color, r, c);
         std::vector<ChessPiece> promotionPieces = { queen, rook, bishop, knight };
+
         std::unordered_map<PieceType, int> pieceToIndex;
         pieceToIndex[PieceType::QUEEN] = 0;
         pieceToIndex[PieceType::ROOK] = 1;
@@ -256,8 +265,8 @@ namespace ChessGame {
         spritesBoard[0] = { blackRookSprite, blackKnightSprite, blackBishopSprite, blackQueenSprite, blackKingSprite, blackBishopSprite, blackKnightSprite, blackRookSprite };
         spritesBoard[7] = { whiteRookSprite, whiteKnightSprite, whiteBishopSprite, whiteQueenSprite, whiteKingSprite, whiteBishopSprite, whiteKnightSprite, whiteRookSprite };
 
-        int initial_r = 0;
-        int initial_c = 0;
+        int initial_r = -1;
+        int initial_c = -1;
         int r;
         int c;
         float x;
@@ -271,7 +280,7 @@ namespace ChessGame {
         std::string check;
         std::string pgn;
 
-        int depth = 3;
+        int depth = 5;
         Engine e(depth);
         Move engineMove;
         bool makeEngineMove = false;
@@ -319,13 +328,14 @@ namespace ChessGame {
                         if (r < 0 || r >= boardSize || c < 0 || c >= boardSize) {
                             continue;
                         }
+                        ChessPiece initialPiece = b[initial_r][initial_c];
                         ChessPiece capturedPiece = b[r][c];
 
-                        if (b[initial_r][initial_c].getPieceType() == PieceType::PAWN && std::abs(c - initial_c) > 0 && b[r][c].getPieceType() == PieceType::EMPTY) {
+                        if (initialPiece.getPieceType() == PieceType::PAWN && std::abs(c - initial_c) > 0 && b[r][c].getPieceType() == PieceType::EMPTY) {
                             capturedPiece = b[initial_r][c];
                         }
-                        b[initial_r][initial_c].setCoordinates(initial_r, initial_c);
-                        Move* move = new Move(initial_r, initial_c, r, c, b[initial_r][initial_c], capturedPiece);
+                        initialPiece.setCoordinates(initial_r, initial_c);
+                        Move* move = new Move(initial_r, initial_c, r, c, initialPiece, capturedPiece);
                         auto it = std::find_if(legalMoves.begin(), legalMoves.end(), [move](const Move legalMove) {
                             return move->getInitialSquare() == legalMove.getInitialSquare() && move->getEndSquare() == legalMove.getEndSquare();
                         });
@@ -335,7 +345,7 @@ namespace ChessGame {
                             moveNumber = chessBoard.whiteTurn() ? root->moveNumber + 1 : root->moveNumber;
                             MoveNode* n = new MoveNode{ move, children, root, moveNumber, b, legalMoves, "" };
 
-                            if (makeMove(window, chessBoard, spritesBoard, n, false, promotionSprites, legalMoves, m)) {
+                            if (push(window, chessBoard, spritesBoard, n, false, promotionSprites, legalMoves, m)) {
                                 printMove(move, root, orig_root, n, makeEngineMove, legalMoves);
                             }
                         } 
@@ -343,6 +353,8 @@ namespace ChessGame {
                         else {
                             b[initial_r][initial_c].setCoordinates(initial_r, initial_c);
                         }
+                        initial_r = -1;
+                        initial_c = -1;
                     }
                 }
 
@@ -354,7 +366,7 @@ namespace ChessGame {
 
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) && root->children.size() > 0) {
                     root = root->children[0];
-                    bool _ = makeMove(window, chessBoard, spritesBoard, root, true, promotionSprites, legalMoves, m);
+                    bool _ = push(window, chessBoard, spritesBoard, root, true, promotionSprites, legalMoves, m);
                 }
                 b = chessBoard.getChessBoard();
 
@@ -365,7 +377,7 @@ namespace ChessGame {
                     b[initial_r][initial_c].setPosition(sf::Vector2f(x, y));
                 }
                 window.clear();
-                draw(window, squareSize, b, spritesBoard);
+                draw(window, squareSize, b, spritesBoard, initial_r, initial_c);
                 window.display();
             }
         }
