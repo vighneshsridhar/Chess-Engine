@@ -24,11 +24,12 @@ namespace ChessGame {
 		int seeMin(int r, int c, ChessBoard& chessBoard);
 		int seeCapture(Move& move, ChessBoard& chessBoard);
 		int pieceValues[7];
-		std::pair<std::vector<std::vector<int>>, std::vector<std::vector<int>>> pieceTables[6];
+		std::pair<std::vector<std::vector<int>>, std::vector<std::vector<int>>> pieceTables[7];
 
 	private:
 		int boardSize;
 
+		std::vector<std::vector<int>> emptyActivityScoreWhite;
 		std::vector<std::vector<int>> pawnActivityScoreWhite;
 		std::vector<std::vector<int>> knightActivityScoreWhite;
 		std::vector<std::vector<int>> bishopActivityScoreWhite;
@@ -36,6 +37,7 @@ namespace ChessGame {
 		std::vector<std::vector<int>> queenActivityScoreWhite;
 		std::vector<std::vector<int>> kingActivityScoreWhite;
 
+		std::vector<std::vector<int>> emptyActivityScoreBlack;
 		std::vector<std::vector<int>> pawnActivityScoreBlack;
 		std::vector<std::vector<int>> knightActivityScoreBlack;
 		std::vector<std::vector<int>> bishopActivityScoreBlack;

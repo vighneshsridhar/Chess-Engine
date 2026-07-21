@@ -18,7 +18,8 @@ namespace ChessGame {
 
 	bool Bitboard::isValidBoard(ChessBoard& chessBoard) {
 		chessBoard.changeTurn();
-		auto [r, c] = chessBoard.getKingPosition();
+		PieceColor side = chessBoard.whiteTurn() ? PieceColor::WHITE : PieceColor::BLACK;
+		auto [r, c] = chessBoard.getKingPosition(side);
 		PieceColor color = chessBoard.whiteTurn() ? PieceColor::WHITE : PieceColor::BLACK;
 
 		if (kingAttacked(chessBoard, r, c, color)) {

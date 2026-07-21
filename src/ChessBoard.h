@@ -27,7 +27,7 @@ namespace ChessGame {
 		std::vector<Move> getPieceCaptures(ChessPiece& piece);
 		void push(Move move);
 		void unmakeMove(Move move);
-		std::pair<int, int> getKingPosition();
+		std::pair<int, int> getKingPosition(PieceColor side);
 		void setKingPosition(std::pair<int, int> coordinates);
 		int getEnPassantFile();
 		bool isCheckOrCheckmate();

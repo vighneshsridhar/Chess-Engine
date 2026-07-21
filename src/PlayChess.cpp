@@ -280,7 +280,7 @@ namespace ChessGame {
         std::string check;
         std::string pgn;
 
-        int depth = 5;
+        int depth = 4;
         Engine e(depth);
         Move engineMove;
         bool makeEngineMove = false;

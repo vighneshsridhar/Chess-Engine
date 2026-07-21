@@ -20,6 +20,15 @@ namespace ChessGame {
         pieceValues[5] = 900;
         pieceValues[6] = 0;
 
+        emptyActivityScoreWhite = { {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0} };
+        
         pawnActivityScoreWhite = { {0, 0, 0, 0, 0, 0, 0, 0},
             {50, 50, 50, 50, 50, 50, 50, 50},
             {10, 10, 20, 30, 30, 20, 10, 10},
@@ -74,6 +83,7 @@ namespace ChessGame {
             {20, 20, 0, 0, 0, 0, 20, 20},
             {20, 30, 10, 0, 0, 10, 30, 20} };
 
+        emptyActivityScoreBlack = emptyActivityScoreWhite;
         pawnActivityScoreBlack = pawnActivityScoreWhite;
         knightActivityScoreBlack = knightActivityScoreWhite;
         bishopActivityScoreBlack = bishopActivityScoreWhite;
@@ -88,12 +98,13 @@ namespace ChessGame {
         std::reverse(queenActivityScoreBlack.begin(), queenActivityScoreBlack.end());
         std::reverse(kingActivityScoreBlack.begin(), kingActivityScoreBlack.end());
 
-        pieceTables[0] = std::make_pair(pawnActivityScoreWhite, pawnActivityScoreBlack);
-        pieceTables[1] = std::make_pair(knightActivityScoreWhite, knightActivityScoreBlack);
-        pieceTables[2] = std::make_pair(bishopActivityScoreWhite, bishopActivityScoreBlack);
-        pieceTables[3] = std::make_pair(rookActivityScoreWhite, rookActivityScoreBlack);
-        pieceTables[4] = std::make_pair(queenActivityScoreWhite, queenActivityScoreBlack);
-        pieceTables[5] = std::make_pair(kingActivityScoreWhite, kingActivityScoreBlack);
+        pieceTables[0] = std::make_pair(emptyActivityScoreWhite, emptyActivityScoreBlack);
+        pieceTables[1] = std::make_pair(pawnActivityScoreWhite, pawnActivityScoreBlack);
+        pieceTables[2] = std::make_pair(knightActivityScoreWhite, knightActivityScoreBlack);
+        pieceTables[3] = std::make_pair(bishopActivityScoreWhite, bishopActivityScoreBlack);
+        pieceTables[4] = std::make_pair(rookActivityScoreWhite, rookActivityScoreBlack);
+        pieceTables[5] = std::make_pair(queenActivityScoreWhite, queenActivityScoreBlack);
+        pieceTables[6] = std::make_pair(kingActivityScoreWhite, kingActivityScoreBlack);
     }
 
     int Evaluate::evaluatePosition(ChessBoard& chessBoard) {
@@ -106,11 +117,11 @@ namespace ChessGame {
                 ChessPiece piece = chessBoard.pieceAt(r, c);
 
                 if (piece.getColor() == PieceColor::WHITE) {
-                    score += pieceValues[static_cast<int>(piece.getPieceType())] + pieceTables[static_cast<int>(piece.getPieceType()) - 1].first[r][c];
+                    score += pieceValues[static_cast<int>(piece.getPieceType())] + pieceTables[static_cast<int>(piece.getPieceType())].first[r][c];
                 }
 
                 else if (piece.getColor() == PieceColor::BLACK) {
-                    score -= pieceValues[static_cast<int>(piece.getPieceType())] + pieceTables[static_cast<int>(piece.getPieceType()) - 1].second[r][c];
+                    score -= pieceValues[static_cast<int>(piece.getPieceType())] + pieceTables[static_cast<int>(piece.getPieceType())].second[r][c];
                 }
             }
         }
@@ -166,9 +177,10 @@ namespace ChessGame {
             auto [r1, c1] = move.getInitialSquare();
             auto [r2, c2] = move.getEndSquare();
             
-            auto captureValue = pieceValues[static_cast<int>(move.getCapturedPiece().getPieceType())];
+            auto captureValue = pieceValues[static_cast<int>(move.getCapturedPiece().getPieceType())] + 
+                pieceTables[static_cast<int>(move.getCapturedPiece().getPieceType())].second[r2][c2];
             auto pieceSquare = pieceTables[static_cast<int>(move.getAttacker().getPieceType()) - 1].first[r2][c2] -
-                pieceTables[static_cast<int>(move.getAttacker().getPieceType()) - 1].first[r1][c1];
+                pieceTables[static_cast<int>(move.getAttacker().getPieceType())].first[r1][c1];
             runningScore += captureValue;
             runningScore += pieceSquare;
             auto score = quiescenceMin(chessBoard, alpha, beta, newH, tt, runningScore);
@@ -246,9 +258,10 @@ namespace ChessGame {
             auto [r1, c1] = move.getInitialSquare();
             auto [r2, c2] = move.getEndSquare();
 
-            auto captureValue = pieceValues[static_cast<int>(move.getCapturedPiece().getPieceType())];
+            auto captureValue = pieceValues[static_cast<int>(move.getCapturedPiece().getPieceType())] + 
+                pieceTables[static_cast<int>(move.getCapturedPiece().getPieceType())].first[r2][c2];
             auto pieceSquare = pieceTables[static_cast<int>(move.getAttacker().getPieceType()) - 1].second[r2][c2] -
-                pieceTables[static_cast<int>(move.getAttacker().getPieceType()) - 1].second[r1][c1];
+                pieceTables[static_cast<int>(move.getAttacker().getPieceType())].second[r1][c1];
             runningScore -= captureValue;
             runningScore -= pieceSquare;
             auto score = quiescenceMax(chessBoard, alpha, beta, newH, tt, runningScore);

@@ -89,20 +89,22 @@ namespace ChessGame {
     std::vector<Move> ChessBoard::getLegalMoves() {
         std::vector<Move> legalMoves;
         std::vector<Move> moves;
+        PieceColor side = wTurn ? PieceColor::WHITE : PieceColor::BLACK;
 
         for (int r = 0; r < boardSize; r++) {
 
             for (int c = 0; c < boardSize; c++) {
 
-                if ((wTurn && b[r][c].getColor() != PieceColor::WHITE) || (!wTurn && b[r][c].getColor() != PieceColor::BLACK)) {
+                if (b[r][c].getColor() != side) {
                     continue;
                 }
                 moves = getPieceMoves(b[r][c]);
 
                 for (auto& move : moves) {
                     this->push(move);
+                    auto [k, l] = this->getKingPosition(side);
 
-                    if (Bitboard::isValidBoard(*this)) {
+                    if (!Bitboard::kingAttacked(*this, k, l, side)) {
                         legalMoves.push_back(move);
                     }
                     this->unmakeMove(move);
@@ -145,20 +147,22 @@ namespace ChessGame {
     std::vector<Move> ChessBoard::getCaptureMoves() {
         std::vector<Move> legalCaptures;
         std::vector<Move> captures;
+        PieceColor side = wTurn ? PieceColor::WHITE : PieceColor::BLACK;
 
         for (int r = 0; r < boardSize; r++) {
 
             for (int c = 0; c < boardSize; c++) {
 
-                if ((wTurn && b[r][c].getColor() != PieceColor::WHITE) || (!wTurn && b[r][c].getColor() != PieceColor::BLACK)) {
+                if (b[r][c].getColor() != side) {
                     continue;
                 }
                 captures = getPieceCaptures(b[r][c]);
 
                 for (auto& capture : captures) {
                     this->push(capture);
+                    auto [k, l] = this->getKingPosition(side);
 
-                    if (Bitboard::isValidBoard(*this)) {
+                    if (!Bitboard::kingAttacked(*this, k, l, side)) {
                         legalCaptures.push_back(capture);
                     }
                     this->unmakeMove(capture);
@@ -308,8 +312,8 @@ namespace ChessGame {
         return;
     }
 
-    std::pair<int, int> ChessBoard::getKingPosition() {
-        if (wTurn) {
+    std::pair<int, int> ChessBoard::getKingPosition(PieceColor side) {
+        if (side == PieceColor::WHITE) {
             return kingPosition["WHITE_KING"];
         }
 

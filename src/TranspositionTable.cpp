@@ -32,8 +32,8 @@ namespace ChessGame {
 	unsigned long long TranspositionTable::updateHash(Move& move, unsigned long long h) {
 		int s1 = move.getInitialSquare().first * 8 + move.getInitialSquare().second;
 		int s2 = move.getEndSquare().first * 8 + move.getEndSquare().second;
-		ChessPiece piece = move.getAttacker();
-		ChessPiece capturedPiece = move.getCapturedPiece();
+		const ChessPiece& piece = move.getAttacker();
+		const ChessPiece& capturedPiece = move.getCapturedPiece();
 		int t1 = static_cast<int>(piece.getPieceType()) - 1;
 		int t2 = static_cast<int>(capturedPiece.getPieceType()) - 1;
 		
