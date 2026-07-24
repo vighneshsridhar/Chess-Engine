@@ -132,7 +132,7 @@ namespace ChessGame {
 		return false;
 	}
 
-	ChessPiece& Bitboard::getSmallestAttacker(ChessBoard& chessBoard, int r, int c, PieceColor side) {
+	ChessPiece Bitboard::getSmallestAttacker(ChessBoard& chessBoard, int r, int c, PieceColor side) {
 		PieceColor enemy = side == PieceColor::WHITE ? PieceColor::BLACK : PieceColor::WHITE;
 		int boardSize = 8;
 		ChessPiece ans;
@@ -205,6 +205,7 @@ namespace ChessGame {
 					else if (p.getPieceType() == PieceType::QUEEN) {
 						ans = p;
 					}
+					break;
 				}
 				s += d[0];
 				t += d[1];

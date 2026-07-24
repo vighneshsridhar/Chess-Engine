@@ -30,6 +30,7 @@ namespace ChessGame {
 		std::pair<int, int> getKingPosition(PieceColor side);
 		void setKingPosition(std::pair<int, int> coordinates);
 		int getEnPassantFile();
+		std::pair<bool, bool> castlingRights(PieceColor side);
 		bool isCheckOrCheckmate();
 
 	private:

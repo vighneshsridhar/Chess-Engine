@@ -70,6 +70,10 @@ namespace ChessGame {
 	std::pair<bool, bool> Move::isCastling() const {
 		bool kingSide = false;
 		bool queenSide = false;
+		
+		if (piece.getPieceType() != PieceType::KING) {
+			return std::make_pair(false, false);
+		}
 
 		if (c2 - c1 == 2) {
 			kingSide = true;

@@ -334,6 +334,29 @@ namespace ChessGame {
         return enPassantFiles.top();
     }
 
+    std::pair<bool, bool> ChessBoard::castlingRights(PieceColor side) {
+        auto [k, l] = getKingPosition(side);
+        ChessPiece& king = b[k][l];
+
+        if (king.pieceHasMoved()) {
+            return std::make_pair(false, false);
+        }
+        bool kingSide = false;
+        bool queenSide = false;
+        ChessPiece& x = b[k][7];
+        ChessPiece& y = b[k][0];
+
+        if (!x.pieceHasMoved()) {
+            kingSide = true;
+        }
+
+        if (!y.pieceHasMoved()) {
+            queenSide = true;
+        }
+
+        return std::make_pair(kingSide, queenSide);
+    }
+
     bool ChessBoard::isCheckOrCheckmate() {
         this->changeTurn();
         bool ans = !Bitboard::isValidBoard(*this);

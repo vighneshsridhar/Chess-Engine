@@ -192,7 +192,7 @@ namespace ChessGame {
         chessBoard.setChessBoard(b);
     }
 
-    void PlayChess::printMove(Move* move, MoveNode*& root, MoveNode* orig_root, MoveNode* n, bool& makeEngineMove, std::vector<Move> legalMoves) {
+    void PlayChess::printMove(Move* move, MoveNode*& root, MoveNode* orig_root, MoveNode* n) {
         bool newMove = true;
         std::string pgn;
 
@@ -212,10 +212,6 @@ namespace ChessGame {
         pgn = m.generatePGN(orig_root, startingPosition, 0);
         // std::cout << "\033[2J\033[H";
         std::cout << pgn + "\n" << std::endl;
-
-        if (legalMoves.size() > 0) {
-            makeEngineMove = true;
-        }
     }
 
     void PlayChess::playGame() {
@@ -346,7 +342,11 @@ namespace ChessGame {
                             MoveNode* n = new MoveNode{ move, children, root, moveNumber, b, legalMoves, "" };
 
                             if (push(window, chessBoard, spritesBoard, n, false, promotionSprites, legalMoves, m)) {
-                                printMove(move, root, orig_root, n, makeEngineMove, legalMoves);
+                                printMove(move, root, orig_root, n);
+
+                                if (legalMoves.size() > 0) {
+                                    makeEngineMove = true;
+                                }
                             }
                         } 
 

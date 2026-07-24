@@ -15,6 +15,11 @@ namespace ChessGame {
 		std::random_device rd;
 		std::mt19937 gen(rd());
 		std::uniform_int_distribution<unsigned long long> dist(0, 0xFFFFFFFFFFFFFFFFULL);
+		boardSize = 8;
+
+		castlingRights.push({ true, true, true, true });
+		enPassantFiles.push(-1);
+
 		hashTable.resize(64, std::vector<unsigned long long>(13, 0));
 
 		for (int s = 0; s < 64; s++) {
@@ -24,12 +29,16 @@ namespace ChessGame {
 			}
 		}
 
-		for (int u = 0; u < 5; u++) {
+		for (int u = 0; u < 13; u++) {
 			hashTable[u][12] = dist(gen);
 		}
 	};
 
-	unsigned long long TranspositionTable::updateHash(Move& move, unsigned long long h) {
+	unsigned long long TranspositionTable::updateHash(Move& move, bool push, ChessBoard& chessBoard, unsigned long long h) {
+		if (!push) {
+			castlingRights.pop();
+			enPassantFiles.pop();
+		}
 		int s1 = move.getInitialSquare().first * 8 + move.getInitialSquare().second;
 		int s2 = move.getEndSquare().first * 8 + move.getEndSquare().second;
 		const ChessPiece& piece = move.getAttacker();
@@ -48,48 +57,66 @@ namespace ChessGame {
 		h ^= hashTable[s2][t1];
 
 		if (capturedPiece.getPieceType() != PieceType::EMPTY) {
+			s2 = capturedPiece.getCoordinates().first * 8 + capturedPiece.getCoordinates().second;
 			h ^= hashTable[s2][t2];
 		}
-		auto [kingSide, queenSide] = move.isCastling();
-		
-		if (piece.getColor() == PieceColor::BLACK) {
-			h ^= hashTable[0][12];
 
-			if (kingSide) {
-				h ^= hashTable[3][12];
+		if (!chessBoard.whiteTurn()) {
+			h ^= hashTable[0][12];
+		}
+		auto [whiteKingSide, whiteQueenSide] = chessBoard.castlingRights(PieceColor::WHITE);
+		auto [blackKingSide, blackQueenSide] = chessBoard.castlingRights(PieceColor::BLACK);
+		std::vector<bool> a = { whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide };
+		std::vector<bool> b = castlingRights.top();
+
+		for (int i = 1; i <= 4; i++) {
+			
+			if (b[i - 1]) {
+				h ^= hashTable[i][12];
 			}
 
-			if (queenSide) {
-				h ^= hashTable[4][12];
+			if (a[i - 1]) {
+				h ^= hashTable[i][12];
 			}
 		}
+		int enPassantFile = chessBoard.getEnPassantFile();
+		int prevEnPassantFile = enPassantFiles.top();
 
-		if (piece.getColor() == PieceColor::WHITE) {
+		if (enPassantFile != -1) {
+			h ^= hashTable[enPassantFile + 5][12];
+		}
 
-			if (kingSide) {
-				h ^= hashTable[1][12];
-			}
+		if (prevEnPassantFile != -1) {
+			h ^= hashTable[prevEnPassantFile + 5][12];
+		}
 
-			if (queenSide) {
-				h ^= hashTable[2][12];
-			}
+		if (push) {
+			castlingRights.push(a);
+			enPassantFiles.push(enPassantFile);
 		}
 
 		return h;
 	}
 
-	unsigned long long TranspositionTable::getInitialH() {
+	unsigned long long TranspositionTable::getInitialH(ChessBoard& chessBoard) {
 		unsigned long long h = 0;
 
-		for (int s = 0; s < 64; s++) {
+		for (int r = 0; r < boardSize; r++){
 
-			for (int t = 0; t < 12; t++) {
+			for (int c = 0; c < boardSize; c++) {
+				ChessPiece& piece = chessBoard.pieceAt(r, c);
+
+				if (piece.getPieceType() == PieceType::EMPTY) {
+					continue;
+				}
+				auto s = r * 8 + c;
+				auto t = static_cast<int>(piece.getPieceType()) - 1;
+
+				if (piece.getColor() == PieceColor::BLACK) {
+					t += 6;
+				}
 				h ^= hashTable[s][t];
 			}
-		}
-
-		for (int u = 0; u < 5; u++) {
-			h ^= hashTable[u][12];
 		}
 
 		return h;
@@ -100,7 +127,7 @@ namespace ChessGame {
 			return tt[h];
 		}
 		Move move;
-		TTEntry entry = { 0, -1, TTFlag::EXACT_EVAL, move };
+		TTEntry entry = { 0, std::numeric_limits<int>::min(), TTFlag::EXACT_EVAL, move };
 
 		return entry;
 	}

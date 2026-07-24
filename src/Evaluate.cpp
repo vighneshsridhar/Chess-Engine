@@ -129,11 +129,11 @@ namespace ChessGame {
         return score;
     }
 
-    int Evaluate::quiescenceMax(ChessBoard& chessBoard, int alpha, int beta, unsigned long long h, TranspositionTable& tt, int runningScore) {
+    int Evaluate::quiescenceMax(ChessBoard& chessBoard, int alpha, int beta, int depthLeft, unsigned long long h, TranspositionTable& tt, int runningScore) {
         TranspositionTable::TTEntry entry = tt.getTT(h);
         unsigned long long newH;
 
-        /*if (entry.depth >= 0) {
+        if (entry.depth >= depthLeft) {
 
             if (entry.flag == TranspositionTable::TTFlag::EXACT_EVAL) {
                 return entry.eval;
@@ -150,7 +150,7 @@ namespace ChessGame {
             if (alpha >= beta) {
                 return entry.eval;
             }
-        } */
+        }
         int bestValue = runningScore;
         Move bestMove;
 
@@ -173,23 +173,26 @@ namespace ChessGame {
                 continue;
             }
             chessBoard.push(move);
-            newH = tt.updateHash(move, h);
+            newH = tt.updateHash(move, true, chessBoard, h);
+            const ChessPiece& capturedPiece = move.getCapturedPiece();
             auto [r1, c1] = move.getInitialSquare();
             auto [r2, c2] = move.getEndSquare();
+            auto [s, t] = capturedPiece.getCoordinates();
             
-            auto captureValue = pieceValues[static_cast<int>(move.getCapturedPiece().getPieceType())] + 
-                pieceTables[static_cast<int>(move.getCapturedPiece().getPieceType())].second[r2][c2];
-            auto pieceSquare = pieceTables[static_cast<int>(move.getAttacker().getPieceType()) - 1].first[r2][c2] -
+            auto captureValue = pieceValues[static_cast<int>(capturedPiece.getPieceType())] + 
+                pieceTables[static_cast<int>(capturedPiece.getPieceType())].second[s][t];
+            auto initialValue = pieceTables[static_cast<int>(move.getAttacker().getPieceType())].first[r2][c2] -
                 pieceTables[static_cast<int>(move.getAttacker().getPieceType())].first[r1][c1];
             runningScore += captureValue;
-            runningScore += pieceSquare;
-            auto score = quiescenceMin(chessBoard, alpha, beta, newH, tt, runningScore);
+            runningScore += initialValue;
+            auto score = quiescenceMin(chessBoard, alpha, beta, depthLeft - 1, newH, tt, runningScore);
             runningScore -= captureValue;
-            runningScore -= pieceSquare;
+            runningScore -= initialValue;
+            newH = tt.updateHash(move, false, chessBoard, newH);
             chessBoard.unmakeMove(move);
 
             if (score >= beta) {
-                TranspositionTable::TTEntry entry = { score, 0, TranspositionTable::TTFlag::LOWER_BOUND, move };
+                TranspositionTable::TTEntry entry = { score, depthLeft, TranspositionTable::TTFlag::LOWER_BOUND, move };
                 tt.updateTT(h, entry);
 
                 return score;
@@ -204,17 +207,17 @@ namespace ChessGame {
                 alpha = score;
             }
         }
-        entry = { bestValue, 0, TranspositionTable::TTFlag::EXACT_EVAL, bestMove };
+        entry = { bestValue, depthLeft, TranspositionTable::TTFlag::EXACT_EVAL, bestMove };
         tt.updateTT(h, entry);
 
         return bestValue;
     }
 
-    int Evaluate::quiescenceMin(ChessBoard& chessBoard, int alpha, int beta, unsigned long long h, TranspositionTable& tt, int runningScore) {
+    int Evaluate::quiescenceMin(ChessBoard& chessBoard, int alpha, int beta, int depthLeft, unsigned long long h, TranspositionTable& tt, int runningScore) {
         TranspositionTable::TTEntry entry = tt.getTT(h);
         unsigned long long newH;
 
-        /*if (entry.depth >= 0) {
+        if (entry.depth >= depthLeft) {
 
             if (entry.flag == TranspositionTable::TTFlag::EXACT_EVAL) {
                 return entry.eval;
@@ -231,7 +234,7 @@ namespace ChessGame {
             if (alpha >= beta) {
                 return entry.eval;
             }
-        } */
+        }
         int bestValue = runningScore;
         Move bestMove;
 
@@ -254,23 +257,26 @@ namespace ChessGame {
                 continue;
             }
             chessBoard.push(move);
-            newH = tt.updateHash(move, h);
+            newH = tt.updateHash(move, true, chessBoard, h);
+            const ChessPiece& capturedPiece = move.getCapturedPiece();
             auto [r1, c1] = move.getInitialSquare();
             auto [r2, c2] = move.getEndSquare();
+            auto [s, t] = capturedPiece.getCoordinates();
 
-            auto captureValue = pieceValues[static_cast<int>(move.getCapturedPiece().getPieceType())] + 
-                pieceTables[static_cast<int>(move.getCapturedPiece().getPieceType())].first[r2][c2];
-            auto pieceSquare = pieceTables[static_cast<int>(move.getAttacker().getPieceType()) - 1].second[r2][c2] -
+            auto captureValue = pieceValues[static_cast<int>(capturedPiece.getPieceType())] + 
+                pieceTables[static_cast<int>(capturedPiece.getPieceType())].first[s][t];
+            auto initialValue = pieceTables[static_cast<int>(move.getAttacker().getPieceType())].second[r2][c2] -
                 pieceTables[static_cast<int>(move.getAttacker().getPieceType())].second[r1][c1];
             runningScore -= captureValue;
-            runningScore -= pieceSquare;
-            auto score = quiescenceMax(chessBoard, alpha, beta, newH, tt, runningScore);
+            runningScore -= initialValue;
+            auto score = quiescenceMax(chessBoard, alpha, beta, depthLeft - 1, newH, tt, runningScore);
             runningScore += captureValue;
-            runningScore += pieceSquare;
+            runningScore += initialValue;
+            newH = tt.updateHash(move, false, chessBoard, newH);
             chessBoard.unmakeMove(move);
 
             if (score <= alpha) {
-                TranspositionTable::TTEntry entry = { score, 0, TranspositionTable::TTFlag::UPPER_BOUND, move };
+                TranspositionTable::TTEntry entry = { score, depthLeft, TranspositionTable::TTFlag::UPPER_BOUND, move };
                 tt.updateTT(h, entry);
 
                 return score;
@@ -285,7 +291,7 @@ namespace ChessGame {
                 beta = score;
             }
         }
-        entry = { bestValue, 0, TranspositionTable::TTFlag::EXACT_EVAL, bestMove };
+        entry = { bestValue, depthLeft, TranspositionTable::TTFlag::EXACT_EVAL, bestMove };
         tt.updateTT(h, entry);
 
         return bestValue;
@@ -293,14 +299,17 @@ namespace ChessGame {
 
     int Evaluate::seeMax(int r, int c, ChessBoard& chessBoard) {
         int value = 0;
-        ChessPiece& attacker = Bitboard::getSmallestAttacker(chessBoard, r, c, PieceColor::WHITE);
+        ChessPiece attacker = Bitboard::getSmallestAttacker(chessBoard, r, c, PieceColor::WHITE);
         ChessPiece& capturedPiece = chessBoard.pieceAt(r, c);
 
         if (attacker.getPieceType() != PieceType::EMPTY) {
             auto [s, t] = attacker.getCoordinates();
             Move move(s, t, r, c, attacker, capturedPiece);
             chessBoard.push(move);
-            value = std::max(0, pieceValues[static_cast<int>(capturedPiece.getPieceType())] + seeMin(r, c, chessBoard));
+            auto initialValue = pieceTables[static_cast<int>(attacker.getPieceType())].first[r][c] -
+                pieceTables[static_cast<int>(attacker.getPieceType())].first[s][t];
+            auto captureValue = pieceValues[static_cast<int>(capturedPiece.getPieceType())] + pieceTables[static_cast<int>(capturedPiece.getPieceType())].second[r][c];
+            value = std::max(0, captureValue + initialValue + seeMin(r, c, chessBoard));
             chessBoard.unmakeMove(move);
         }
 
@@ -309,14 +318,17 @@ namespace ChessGame {
 
     int Evaluate::seeMin(int r, int c, ChessBoard& chessBoard) {
         int value = 0;
-        ChessPiece& attacker = Bitboard::getSmallestAttacker(chessBoard, r, c, PieceColor::BLACK);
+        ChessPiece attacker = Bitboard::getSmallestAttacker(chessBoard, r, c, PieceColor::BLACK);
         ChessPiece& capturedPiece = chessBoard.pieceAt(r, c);
 
         if (attacker.getPieceType() != PieceType::EMPTY) {
             auto [s, t] = attacker.getCoordinates();
             Move move(s, t, r, c, attacker, capturedPiece);
             chessBoard.push(move);
-            value = std::min(0, -pieceValues[static_cast<int>(capturedPiece.getPieceType())] + seeMax(r, c, chessBoard));
+            auto initialValue = pieceTables[static_cast<int>(attacker.getPieceType())].second[r][c] -
+                pieceTables[static_cast<int>(attacker.getPieceType())].second[s][t];
+            auto captureValue = pieceValues[static_cast<int>(capturedPiece.getPieceType())] + pieceTables[static_cast<int>(capturedPiece.getPieceType())].first[r][c];
+            value = std::min(0, -initialValue - captureValue + seeMax(r, c, chessBoard));
             chessBoard.unmakeMove(move);
         }
 
@@ -326,15 +338,24 @@ namespace ChessGame {
     int Evaluate::seeCapture(Move& move, ChessBoard& chessBoard) {
         int value = 0;
         const ChessPiece& piece = move.getAttacker();
-        auto [r, c] = move.getEndSquare();
+        const ChessPiece& capturedPiece = move.getCapturedPiece();
+        auto [r1, c1] = move.getInitialSquare();
+        auto [r2, c2] = move.getEndSquare();
+        auto [s, t] = capturedPiece.getCoordinates();
         chessBoard.push(move);
 
         if (chessBoard.whiteTurn()) {
-            value = -pieceValues[static_cast<int>(move.getCapturedPiece().getPieceType())] + seeMax(r, c, chessBoard);
+            auto initialValue = pieceTables[static_cast<int>(piece.getPieceType())].second[r2][c2] -
+                pieceTables[static_cast<int>(piece.getPieceType())].second[r1][c1];
+            auto captureValue = pieceValues[static_cast<int>(capturedPiece.getPieceType())] + pieceTables[static_cast<int>(capturedPiece.getPieceType())].first[s][t];
+            value = -initialValue - captureValue + seeMax(r2, c2, chessBoard);
         }
 
         else {
-            value = pieceValues[static_cast<int>(move.getCapturedPiece().getPieceType())] + seeMin(r, c, chessBoard);
+            auto initialValue = pieceTables[static_cast<int>(piece.getPieceType())].first[r2][c2] -
+                pieceTables[static_cast<int>(piece.getPieceType())].first[r1][c1];
+            auto captureValue = pieceValues[static_cast<int>(capturedPiece.getPieceType())] + pieceTables[static_cast<int>(capturedPiece.getPieceType())].second[s][t];
+            value = initialValue + captureValue + seeMin(r2, c2, chessBoard);
         }
         chessBoard.unmakeMove(move);
 

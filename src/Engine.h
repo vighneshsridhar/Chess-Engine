@@ -25,7 +25,7 @@ namespace ChessGame {
 		int boardSize;
 		int maxDepth;
 		TranspositionTable tt;
-		unsigned long long h;
+		// unsigned long long h;
 		std::vector<std::vector<Move>> killerMoves;
 		Evaluate e;
 	};

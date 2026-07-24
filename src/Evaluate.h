@@ -18,8 +18,8 @@ namespace ChessGame {
 	public:
 		Evaluate();
 		int evaluatePosition(ChessBoard& chessBoard);
-		int quiescenceMax(ChessBoard& chessBoard, int alpha, int beta, unsigned long long h, TranspositionTable& tt, int runningScore);
-		int quiescenceMin(ChessBoard& chessBoard, int alpha, int beta, unsigned long long h, TranspositionTable& tt, int runningScore);
+		int quiescenceMax(ChessBoard& chessBoard, int alpha, int beta, int depthLeft, unsigned long long h, TranspositionTable& tt, int runningScore);
+		int quiescenceMin(ChessBoard& chessBoard, int alpha, int beta, int depthLeft, unsigned long long h, TranspositionTable& tt, int runningScore);
 		int seeMax(int r, int c, ChessBoard& chessBoard);
 		int seeMin(int r, int c, ChessBoard& chessBoard);
 		int seeCapture(Move& move, ChessBoard& chessBoard);
