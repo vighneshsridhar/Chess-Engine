@@ -302,8 +302,8 @@ namespace ChessGame {
             auto score = alphaBetaMax(chessBoard, alpha, beta, depthLeft - 1, newH, runningScore);
             runningScore += captureValue;
             runningScore += pieceSquare;
-            chessBoard.unmakeMove(move);
             newH = tt.updateHash(move, false, chessBoard, newH);
+            chessBoard.unmakeMove(move);
 
             if (score < bestValue) {
                 bestValue = score;

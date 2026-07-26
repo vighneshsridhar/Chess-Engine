@@ -139,6 +139,7 @@ namespace ChessGame {
 		int dr = side == PieceColor::WHITE ? 1 : -1;
 		int pawnDirs[2][2] = { {dr, -1}, {dr, 1} };
 		ChessPiece p;
+		bool isLegalMove;
 
 		int s = r;
 		int t = c;
@@ -151,7 +152,14 @@ namespace ChessGame {
 				p = chessBoard.pieceAt(s, t);
 
 				if (p.getColor() == side && p.getPieceType() == PieceType::PAWN) {
-					return p;
+					Move m(s, t, r, c, p, chessBoard.pieceAt(r, c));
+					chessBoard.push(m);
+					isLegalMove = !kingAttacked(chessBoard, r, c, side);
+					chessBoard.unmakeMove(m);
+
+					if (isLegalMove) {
+						return p;
+					}
 				}
 			}
 		}
@@ -165,7 +173,14 @@ namespace ChessGame {
 				p = chessBoard.pieceAt(s, t);
 
 				if (p.getColor() == side && p.getPieceType() == PieceType::KING) {
-					return p;
+					Move m(s, t, r, c, p, chessBoard.pieceAt(r, c));
+					chessBoard.push(m);
+					isLegalMove = !kingAttacked(chessBoard, r, c, side);
+					chessBoard.unmakeMove(m);
+
+					if (isLegalMove) {
+						return p;
+					}
 				}
 			}
 		}
@@ -179,7 +194,14 @@ namespace ChessGame {
 				p = chessBoard.pieceAt(s, t);
 
 				if (p.getColor() == side && p.getPieceType() == PieceType::KNIGHT) {
-					return p;
+					Move m(s, t, r, c, p, chessBoard.pieceAt(r, c));
+					chessBoard.push(m);
+					isLegalMove = !kingAttacked(chessBoard, r, c, side);
+					chessBoard.unmakeMove(m);
+
+					if (isLegalMove) {
+						return p;
+					}
 				}
 			}
 		}
@@ -199,11 +221,25 @@ namespace ChessGame {
 				if (p.getColor() == side) {
 
 					if (p.getPieceType() == PieceType::BISHOP) {
-						return p;
+						Move m(s, t, r, c, p, chessBoard.pieceAt(r, c));
+						chessBoard.push(m);
+						isLegalMove = !kingAttacked(chessBoard, r, c, side);
+						chessBoard.unmakeMove(m);
+
+						if (isLegalMove) {
+							return p;
+						}
 					}
 
 					else if (p.getPieceType() == PieceType::QUEEN) {
-						ans = p;
+						Move m(s, t, r, c, p, chessBoard.pieceAt(r, c));
+						chessBoard.push(m);
+						isLegalMove = !kingAttacked(chessBoard, r, c, side);
+						chessBoard.unmakeMove(m);
+
+						if (isLegalMove) {
+							ans = p;
+						}
 					}
 					break;
 				}
@@ -227,11 +263,25 @@ namespace ChessGame {
 				if (p.getColor() == side) {
 
 					if (p.getPieceType() == PieceType::ROOK) {
-						return p;
+						Move m(s, t, r, c, p, chessBoard.pieceAt(r, c));
+						chessBoard.push(m);
+						isLegalMove = !kingAttacked(chessBoard, r, c, side);
+						chessBoard.unmakeMove(m);
+
+						if (isLegalMove) {
+							return p;
+						}
 					}
 
 					else if (p.getPieceType() == PieceType::QUEEN) {
-						ans = p;
+						Move m(s, t, r, c, p, chessBoard.pieceAt(r, c));
+						chessBoard.push(m);
+						isLegalMove = !kingAttacked(chessBoard, r, c, side);
+						chessBoard.unmakeMove(m);
+
+						if (isLegalMove) {
+							ans = p;
+						}
 					}
 					break;
 				}
