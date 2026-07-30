@@ -27,7 +27,7 @@ namespace ChessGame {
 			}
 			for (int t = c - 1; t <= c + 1; t++) {
 
-				if (t < 0 || t >= boardSize) {
+				if (t < 0 || t >= boardSize || (s == r && t == c)) {
 					continue;
 				}
 				auto piece = chessBoard.pieceAt(s, t);
@@ -42,44 +42,46 @@ namespace ChessGame {
 		if (!king.pieceHasMoved()) {
 
 			if (color == PieceColor::WHITE) {
-				auto rook = chessBoard.pieceAt(7, 7);
+				auto piece = chessBoard.pieceAt(7, 7);
 				auto square1 = chessBoard.pieceAt(7, 5);
 				auto square2 = chessBoard.pieceAt(7, 6);
 
-				if (!rook.pieceHasMoved() && square1.getPieceType() == PieceType::EMPTY && square2.getPieceType() == PieceType::EMPTY && !Bitboard::kingAttacked(chessBoard, 7, 4, color) &&
-					!Bitboard::kingAttacked(chessBoard, 7, 5, color) && !Bitboard::kingAttacked(chessBoard, 7, 6, color)) {
+				if (piece.getPieceType() == PieceType::ROOK && !piece.pieceHasMoved() && square1.getPieceType() == PieceType::EMPTY && square2.getPieceType() == PieceType::EMPTY && 
+					!Bitboard::kingAttacked(chessBoard, 7, 4, color) && !Bitboard::kingAttacked(chessBoard, 7, 5, color) && !Bitboard::kingAttacked(chessBoard, 7, 6, color)) {
 					Move move(r, c, 7, 6, king, square2);
 					moves.push_back(move);
 				}
-				rook = chessBoard.pieceAt(7, 0);
+				piece = chessBoard.pieceAt(7, 0);
 				square1 = chessBoard.pieceAt(7, 1);
 				square2 = chessBoard.pieceAt(7, 2);
 				auto square3 = chessBoard.pieceAt(7, 3);
 
-				if (!rook.pieceHasMoved() && square1.getPieceType() == PieceType::EMPTY && square2.getPieceType() == PieceType::EMPTY && square3.getPieceType() == PieceType::EMPTY && 
-					!Bitboard::kingAttacked(chessBoard, 7, 4, color) && !Bitboard::kingAttacked(chessBoard, 7, 3, color) && !Bitboard::kingAttacked(chessBoard, 7, 2, color)) {
+				if (piece.getPieceType() == PieceType::ROOK && !piece.pieceHasMoved() && square1.getPieceType() == PieceType::EMPTY && square2.getPieceType() == PieceType::EMPTY &&
+					square3.getPieceType() == PieceType::EMPTY && !Bitboard::kingAttacked(chessBoard, 7, 4, color) && !Bitboard::kingAttacked(chessBoard, 7, 3, color) && 
+					!Bitboard::kingAttacked(chessBoard, 7, 2, color)) {
 					Move move(r, c, 7, 2, king, square2);
 					moves.push_back(move);
 				}
 			}
 
 			if (color == PieceColor::BLACK) {
-				auto rook = chessBoard.pieceAt(0, 7);
+				auto piece = chessBoard.pieceAt(0, 7);
 				auto square1 = chessBoard.pieceAt(0, 5);
 				auto square2 = chessBoard.pieceAt(0, 6);
 
-				if (!rook.pieceHasMoved() && square1.getPieceType() == PieceType::EMPTY && square2.getPieceType() == PieceType::EMPTY && !Bitboard::kingAttacked(chessBoard, 0, 4, color) &&
-					!Bitboard::kingAttacked(chessBoard, 0, 5, color) && !Bitboard::kingAttacked(chessBoard, 0, 6, color)) {
+				if (piece.getPieceType() == PieceType::ROOK && !piece.pieceHasMoved() && square1.getPieceType() == PieceType::EMPTY && square2.getPieceType() == PieceType::EMPTY &&
+					!Bitboard::kingAttacked(chessBoard, 0, 4, color) && !Bitboard::kingAttacked(chessBoard, 0, 5, color) && !Bitboard::kingAttacked(chessBoard, 0, 6, color)) {
 					Move move(r, c, 0, 6, king, square2);
 					moves.push_back(move);
 				}
-				rook = chessBoard.pieceAt(0, 0);
+				piece = chessBoard.pieceAt(0, 0);
 				square1 = chessBoard.pieceAt(0, 1);
 				square2 = chessBoard.pieceAt(0, 2);
 				auto square3 = chessBoard.pieceAt(0, 3);
 
-				if (!rook.pieceHasMoved() && square1.getPieceType() == PieceType::EMPTY && square2.getPieceType() == PieceType::EMPTY && square3.getPieceType() == PieceType::EMPTY &&
-					!Bitboard::kingAttacked(chessBoard, 0, 4, color) && !Bitboard::kingAttacked(chessBoard, 0, 3, color) && !Bitboard::kingAttacked(chessBoard, 0, 2, color)) {
+				if (piece.getPieceType() == PieceType::ROOK && !piece.pieceHasMoved() && square1.getPieceType() == PieceType::EMPTY && square2.getPieceType() == PieceType::EMPTY &&
+					square3.getPieceType() == PieceType::EMPTY && !Bitboard::kingAttacked(chessBoard, 0, 4, color) && !Bitboard::kingAttacked(chessBoard, 0, 3, color) && 
+					!Bitboard::kingAttacked(chessBoard, 0, 2, color)) {
 					Move move(r, c, 0, 2, king, square2);
 					moves.push_back(move);
 				}
@@ -104,7 +106,7 @@ namespace ChessGame {
 			}
 			for (int t = c - 1; t <= c + 1; t++) {
 
-				if (t < 0 || t >= boardSize) {
+				if (t < 0 || t >= boardSize || (s == r && t == c)) {
 					continue;
 				}
 				auto piece = chessBoard.pieceAt(s, t);

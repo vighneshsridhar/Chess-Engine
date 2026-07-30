@@ -140,6 +140,7 @@ namespace ChessGame {
 		int pawnDirs[2][2] = { {dr, -1}, {dr, 1} };
 		ChessPiece p;
 		bool isLegalMove;
+		auto [k, l] = chessBoard.getKingPosition(side);
 
 		int s = r;
 		int t = c;
@@ -154,7 +155,7 @@ namespace ChessGame {
 				if (p.getColor() == side && p.getPieceType() == PieceType::PAWN) {
 					Move m(s, t, r, c, p, chessBoard.pieceAt(r, c));
 					chessBoard.push(m);
-					isLegalMove = !kingAttacked(chessBoard, r, c, side);
+					isLegalMove = !kingAttacked(chessBoard, k, l, side);
 					chessBoard.unmakeMove(m);
 
 					if (isLegalMove) {
@@ -196,7 +197,7 @@ namespace ChessGame {
 				if (p.getColor() == side && p.getPieceType() == PieceType::KNIGHT) {
 					Move m(s, t, r, c, p, chessBoard.pieceAt(r, c));
 					chessBoard.push(m);
-					isLegalMove = !kingAttacked(chessBoard, r, c, side);
+					isLegalMove = !kingAttacked(chessBoard, k, l, side);
 					chessBoard.unmakeMove(m);
 
 					if (isLegalMove) {
@@ -223,7 +224,7 @@ namespace ChessGame {
 					if (p.getPieceType() == PieceType::BISHOP) {
 						Move m(s, t, r, c, p, chessBoard.pieceAt(r, c));
 						chessBoard.push(m);
-						isLegalMove = !kingAttacked(chessBoard, r, c, side);
+						isLegalMove = !kingAttacked(chessBoard, k, l, side);
 						chessBoard.unmakeMove(m);
 
 						if (isLegalMove) {
@@ -234,7 +235,7 @@ namespace ChessGame {
 					else if (p.getPieceType() == PieceType::QUEEN) {
 						Move m(s, t, r, c, p, chessBoard.pieceAt(r, c));
 						chessBoard.push(m);
-						isLegalMove = !kingAttacked(chessBoard, r, c, side);
+						isLegalMove = !kingAttacked(chessBoard, k, l, side);
 						chessBoard.unmakeMove(m);
 
 						if (isLegalMove) {
@@ -265,7 +266,7 @@ namespace ChessGame {
 					if (p.getPieceType() == PieceType::ROOK) {
 						Move m(s, t, r, c, p, chessBoard.pieceAt(r, c));
 						chessBoard.push(m);
-						isLegalMove = !kingAttacked(chessBoard, r, c, side);
+						isLegalMove = !kingAttacked(chessBoard, k, l, side);
 						chessBoard.unmakeMove(m);
 
 						if (isLegalMove) {
@@ -276,7 +277,7 @@ namespace ChessGame {
 					else if (p.getPieceType() == PieceType::QUEEN) {
 						Move m(s, t, r, c, p, chessBoard.pieceAt(r, c));
 						chessBoard.push(m);
-						isLegalMove = !kingAttacked(chessBoard, r, c, side);
+						isLegalMove = !kingAttacked(chessBoard, k, l, side);
 						chessBoard.unmakeMove(m);
 
 						if (isLegalMove) {

@@ -39,7 +39,7 @@ namespace ChessGame {
 		std::pair<int, int> getCoordinates() const;
 		void setCoordinates(int r, int c);
 		bool pieceHasMoved() const;
-		void setPieceHasMoved();
+		void setPieceHasMoved(bool newHasMoved);
 		bool operator == (ChessPiece& piece) const;
 
 	private:

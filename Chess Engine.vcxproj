@@ -155,6 +155,7 @@
   <ItemGroup>
     <ClCompile Include="src\Bishop.cpp" />
     <ClCompile Include="src\Bitboard.cpp" />
+    <ClCompile Include="src\Button.cpp" />
     <ClCompile Include="src\ChessBoard.cpp" />
     <ClCompile Include="src\ChessPiece.cpp" />
     <ClCompile Include="src\Engine.cpp" />
@@ -207,6 +208,7 @@
   <ItemGroup>
     <ClInclude Include="src\Bishop.h" />
     <ClInclude Include="src\Bitboard.h" />
+    <ClInclude Include="src\Button.h" />
     <ClInclude Include="src\ChessBoard.h" />
     <ClInclude Include="src\ChessPiece.h" />
     <ClInclude Include="src\Engine.h" />

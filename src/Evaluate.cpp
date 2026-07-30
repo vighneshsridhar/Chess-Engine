@@ -168,10 +168,6 @@ namespace ChessGame {
         std::sort(captures.begin(), captures.end(), comp);
 
         for (auto& move : captures) {
-
-            if (seeCapture(move, chessBoard) < 0) {
-                continue;
-            }
             chessBoard.push(move);
             newH = tt.updateHash(move, true, chessBoard, h);
             const ChessPiece& capturedPiece = move.getCapturedPiece();
@@ -252,10 +248,6 @@ namespace ChessGame {
         std::sort(captures.begin(), captures.end(), comp);
 
         for (auto& move : captures) {
-
-            if (seeCapture(move, chessBoard) > 0) {
-                continue;
-            }
             chessBoard.push(move);
             newH = tt.updateHash(move, true, chessBoard, h);
             const ChessPiece& capturedPiece = move.getCapturedPiece();

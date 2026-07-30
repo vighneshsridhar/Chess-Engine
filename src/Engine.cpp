@@ -166,8 +166,8 @@ namespace ChessGame {
             }
         }
         auto comp = [&, depthLeft](Move& a, Move& b) {
-            return a.getOrderingScore(killerMoves, depthLeft) >
-                b.getOrderingScore(killerMoves, depthLeft);
+            return a.getOrderingScore(killerMoves, depthLeft) + (a.isCapture() && e.seeCapture(a, chessBoard) >= 0 ? 5000 : 0) >
+                b.getOrderingScore(killerMoves, depthLeft) + (b.isCapture() && e.seeCapture(b, chessBoard) >= 0 ? 5000 : 0);
             };
         std::sort(legalMoves.begin(), legalMoves.end(), comp);
         Move bestMove;
@@ -175,10 +175,6 @@ namespace ChessGame {
 
         for (int i = 0; i < legalMoves.size(); i++) {
             Move& move = legalMoves[i];
-
-            if (move.isCapture() && e.seeCapture(move, chessBoard) < 0) {
-                continue;
-            }
             chessBoard.push(move);
             newH = tt.updateHash(move, true, chessBoard, h);
             const ChessPiece& capturedPiece = move.getCapturedPiece();
@@ -241,8 +237,8 @@ namespace ChessGame {
             return 0;
         }
         auto comp = [&, depthLeft](Move& a, Move& b) {
-            return a.getOrderingScore(killerMoves, depthLeft) >
-                b.getOrderingScore(killerMoves, depthLeft);
+            return a.getOrderingScore(killerMoves, depthLeft) + (a.isCapture() && e.seeCapture(a, chessBoard) <= 0 ? 5000 : 0) >
+                b.getOrderingScore(killerMoves, depthLeft) + (b.isCapture() && e.seeCapture(b, chessBoard) <= 0 ? 5000 : 0);
             };
         std::sort(legalMoves.begin(), legalMoves.end(), comp);
 
@@ -282,10 +278,6 @@ namespace ChessGame {
 
         for (int i = 0; i < legalMoves.size(); i++) {
             Move& move = legalMoves[i];
-
-            if (move.isCapture() && e.seeCapture(move, chessBoard) > 0) {
-                continue;
-            }
             chessBoard.push(move);
             newH = tt.updateHash(move, true, chessBoard, h);
             const ChessPiece& capturedPiece = move.getCapturedPiece();

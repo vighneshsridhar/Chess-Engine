@@ -17,6 +17,7 @@ namespace ChessGame {
 		ChessBoard();
 		bool whiteTurn() const;
 		void changeTurn();
+		void setTurn(PieceColor side);
 		std::vector<std::vector<ChessPiece>> getChessBoard();
 		void setChessBoard(std::vector<std::vector<ChessPiece>> newChessBoard);
 		ChessPiece& pieceAt(int r, int c);

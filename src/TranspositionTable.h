@@ -25,7 +25,7 @@ namespace ChessGame {
 		struct TTEntry {
 			int eval;
 			int depth;
-			TTFlag flag;
+			TTFlag flag = TTFlag::EXACT_EVAL;
 			Move bestMove;
 		};
 		unsigned long long updateHash(Move& move, bool push, ChessBoard& chessBoard, unsigned long long h);

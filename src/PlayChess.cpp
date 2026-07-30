@@ -24,7 +24,8 @@ namespace ChessGame {
         boardSize = 8;
     };
 
-    void PlayChess::draw(sf::RenderWindow& window, float squareSize, std::vector<std::vector<ChessPiece>> b, std::vector<std::vector<sf::Sprite>>& spritesBoard, 
+    void PlayChess::draw(sf::RenderWindow& window, Button& playButton, bool playMode, Button& changePositionButton, bool changePositionMode, 
+        Button& engineButton, bool engineMode, float squareSize, std::vector<std::vector<ChessPiece>> b, std::vector<std::vector<sf::Sprite>>& spritesBoard, 
         int initial_r, int initial_c) const {
         for (int r = 0; r < boardSize; r++) {
 
@@ -42,6 +43,45 @@ namespace ChessGame {
                 window.draw(square);
             }
         }
+        sf::RectangleShape p = playButton.getButton();
+        sf::RectangleShape e = engineButton.getButton();
+        sf::RectangleShape cp = changePositionButton.getButton();
+
+        sf::FloatRect globalBounds = p.getGlobalBounds();
+        sf::FloatRect localBounds = p.getLocalBounds();
+        
+        const sf::Font font("Assets/arial.ttf");
+        sf::Text playText(font, "Play");
+        float offset = playMode ? 10.f : 0;
+        playText.setOrigin(sf::Vector2f(localBounds.position.x + localBounds.size.x, localBounds.position.y + localBounds.size.y));
+        playText.setPosition(sf::Vector2f(globalBounds.position.x + globalBounds.size.x, globalBounds.position.y + globalBounds.size.y + offset));
+        playText.setCharacterSize(30);
+        playText.setFillColor(sf::Color::Black);
+
+        globalBounds = e.getGlobalBounds();
+        localBounds = e.getLocalBounds();
+        sf::Text engineText(font, "Analyze");
+        offset = engineMode ? 10.f : 0;
+        engineText.setOrigin(sf::Vector2f(localBounds.position.x + localBounds.size.x, localBounds.position.y + localBounds.size.y));
+        engineText.setPosition(sf::Vector2f(globalBounds.position.x + globalBounds.size.x, globalBounds.position.y + globalBounds.size.y + offset));
+        engineText.setCharacterSize(30);
+        engineText.setFillColor(sf::Color::Black);
+
+        globalBounds = cp.getGlobalBounds();
+        localBounds = cp.getLocalBounds();
+        sf::Text changePositionText(font, "Change Position");
+        offset = changePositionMode ? 10.f : 0;
+        changePositionText.setOrigin(sf::Vector2f(localBounds.position.x + localBounds.size.x, localBounds.position.y + localBounds.size.y));
+        changePositionText.setPosition(sf::Vector2f(globalBounds.position.x + globalBounds.size.x, globalBounds.position.y + globalBounds.size.y + offset));
+        changePositionText.setCharacterSize(30);
+        changePositionText.setFillColor(sf::Color::Black);
+
+        window.draw(p);
+        window.draw(playText);
+        window.draw(e);
+        window.draw(engineText);
+        window.draw(cp);
+        window.draw(changePositionText);
 
         for (int r = 0; r < boardSize; r++) {
 
@@ -62,134 +102,6 @@ namespace ChessGame {
                 }
             }
         }
-    }
-
-    bool PlayChess::push(sf::RenderWindow& window, ChessBoard& chessBoard, std::vector<std::vector<sf::Sprite>>& spritesBoard, MoveNode* n, bool rightArrow,
-    std::vector<std::vector<sf::Sprite>>& promotionSprites, std::vector<Move>& legalMoves, PGN& m) const {
-        Move move = *n->move;
-        chessBoard.push(move);
-        std::vector<std::vector<ChessPiece>> b = chessBoard.getChessBoard();
-
-        auto [initial_r, initial_c] = move.getInitialSquare();
-        auto [r, c] = move.getEndSquare();
-
-        ChessPiece initialPiece = move.getAttacker();
-        ChessPiece capturedPiece = move.getCapturedPiece();
-        PieceColor color = initialPiece.getColor();
-        ChessPiece knight(PieceType::KNIGHT, color, r, c);
-        ChessPiece bishop(PieceType::BISHOP, color, r, c);
-        ChessPiece rook(PieceType::ROOK, color, r, c);
-        ChessPiece queen(PieceType::QUEEN, color, r, c);
-        std::vector<ChessPiece> promotionPieces = { queen, rook, bishop, knight };
-
-        std::unordered_map<PieceType, int> pieceToIndex;
-        pieceToIndex[PieceType::QUEEN] = 0;
-        pieceToIndex[PieceType::ROOK] = 1;
-        pieceToIndex[PieceType::BISHOP] = 2;
-        pieceToIndex[PieceType::KNIGHT] = 3;
-        spritesBoard[r][c] = spritesBoard[initial_r][initial_c];
-
-        if (initialPiece.getPieceType() == PieceType::PAWN && (r == 0 || r == 7)) {
-            int j;
-
-            if (initialPiece.getColor() == PieceColor::WHITE) {
-                j = 0;
-            }
-
-            else {
-                j = 1;
-            }
-
-            if (!rightArrow) {
-                auto [i, didPromote] = PromotionClicker::promotePawn(window, b, initialPiece, spritesBoard, promotionSprites[j], r, c);
-
-                if (didPromote) {
-                    spritesBoard[r][c] = promotionSprites[j][i];
-                    n->move->setPromotionPiece(promotionPieces[i]);
-                }
-
-                else {
-                    return false;
-                }
-            }
-
-            else {
-                auto i = pieceToIndex[n->move->getPromotionPiece().getPieceType()];
-                spritesBoard[r][c] = promotionSprites[j][i];
-            }
-        }
-        spritesBoard[r][c].setPosition(Functions::convertToPosition(r, c));
-        b[r][c].setPosition(Functions::convertToPosition(r, c));
-
-        if (initialPiece.getPieceType() == PieceType::KING) {
-
-            if (c - initial_c == 2) {
-                spritesBoard[r][5] = spritesBoard[r][7];
-                b[r][5].setPosition(Functions::convertToPosition(r, 5));
-            }
-
-            if (c - initial_c == -2) {
-                spritesBoard[r][3] = spritesBoard[r][0];
-                b[r][3].setPosition(Functions::convertToPosition(r, 3));
-            }
-        }
-        chessBoard.setChessBoard(b);
-        legalMoves = chessBoard.getLegalMoves();
-        n->checkSymbol = m.checkOrCheckmate(chessBoard, legalMoves.size());
-
-        return true;
-    }
-
-    void PlayChess::undoMove(ChessBoard& chessBoard, std::vector<std::vector<sf::Sprite>>& spritesBoard, MoveNode* n, std::vector<std::vector<sf::Sprite>> sprites) const {
-        Move move = *n->move;
-        auto [r1, c1] = move.getInitialSquare();
-        auto [r2, c2] = move.getEndSquare();
-        chessBoard.unmakeMove(move);
-        std::vector<std::vector<ChessPiece>> b = chessBoard.getChessBoard();
-
-        if (b[r1][c1].getPieceType() == PieceType::KING) {
-            
-            if (c2 - c1 == 2) {
-                spritesBoard[r1][c2 + 1] = b[r1][c1].getColor() == PieceColor::WHITE ? sprites[0][3] : sprites[1][3];
-                b[r1][c2 + 1].setPosition(Functions::convertToPosition(r1, c2 + 1));
-            }
-
-            else if (c2 - c1 == -2) {
-                spritesBoard[r1][c2 - 2] = b[r1][c1].getColor() == PieceColor::WHITE ? sprites[0][3] : sprites[1][3];
-                b[r1][c2 - 2].setPosition(Functions::convertToPosition(r1, c2 - 2));
-            }
-        }
-        ChessPiece capturedPiece = move.getCapturedPiece();
-
-        if (move.getPromotionPiece().getPieceType() == PieceType::EMPTY) {
-            spritesBoard[r1][c1] = spritesBoard[r2][c2];
-        }
-        
-        else {
-            spritesBoard[r1][c1] = b[r1][c1].getColor() == PieceColor::WHITE ? sprites[0][0] : sprites[1][0];
-        }
-        b[r1][c1].setPosition(Functions::convertToPosition(r1, c1));
-
-        if (move.isEnPassant()) {
-
-            if (b[r1][c1].getColor() == PieceColor::WHITE) {;
-                spritesBoard[r2 + 1][c2] = sprites[1][0];
-                b[r2 + 1][c2].setPosition(Functions::convertToPosition(r2 + 1, c2));
-            }
-
-            else {
-                spritesBoard[r2 - 1][c2] = sprites[0][0];
-                b[r2 - 1][c2].setPosition(Functions::convertToPosition(r2 - 1, c2));
-            }
-        }
-
-        else if (capturedPiece.getPieceType() != PieceType::EMPTY) {
-            int type = static_cast<int>(capturedPiece.getPieceType()) - 1;
-            int color = static_cast<int>(capturedPiece.getColor());
-            spritesBoard[r2][c2] = sprites[color][type];
-            b[r2][c2].setPosition(Functions::convertToPosition(r2, c2));
-        }
-        chessBoard.setChessBoard(b);
     }
 
     void PlayChess::printMove(Move* move, MoveNode*& root, MoveNode* orig_root, MoveNode* n) {
@@ -215,9 +127,23 @@ namespace ChessGame {
     }
 
     void PlayChess::playGame() {
-        sf::RenderWindow window(sf::VideoMode({ 800, 800 }), "Chess Board with Pieces!");
+        sf::RenderWindow window(sf::VideoMode({ 1200, 800 }), "Play a game of chess!");
         auto windowSize = window.getSize();
         float squareSize = std::min(windowSize.x, windowSize.y) / 8.f;
+        // float extraSpaceX = std::abs(sf::Vector2f(windowSize).x - sf::Vector2f(windowSize).y);
+        // float extraSpaceY = std::min(windowSize.x, windowSize.y);
+
+        Button playButton(250.f, 50.f, squareSize * 8 + 50.f, squareSize * 3, true);
+        sf::Vector2f playPosition = playButton.getPosition();
+        sf::Vector2f playSize = playButton.getSize();
+
+        Button engineButton(250.f, 50.f, squareSize * 8 + 50.f, squareSize * 4.5, false);
+        sf::Vector2f enginePosition = engineButton.getPosition();
+        sf::Vector2f engineSize = engineButton.getSize();
+        
+        Button changePositionButton(250.f, 50.f, squareSize * 8 + 50.f, squareSize * 6, false);
+        sf::Vector2f position = changePositionButton.getPosition();
+        sf::Vector2f positionSize = changePositionButton.getSize();
 
         bool isDragging = false;
         bool didPromote = false;
@@ -280,6 +206,12 @@ namespace ChessGame {
         Engine e(depth);
         Move engineMove;
         bool makeEngineMove = false;
+        bool playMode = true;
+        bool playButtonClicked = false;
+        bool engineMode = false;
+        bool engineButtonClicked = false;
+        bool changePositionMode = false;
+        bool changePositionButtonClicked = false;
 
         while (window.isOpen()) {
 
@@ -289,7 +221,7 @@ namespace ChessGame {
                     window.close();
                 }
 
-                if (makeEngineMove) {
+                if (makeEngineMove && engineMode) {
                     engineMove = e.iterative_deepening(chessBoard);
                     moveNumber = chessBoard.whiteTurn() ? moveNumber + 1 : moveNumber;
                     pgn = m.convertMoveToPGN(&engineMove, moveNumber, chessBoard, legalMoves);
@@ -303,22 +235,35 @@ namespace ChessGame {
                         mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
                         initial_r = int(mousePosition.y / squareSize);
                         initial_c = int(mousePosition.x / squareSize);
-                        x = squareSize * initial_c;
-                        y = squareSize * initial_r;
                         isDragging = true;
-                        dragOffset.x = mousePosition.x - spritesBoard[initial_r][initial_c].getPosition().x;
-                        dragOffset.y = mousePosition.y - spritesBoard[initial_r][initial_c].getPosition().y;
+
+                        if (initial_r >= 0 && initial_r < boardSize && initial_c >= 0 && initial_c < boardSize) {
+                            dragOffset.x = mousePosition.x - spritesBoard[initial_r][initial_c].getPosition().x;
+                            dragOffset.y = mousePosition.y - spritesBoard[initial_r][initial_c].getPosition().y;
+                        }
+
+                        else if (changePositionButton.mouseOverButton(mousePosition.x, mousePosition.y)) {
+                            changePositionButtonClicked = true;
+                        }
+
+                        else if (playButton.mouseOverButton(mousePosition.x, mousePosition.y)) {
+                            playButtonClicked = true;
+                        }
+
+                        else if (engineButton.mouseOverButton(mousePosition.x, mousePosition.y)) {
+                            engineButtonClicked = true;
+                        }
                     }
                 }
 
                 if (event->is<sf::Event::MouseButtonReleased>()) {
 
-                    if (isDragging) {
+                    if (isDragging && initial_r >= 0 && initial_r < boardSize && initial_c >= 0 && initial_c < boardSize) {
                         isDragging = false;
                         didPromote = false;
                         sf::Sprite initialSprite = spritesBoard[initial_r][initial_c];
                         sf::Vector2f spritePosition = initialSprite.getPosition();
-                        r = std::round(spritePosition.y / squareSize);
+                        r = int(std::round(spritePosition.y / squareSize));
                         c = std::round(spritePosition.x / squareSize);
 
                         if (r < 0 || r >= boardSize || c < 0 || c >= boardSize) {
@@ -336,19 +281,30 @@ namespace ChessGame {
                             return move->getInitialSquare() == legalMove.getInitialSquare() && move->getEndSquare() == legalMove.getEndSquare();
                         });
 
-                        if (it != legalMoves.end()) {
+                        if (it != legalMoves.end() && (playMode || engineMode)) {
                             std::vector<MoveNode*> children;
                             moveNumber = chessBoard.whiteTurn() ? root->moveNumber + 1 : root->moveNumber;
                             MoveNode* n = new MoveNode{ move, children, root, moveNumber, b, legalMoves, "" };
 
-                            if (push(window, chessBoard, spritesBoard, n, false, promotionSprites, legalMoves, m)) {
+                            if (Functions::push(window, chessBoard, spritesBoard, n, false, promotionSprites, legalMoves)) {
                                 printMove(move, root, orig_root, n);
 
                                 if (legalMoves.size() > 0) {
                                     makeEngineMove = true;
                                 }
                             }
-                        } 
+                        }
+
+                        else if (changePositionMode) {
+                            b[r][c] = b[initial_r][initial_c];
+
+                            if (initial_r != r || initial_c != c) {
+                                b[initial_r][initial_c] = empty;
+                            }
+                            spritesBoard[r][c] = spritesBoard[initial_r][initial_c];
+                            b[r][c].setCoordinates(r, c);
+                            chessBoard.setChessBoard(b);
+                        }
 
                         else {
                             b[initial_r][initial_c].setCoordinates(initial_r, initial_c);
@@ -356,28 +312,79 @@ namespace ChessGame {
                         initial_r = -1;
                         initial_c = -1;
                     }
+
+                    else if (changePositionButtonClicked) {
+
+                        if (changePositionButton.mouseOverButton(mousePosition.x, mousePosition.y)) {
+                            changePositionMode = true;
+                            playMode = false;
+                            engineMode = false;
+                            std::cout << "In Change Position Mode" << std::endl;
+                        }
+                        changePositionButtonClicked = false;
+                    }
+
+                    else if (playButtonClicked) {
+
+                        if (playButton.mouseOverButton(mousePosition.x, mousePosition.y)) {
+                            playMode = true;
+                            engineMode = false;
+                            changePositionMode = false;
+                            b = chessBoard.getChessBoard();
+                            legalMoves = chessBoard.getLegalMoves();
+                            root = new MoveNode{ nullptr, {}, nullptr, 0, b, {}, "" };
+                            orig_root = root;
+                            std::cout << "In Play Mode" << std::endl;
+                        }
+                        playButtonClicked = false;
+                    }
+
+                    else if (engineButtonClicked) {
+
+                        if (engineButton.mouseOverButton(mousePosition.x, mousePosition.y)) {
+                            engineMode = true;
+                            playMode = false;
+                            changePositionMode = false;
+                            makeEngineMove = true;
+                            std::cout << "In Engine Mode" << std::endl;
+                        }
+                        engineButtonClicked = false;
+                    }
+                    isDragging = false;
                 }
 
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) && root->move != nullptr) {
-                    undoMove(chessBoard, spritesBoard, root, sprites);
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) && root->move != nullptr && !changePositionMode) {
+                    Functions::undoMove(chessBoard, spritesBoard, root, sprites);
                     root = root->parent;
                     legalMoves = chessBoard.getLegalMoves();
                 }
 
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) && root->children.size() > 0) {
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) && root->children.size() > 0 && !changePositionMode) {
                     root = root->children[0];
-                    bool _ = push(window, chessBoard, spritesBoard, root, true, promotionSprites, legalMoves, m);
+                    bool _ = Functions::push(window, chessBoard, spritesBoard, root, true, promotionSprites, legalMoves);
                 }
                 b = chessBoard.getChessBoard();
 
                 if (isDragging) {
-                    sf::Vector2f mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
+                    mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
                     x = mousePosition.x - dragOffset.x;
                     y = mousePosition.y - dragOffset.y;
-                    b[initial_r][initial_c].setPosition(sf::Vector2f(x, y));
+
+                    if (x >= 0 && x <= squareSize * 8 && y >= 0 && y <= squareSize * 8 && initial_r >= 0 && initial_r < boardSize && initial_c >= 0 && initial_c < boardSize) {
+                        b[initial_r][initial_c].setPosition(sf::Vector2f(x, y));
+                    }
                 }
+                mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
+                playButton.setMode(playMode);
+                engineButton.setMode(engineMode);
+                changePositionButton.setMode(changePositionMode);
+
+                playButton.setFillColor(mousePosition.x, mousePosition.y);
+                engineButton.setFillColor(mousePosition.x, mousePosition.y);
+                changePositionButton.setFillColor(mousePosition.x, mousePosition.y);
+
                 window.clear();
-                draw(window, squareSize, b, spritesBoard, initial_r, initial_c);
+                draw(window, playButton, playMode, changePositionButton, changePositionMode, engineButton, engineMode, squareSize, b, spritesBoard, initial_r, initial_c);
                 window.display();
             }
         }

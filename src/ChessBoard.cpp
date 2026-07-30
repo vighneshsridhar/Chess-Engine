@@ -70,6 +70,11 @@ namespace ChessGame {
         return;
     }
 
+    void ChessBoard::setTurn(PieceColor side) {
+        wTurn = side == PieceColor::WHITE ? true : false;
+        return;
+    }
+
     std::vector<std::vector<ChessPiece>> ChessBoard::getChessBoard() {
         return b;
     }
@@ -258,11 +263,12 @@ namespace ChessGame {
             if (rookC != -1) {
                 b[r][rookC + delta] = b[r][rookC];
                 b[r][rookC + delta].setCoordinates(r, rookC + delta);
+                b[r][rookC + delta].setPieceHasMoved(true);
                 b[r][rookC] = empty;
             }
         }
         this->changeTurn();
-        b[r][c].setPieceHasMoved();
+        b[r][c].setPieceHasMoved(true);
         b[initial_r][initial_c] = empty;
         b[initial_r][initial_c].setCoordinates(initial_r, initial_c);
 
@@ -299,12 +305,14 @@ namespace ChessGame {
             if (c - initial_c == 2) {
                 b[r][7] = b[r][5];
                 b[r][7].setCoordinates(r, 7);
+                b[r][7].setPieceHasMoved(false);
                 b[r][5] = empty;
             }
 
             if (c - initial_c == -2) {
                 b[r][0] = b[r][3];
                 b[r][0].setCoordinates(r, 0);
+                b[r][0].setPieceHasMoved(false);
                 b[r][3] = empty;
             }
         }
@@ -358,10 +366,9 @@ namespace ChessGame {
     }
 
     bool ChessBoard::isCheckOrCheckmate() {
-        this->changeTurn();
-        bool ans = !Bitboard::isValidBoard(*this);
-        this->changeTurn();
+        PieceColor side = wTurn ? PieceColor::WHITE : PieceColor::BLACK;
+        auto [k, l] = getKingPosition(side);
 
-        return ans;
+        return Bitboard::kingAttacked(*this, k, l, side);
     }
 }

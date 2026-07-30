@@ -140,8 +140,8 @@ namespace ChessGame {
 		return hasMoved;
 	}
 
-	void ChessPiece::setPieceHasMoved() {
-		hasMoved = true;
+	void ChessPiece::setPieceHasMoved(bool newHasMoved) {
+		hasMoved = newHasMoved;
 	}
 
 	bool ChessPiece::operator == (ChessPiece& piece) const {

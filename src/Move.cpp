@@ -112,9 +112,9 @@ namespace ChessGame {
 			score += 9000;
 		}
 
-		if (isCheck()) {
+		/*if (isCheck()) {
 			score += 5000;
-		}
+		} */
 
 		if (*this == killerMoves[depth][0] || *this == killerMoves[depth][1]) {
 			score += 9000;

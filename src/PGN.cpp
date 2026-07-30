@@ -133,7 +133,7 @@ namespace ChessGame {
 	std::string PGN::generatePGN(MoveNode* root, ChessBoard chessBoard, int index) {
 		std::string pgn_ans = "";
 		std::string move_pgn;
-		int moveNumber = root->moveNumber;
+		size_t moveNumber = root->moveNumber;
 		bool priorityLine = false;
 
 		if (root->move) {
