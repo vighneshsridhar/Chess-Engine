@@ -11,7 +11,10 @@
 #include "PromotionClicker.h"
 #include "PGN.h"
 #include "Move.h"
+#include "Bitboard.h"
+#include "Engine.h"
 #include "Button.h"
+#include "Position.h"
 
 namespace ChessGame {
 

@@ -32,10 +32,14 @@ namespace ChessGame {
 		unsigned long long getInitialH(ChessBoard& chessBoard);
 		TTEntry& getTT(unsigned long long h);
 		void updateTT(unsigned long long h, TTEntry& entry);
+		void incrementCount(unsigned long long h);
+		void decrementCount(unsigned long long h);
+		int getPositionCount(unsigned long long h);
 
 	private:
 		std::vector<std::vector<unsigned long long>> hashTable;
 		std::unordered_map<unsigned long long, TTEntry> tt;
+		std::unordered_map<unsigned long long, int> count;
 		int boardSize;
 		std::stack<std::vector<bool>> castlingRights;
 		std::stack<int> enPassantFiles;

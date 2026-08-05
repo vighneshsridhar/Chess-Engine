@@ -1,3 +1,6 @@
+#include <filesystem>
+#include <windows.h>
+
 #include "TextureManager.h"
 #include "ChessPiece.h"
 
@@ -38,6 +41,16 @@ namespace ChessGame {
         textures["BLACK_ROOK"] = blackRook.getTexture();
         textures["BLACK_QUEEN"] = blackQueen.getTexture();
         textures["BLACK_KING"] = blackKing.getTexture();
+
+        sf::Texture emptyTexture(sf::Vector2u(50, 50));
+        textures["EMPTY_TEXTURE"] = emptyTexture;
+        std::string path = "Assets/cursor.png";
+        sf::Texture cursorTexture;
+
+        if (!cursorTexture.loadFromFile(path)) {
+            OutputDebugStringA("Failed to load texture\n");
+        }
+        textures["CURSOR"] = cursorTexture;
 
         return textures;
     }

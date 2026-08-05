@@ -130,8 +130,12 @@ namespace ChessGame {
     }
 
     int Evaluate::quiescenceMax(ChessBoard& chessBoard, int alpha, int beta, int depthLeft, unsigned long long h, TranspositionTable& tt, int runningScore) {
-        TranspositionTable::TTEntry entry = tt.getTT(h);
         unsigned long long newH;
+
+        if (tt.getPositionCount(h) >= 3) {
+            return 0;
+        }
+        TranspositionTable::TTEntry entry = tt.getTT(h);
 
         if (entry.depth >= depthLeft) {
 
@@ -163,13 +167,15 @@ namespace ChessGame {
         }
         std::vector<Move> captures = chessBoard.getCaptureMoves();
         auto comp = [&](Move& a, Move& b) {
-            return a.getCaptureScore() > b.getCaptureScore();
+            return (a.isCapture() && seeCapture(a, chessBoard) >= 0 ? 15000 : 0) >
+                (b.isCapture() && seeCapture(b, chessBoard) >= 0 ? 15000 : 0);
             };
         std::sort(captures.begin(), captures.end(), comp);
 
         for (auto& move : captures) {
             chessBoard.push(move);
             newH = tt.updateHash(move, true, chessBoard, h);
+            tt.incrementCount(newH);
             const ChessPiece& capturedPiece = move.getCapturedPiece();
             auto [r1, c1] = move.getInitialSquare();
             auto [r2, c2] = move.getEndSquare();
@@ -184,6 +190,7 @@ namespace ChessGame {
             auto score = quiescenceMin(chessBoard, alpha, beta, depthLeft - 1, newH, tt, runningScore);
             runningScore -= captureValue;
             runningScore -= initialValue;
+            tt.decrementCount(newH);
             newH = tt.updateHash(move, false, chessBoard, newH);
             chessBoard.unmakeMove(move);
 
@@ -212,6 +219,10 @@ namespace ChessGame {
     int Evaluate::quiescenceMin(ChessBoard& chessBoard, int alpha, int beta, int depthLeft, unsigned long long h, TranspositionTable& tt, int runningScore) {
         TranspositionTable::TTEntry entry = tt.getTT(h);
         unsigned long long newH;
+
+        if (tt.getPositionCount(h) >= 3) {
+            return 0;
+        }
 
         if (entry.depth >= depthLeft) {
 
@@ -243,13 +254,15 @@ namespace ChessGame {
         }
         std::vector<Move> captures = chessBoard.getCaptureMoves();
         auto comp = [&](Move& a, Move& b) {
-            return a.getCaptureScore() > b.getCaptureScore();
+            return (a.isCapture() && seeCapture(a, chessBoard) <= 0 ? 15000 : 0) >
+                (b.isCapture() && seeCapture(b, chessBoard) <= 0 ? 15000 : 0);
             };
         std::sort(captures.begin(), captures.end(), comp);
 
         for (auto& move : captures) {
             chessBoard.push(move);
             newH = tt.updateHash(move, true, chessBoard, h);
+            tt.incrementCount(newH);
             const ChessPiece& capturedPiece = move.getCapturedPiece();
             auto [r1, c1] = move.getInitialSquare();
             auto [r2, c2] = move.getEndSquare();
@@ -264,6 +277,7 @@ namespace ChessGame {
             auto score = quiescenceMax(chessBoard, alpha, beta, depthLeft - 1, newH, tt, runningScore);
             runningScore += captureValue;
             runningScore += initialValue;
+            tt.decrementCount(newH);
             newH = tt.updateHash(move, false, chessBoard, newH);
             chessBoard.unmakeMove(move);
 

@@ -1,4 +1,3 @@
-#pragma once
 #ifndef ChessGame_Knight_h
 #define ChessGame_Knight_h
 

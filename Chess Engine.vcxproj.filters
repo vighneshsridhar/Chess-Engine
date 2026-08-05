@@ -75,6 +75,9 @@
     <ClCompile Include="src\Button.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Position.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="x64\Debug\Chess Engine.exe.recipe" />
@@ -88,6 +91,9 @@
     <None Include="x64\Debug\sfml-system-d-3.dll" />
     <None Include="x64\Debug\sfml-window-3.dll" />
     <None Include="x64\Debug\sfml-window-d-3.dll" />
+    <None Include=".gitattributes" />
+    <None Include=".gitignore" />
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="x64\Debug\Chess Engine.log" />
@@ -130,6 +136,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="Assets\BlackKing.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\cursor.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
@@ -191,5 +200,11 @@
     <ClInclude Include="src\Button.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Position.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Assets\arial.ttf" />
   </ItemGroup>
 </Project>

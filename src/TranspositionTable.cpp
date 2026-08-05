@@ -39,8 +39,10 @@ namespace ChessGame {
 			castlingRights.pop();
 			enPassantFiles.pop();
 		}
-		int s1 = move.getInitialSquare().first * 8 + move.getInitialSquare().second;
-		int s2 = move.getEndSquare().first * 8 + move.getEndSquare().second;
+		auto [r1, c1] = move.getInitialSquare();
+		auto [r2, c2] = move.getEndSquare();
+		int s1 = r1 * 8 + c1;
+		int s2 = r2 * 8 + c2;
 		const ChessPiece& piece = move.getAttacker();
 		const ChessPiece& capturedPiece = move.getCapturedPiece();
 		int t1 = static_cast<int>(piece.getPieceType()) - 1;
@@ -60,9 +62,23 @@ namespace ChessGame {
 			s2 = capturedPiece.getCoordinates().first * 8 + capturedPiece.getCoordinates().second;
 			h ^= hashTable[s2][t2];
 		}
+		h ^= hashTable[0][12];
+		
+		auto [kingSide, queenSide] = move.isCastling();
+		t1 = piece.getColor() == PieceColor::WHITE ? 3 : 9;
 
-		if (!chessBoard.whiteTurn()) {
-			h ^= hashTable[0][12];
+		if (kingSide) {
+			s1 = r1 * 8 + 7;
+			s2 = r1 * 8 + 5;
+			h ^= hashTable[s1][t1];
+			h ^= hashTable[s2][t1];
+		}
+
+		if (queenSide) {
+			s1 = r1 * 8;
+			s2 = r1 * 8 + 3;
+			h ^= hashTable[s1][t1];
+			h ^= hashTable[s2][t1];
 		}
 		auto [whiteKingSide, whiteQueenSide] = chessBoard.castlingRights(PieceColor::WHITE);
 		auto [blackKingSide, blackQueenSide] = chessBoard.castlingRights(PieceColor::BLACK);
@@ -118,6 +134,8 @@ namespace ChessGame {
 				h ^= hashTable[s][t];
 			}
 		}
+		h = 0;
+		count[h] += 1;
 
 		return h;
 	}
@@ -135,5 +153,23 @@ namespace ChessGame {
 	void TranspositionTable::updateTT(unsigned long long h, TranspositionTable::TTEntry& entry) {
 		tt[h] = entry;
 		return;
+	}
+
+	void TranspositionTable::incrementCount(unsigned long long h) {
+		count[h] += 1;
+		return;
+	}
+
+	void TranspositionTable::decrementCount(unsigned long long h) {
+		count[h] -= 1;
+		return;
+	}
+
+	int TranspositionTable::getPositionCount(unsigned long long h) {
+		if (count.find(h) != count.end()) {
+			return count[h];
+		}
+
+		return 0;
 	}
 }

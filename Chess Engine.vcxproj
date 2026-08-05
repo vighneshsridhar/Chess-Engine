@@ -168,6 +168,7 @@
     <ClCompile Include="src\Pawn.cpp" />
     <ClCompile Include="src\PGN.cpp" />
     <ClCompile Include="src\PlayChess.cpp" />
+    <ClCompile Include="src\Position.cpp" />
     <ClCompile Include="src\PromotionClicker.cpp" />
     <ClCompile Include="src\Queen.cpp" />
     <ClCompile Include="src\Rook.cpp" />
@@ -175,6 +176,9 @@
     <ClCompile Include="src\TranspositionTable.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".gitattributes" />
+    <None Include=".gitignore" />
+    <None Include="README.md" />
     <None Include="x64\Debug\Chess Engine.exe.recipe" />
     <None Include="x64\Debug\sfml-audio-3.dll" />
     <None Include="x64\Debug\sfml-audio-d-3.dll" />
@@ -197,6 +201,7 @@
     <Image Include="Assets\BlackPawn.png" />
     <Image Include="Assets\BlackQueen.png" />
     <Image Include="Assets\BlackRook.png" />
+    <Image Include="Assets\cursor.png" />
     <Image Include="Assets\WhiteBishop.png" />
     <Image Include="Assets\WhiteKing.png" />
     <Image Include="Assets\WhiteKnight.png" />
@@ -220,11 +225,15 @@
     <ClInclude Include="src\Pawn.h" />
     <ClInclude Include="src\PGN.h" />
     <ClInclude Include="src\PlayChess.h" />
+    <ClInclude Include="src\Position.h" />
     <ClInclude Include="src\PromotionClicker.h" />
     <ClInclude Include="src\Queen.h" />
     <ClInclude Include="src\Rook.h" />
     <ClInclude Include="src\TextureManager.h" />
     <ClInclude Include="src\TranspositionTable.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Assets\arial.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -25,6 +25,7 @@ namespace ChessGame {
         enPassantFiles.push(-1);
         int x = -1;
         int y = -1;
+        float squareSize = 100.f;
 
         ChessGame::ChessPiece empty(PieceType::EMPTY, PieceColor::NONE, x, y);
         ChessGame::ChessPiece whitePawn(PieceType::PAWN, PieceColor::WHITE, x, y);
@@ -56,7 +57,7 @@ namespace ChessGame {
 
             for (int c = 0; c < boardSize; c++) {
                 b[r][c].setCoordinates(r, c);
-                b[r][c].setPosition(Functions::convertToPosition(r, c));
+                b[r][c].setPosition(Functions::convertToPosition(r, c, squareSize));
             }
         }
     };
@@ -354,11 +355,11 @@ namespace ChessGame {
         ChessPiece& x = b[k][7];
         ChessPiece& y = b[k][0];
 
-        if (!x.pieceHasMoved()) {
+        if (x.getPieceType() == PieceType::ROOK && !x.pieceHasMoved()) {
             kingSide = true;
         }
 
-        if (!y.pieceHasMoved()) {
+        if (y.getPieceType() == PieceType::ROOK && !y.pieceHasMoved()) {
             queenSide = true;
         }
 
